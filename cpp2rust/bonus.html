@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>C++ to Rust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="remark.css">
+  </head>
+  <body>
+    <textarea id="source">
+
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+
+# Bonus Level
+
+What? there's still time!
+
+---
+layout: false
+
+# C++ in games.red[*]
+
+* Need Fine grained control over memory allocation, alignment
+* Avoid deep object heirarchies
+* Focus on data and data transformation
+* Avoid runtime polymorphism
+* No exceptions
+* Increasingly parallel
+* Immutability important
+* Clear ownership and lifetime important
+
+.footnote[.red[*] some are trends and some are personal preferences]
+
+???
+
+* No exceptions
+  * compilers on some platforms didn't support them
+  * lots of exception unsafe code
+  * restricts optimisations
+* Move semantics and unique_ptr with C++11 help with lifetime and ownership
+* Const all of the things
+
+---
+
+# Rust ticks most boxes
+
+* Clear ownership and lifetime of data is a language feature
+* Move built-in to language
+* No exceptions
+* Compile time polymorphism
+* Data (struct) separate from code (impl)
+* Immutable by default
+* Good safety guarantees for concurrency
+
+On the down side
+* Lacking fine grained control over allocation in std library
+
+???
+
+* Jealous about immubtable
+* Security not a big issue for many games
+
+---
+
+# Developer tools
+
+* No fancy IDE
+* rust.vim
+* println!
+* log library
+* rust-gdb
+* apitrace for GL
+
+---
+template: inverse
+
+# Demo time!
+
+???
+
+* Spinny cube
+* SSAO?
+
+    </textarea>
+    <script src="remark.min.js"></script>
+    <script>
+      var slideshow = remark.create({
+        ratio: '4:3',
+        highlightStyle: 'github',
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>C++ to Rust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="remark.css">
+  </head>
+  <body>
+    <textarea id="source">
+
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+
+# From C++ to Rust
+
+Beyond the Borrow Checker
+
+---
+layout: false
+
+# Some background
+
+* 10 years of C++ in games industry
+* PS2, PS3, Xbox360, Wii, PC
+* Many CPU/GPU and memory constrained systems
+* C/C++ used in games for
+ * CPU Performance
+ * Manual memory management
+ * Close to hardware
+ * Legacy
+* C++ is fun but has many pitfalls
+
+.footnote[.red[*] Press 'P' for slide notes]
+
+???
+
+* How many C or C++ programmers in the audience?
+* Won't cover Hello World level stuff
+* Won't talk about borrow checker, it's been covered a lot already
+* Feel free to ask questions as we go.
+
+---
+class: center, middle
+
+![Rust](rust-logo-256x256-blk.png)
+
+???
+* Been dabbling in Rust for about a year
+* Documentation has got a lot better over this time!
+* Interested in Rust because it's could be a viable C++ replacement
+* Wrote some sorting algorithms, wanted to write a more complete program
+* Want to learn more Rust
+
+---
+class: center, middle
+
+![+](superbible6.png)
+
+???
+
+* Want to learn more OpenGL
+* Was reading the OpenGL Superbible at the time so...
+
+---
+template: inverse
+
+# SuperBible in Rust
+
+---
+
+# SuperBible samples
+
+* Simple application framework and many example applications
+* Simple math library
+* Object class for loading and rendering meshes
+* Texture class for loading and rendering images
+* GLSL shader compilation
+* Uses GLFW for windowing and input
+
+???
+
+* Non exhaustive list of Rust things to know for porting
+* Going to skim a lot quickly to give overview
+* Will show a lot of code, but more interested in introducing concepts
+
+---
+
+# Application framework
+
+Defines an application interface class which samples derive from.
+
+```cpp
+class application {
+  APPINFO info;
+  static application * app;
+public:
+  virtual void run(application* the_app) { /* default impl */ }
+  virtual void init() { /* default impl */ }
+  virtual void startup() {}
+  virtual void render(double currentTime) {}
+  virtual void shutdown() {}
+  virtual void onResize(int w, int h) { /* default impl */ }
+  virtual void onKey(int key, int action) {}
+};
+```
+
+Main entry point instantiates sample and calls run.
+
+```cpp
+int main(int argc, const char ** argv) {
+    sample_app app;
+    app->run(&app);
+}
+```
+
+???
+
+* APPINFO is initialisation struct setup by virtual init
+* Static app is used for event callbacks from GLFW.
+* Virtual run is main loop, calls virtual startup, shutdown, render etc
+* Run doesn't really need to be a virtual member, could be static
+* Each sample inherits from this, overrides startup, render and shutdown
+
+---
+
+# Application framework
+
+How to do this in Rust? Create a trait.
+
+```rust
+pub trait App {
+    fn get_app_info(&self) -> &AppInfo;
+    fn startup(&mut self) {}
+    fn update(&mut self, _: f64) {}
+    fn render(&self, _: f64) {}
+    fn shutdown(&mut self) {}
+    fn on_resize(&mut self, _: isize, _: isize) {}
+    fn on_key(&mut self, _: Key, _: Action) {}
+}
+```
+
+The `run` function takes a parameter which implements the App trait.
+
+```rust
+pub fn run<T: App>(app: &mut T) { /* default impl */ }
+```
+
+---
+
+# Application sample
+
+Each sample provides a struct which implements the `App` trait.
+
+```rust
+extern crate sb6;
+
+struct SampleApp { info: sb6::AppInfo }
+
+impl SampleApp {
+  fn new(init: sb6::AppInfo) -> SampleApp { /* impl */ }
+}
+
+impl sb6::App for SampleApp {
+    fn get_app_info(&self) -> &sb6::AppInfo { &self.info }
+    fn startup(&mut self) { /* impl */ }
+    fn render(&self, _: f64) { /* impl */ }
+    fn shutdown(&mut self) { /* impl */ }
+}
+
+fn main() {
+    let mut init = sb6::AppInfo::default();
+    init.title = "Hello Rust 1.0.0!";
+    let mut app = SampleApp::new(init);
+    sb6::run(&mut app);
+}
+```
+
+???
+
+* From C++ virtual to Rust trait
+* Kept same structure
+* A bit of boilerplate, would be good to get rid of App::get_app_info()
+* Don't need virtual, compile time polymorphism for the win
+* Code and data separate! Struct and Trait
+* Traits are awesome
+
+---
+
+# C++ file loading
+
+This is an abridged snippet of model loading code.
+
+```cpp
+FILE * infile = fopen(filename, "rb");
+
+fseek(infile, 0, SEEK_END);
+size_t filesize = ftell(infile);
+fseek(infile, 0, SEEK_SET);
+
+char * data = new char[filesize];
+fread(data, filesize, 1, infile);
+
+char * ptr = data;
+SB6M_HEADER * header = (SB6M_HEADER *)ptr;
+ptr += header->size;
+
+for (unsigned int i = 0; i < header->num_chunks; i++) {
+   SB6M_CHUNK_HEADER * chunk = (SB6M_CHUNK_HEADER *)ptr;
+   ptr += chunk->size;
+   switch (chunk->chunk_type) { /* process chunk record */ }
+}
+
+delete [] data;
+fclose(infile);
+```
+
+???
+
+* OK, it's practically C
+* No error handling in this example
+* Casting binary data into C structs
+* Pointer arithmetic
+* Manual clean up
+* Could use RAII in C++
+
+---
+
+# Error handling
+
+* No exceptions
+* Errors are handled with `Result` type
+* `Result<T, E>` enum used for returning and propogating errors
+  ```rust
+  enum Result<T, E> {
+       Ok(T),
+       Err(E)
+  }
+  ```
+* Match on `Result` to handle errors
+  ```rust
+  match File::create("example.txt") {
+       Ok(_) => println!("Ok!"),
+       Err(e) => println!("Err! {:?}", e),
+  }
+  ```
+
+???
+
+* T is the return type and E is the error type
+
+---
+
+# Error handling
+
+* Use the `try!` macro to propogate the error
+  ```rust
+  fn create_file(filename: &str) -> io::Result<File> {
+       let mut file = try!(File::create("example.txt"));
+       file
+  }
+  ```
+* Or just `unwrap` (`panic!` on error)
+  ```rust
+  let mut file = File::create("example.txt").unwrap();
+  ```
+
+???
+
+* Can use try! instead of writing the same match statement everywhere
+
+---
+
+# Rust file loading
+
+```rust
+let mut file = try!(fs::File::open(&Path::new(filename)));
+
+let mut bytes = Vec::new();
+try!(file.read_to_end(&mut bytes));
+
+let mut reader = BufferReader::new(bytes);
+let header = try!(reader.pop_value::<MeshHeader>());
+
+for _ in 0..header.num_chunks {
+   let chunk_header = try!(reader.pop_value::<ChunkHeader>());
+   match chunk_header.chunk_type { /* process chunk record */ }
+}
+```
+
+???
+
+* Will talk about the pop_value thing shortly
+
+---
+
+# Unsafe and casting
+
+Wrote BufferReader to check bounds and handle ugly pointer arithmetic and casts.
+
+```rust
+pub struct BufferReader {
+   buf: Vec<u8>,
+   pos: usize
+}
+```
+
+```rust
+impl BufferReader {
+   pub fn pop_value<'a, T>(&mut self) -> Result<&'a T, io::Error> {
+      let pop_end = self.pos + mem::size_of::<T>();
+      if pop_end > self.buf.len() {
+         return Err(io::Error::new(
+            io::ErrorKind::InvalidInput, "Buffer overrun"))
+      }
+      let ptr = unsafe {
+         self.buf.as_ptr().offset(self.pos as isize) };
+      self.pos = pop_end;
+      Ok(unsafe { &*(ptr as *const T) })
+   }
+}
+```
+
+???
+
+* You can see why I wrote a wrapper!
+* Don't worry about error handing so much, looking at offset and casting for C people
+
+---
+
+# Unsafe and FFI
+
+Foreign Function Interface for calling C functions.
+
+```rust
+struct Star {
+  position: vmath::Vec3,
+  color: vmath::Vec3
+}
+```
+
+```rust
+let mut stars = unsafe {
+  slice::from_raw_parts_mut(
+    gl::MapBufferRange(gl::ARRAY_BUFFER, 0,
+       (NUM_STARS * mem::size_of::<Star>()) as GLsizeiptr,
+        gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT)
+       as *mut Star, NUM_STARS)
+};
+
+for star in &mut stars[..] { /* update stars */ }
+```
+
+This is the ugliest example in my code, sorry!
+
+???
+
+* This is a particularly curly example
+* Cast's a void pointer returned by MapBuffer back pointer to Star
+* Can then create a Rust slice type from pointer and length
+* Now have a safe array of stuff to iterate over
+
+---
+
+# Other uses for unsafe
+
+* Low level algorithms and data structures
+* Sometimes need mutable aliases
+* Sometimes for performance
+
+???
+
+* E.g. double linked lists (just say no)
+* Vec sort does insertion sort mem copy for performance
+
+---
+
+# Cargo
+
+* Builds your code
+* Downloads your dependencies
+* Builds your dependencies (not just Rust)
+* Runs tests and benchmarks
+* Can build and execute Rust code as part of build
+* Packages on https://crates.io/
+
+???
+
+* Being able to build and run arbitrary rust code makes this quite extensible
+
+---
+
+# Cargo
+
+`Cargo.toml`
+
+```ini
+[package]
+name = "sb6"
+version = "0.0.1"
+authors = ["Cameron Hart <cam@bitshifter.net.nz>"]
+description = "OpenGL Super Bible 6 Application Framework"
+
+[dependencies]
+gl = "*"
+log = "*"
+num = "*"
+rand = "*"
+
+[dependencies.glfw]
+git = "https://github.com/bitshifter/glfw-rs.git"
+```
+
+To build just run `cargo build`
+
+???
+
+* Stuff gets built to target/debug by default
+* I still use Makefile for data
+
+---
+class: center, middle
+
+![SSAO sample](ssao.png)
+
+???
+
+* After all of that, this is the result (one of them)
+* SSAO = screen space ambient occlusion
+
+---
+
+# In conclusion
+
+* I learned a lot about Rust
+* No so much about OpenGL.red[*]
+* Good background for future projects
+* Code at https://github.com/bitshifter/sb6rust
+* Rust is fun!
+
+.footnote[.red[*] Vuklan is the future anyway]
+
+---
+template: inverse
+
+# drop(mic);
+
+???
+
+* Not valid Rust code
+* I'm so sorry
+* So not sorry
+
+---
+
+# Useful links
+
+* SB6 Rust on github - https://github.com/bitshifter/sb6rust
+* SB6 C++ sample code - http://www.openglsuperbible.com/example-code/
+* The Rust Book - http://doc.rust-lang.org/stable/book/
+* Rust by example - http://rustbyexample.com/
+* Traits in Rust - http://blog.rust-lang.org/2015/05/11/traits.html
+* Error handling in Rust - http://blog.burntsushi.net/rust-error-handling/
+* Cargo, Rust's package manager - http://doc.crates.io/
+* OpenGL bindings - https://crates.io/crates/gl
+* GLFW3 bindings - https://crates.io/crates/glfw
+
+    </textarea>
+    <script src="remark.min.js"></script>
+    <script>
+      var slideshow = remark.create({
+        ratio: '4:3',
+        highlightStyle: 'github',
+      });
+    </script>
+  </body>
+</html>
