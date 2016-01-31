@@ -13,19 +13,18 @@ layout: true
 class: center, middle, inverse
 ---
 
-# Debugging & Rust
+# Rust, debugging & rr
 
 ---
 layout: false
 
-# Debugging
+# Overview
 
 * My debugging life
 * First bug hunting steps
-  * Printing
-  * Logging
 * Getting started with a debugger
-* Rreverrse debugging future
+* Bugs from hell
+* The future of debugging the past
 
 .footnote[.red[*] Press 'P' for slide notes]
 
@@ -38,7 +37,15 @@ Huon's "Rreverse Debugging" blog post was the inspiration for this talk:
 
 ---
 
-# Work life
+template: inverse
+
+# My debugging life
+
+???
+
+---
+
+# At work
 
 * I spend a lot of time debugging
 * Large C++ project (2.5M loc)
@@ -46,7 +53,7 @@ Huon's "Rreverse Debugging" blog post was the inspiration for this talk:
 * Lots of unfamiliar (to me) code
 * Lots of weird bugs reported by QA and customers
 * Crash dumps to inspect
-* At work I use debuggers daily
+* At work I use debuggers most days
 
 ???
 
@@ -74,7 +81,8 @@ They're certainly rarer that in my own C code.
 ---
 template: inverse
 
-# So you have a bug in your Rust
+# So your Rust has a bug
+first steps
 
 ???
 
@@ -89,10 +97,14 @@ template: inverse
   * Dynamic dispatch
   * Branching
 
+???
+
+Pretty obvious yet sometimes seemingly overlooked
+
 ---
 # println!
 
-Implement Debug trait on your types
+Implement `Debug` trait on your types
 
 ```rust
 // debug.rs
@@ -163,8 +175,6 @@ thread '<main>' panicked at 'This function never returns!', panic.rs:2
 
 # RUST_BACKTRACE=1
 
-Backtraces aren't enabled by default
-
 ```bash
 $ RUST_BACKTRACE=1 ./panic
 thread '<main>' panicked at 'This function never returns!', panic.rs:2
@@ -190,9 +200,17 @@ stack backtrace:
 
 ???
 
+Backtraces not enabled by default
 Compile with rustc -g for source line numbers. 
 Cargo build defaults to debug profile with -g by default
 Discussion about if this should be on by default in cargo test https://internals.rust-lang.org/t/cargo-test-and-backtraces/2518/9
+
+---
+template: inverse
+
+# Debugging time
+
+???
 
 ---
 
@@ -276,8 +294,6 @@ $ ./pretty
 
 # GDB
 
-GDB doesn't know about Rust
-
 ```bash
 $ gdb -q ./pretty
 Reading symbols from ./pretty...done.
@@ -303,10 +319,10 @@ $1 = {index = 0, color = {
     length = 3}}
 ```
 
-OK, what does that all mean!?
-
 ???
 
+OK, what does that all mean!?
+GDB isn't Rust aware
 Rust appears to compile gdb scripts into the elf!
 
 ---
@@ -333,11 +349,43 @@ That's better!
 
 ???
 
+rust-gdb sets up some module paths for Rust's gdb pretty printing python scripts.
 There are some limitations though.
 There's a similar wrapper for lldb
 
 ---
+template: inverse
 
+# Bugs from hell
+
+---
+
+# A day in the life
+
+A recent bug at work:
+* Main thread generates draw commands
+* Render thread processes draw commands
+* A particular draw command executes callbacks to run 3rd party code
+* A few crash reports with differents crashes inside callback
+* Looks like callback is pointing to deleted data
+  * Data race - callback data didn't live long enough
+* OK, but when was it deleted? Some time ago...
+
+Note: this is C++, one of the reasons I'm excited about Rust is I hope to see the back of these kinds of bugs!
+
+---
+
+# Wouldn't it be great...
+
+* If you could run the program in reverse
+* And trace back to where things went wrong
+
+---
+template: inverse
+
+# rr
+
+---
 template: inverse
 
 # Questions
