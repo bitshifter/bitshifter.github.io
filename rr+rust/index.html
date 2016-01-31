@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Debugging Rust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="remark.css">
+  </head>
+  <body>
+    <textarea id="source">
+
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+
+# Debugging & Rust
+
+---
+layout: false
+
+# Debugging
+
+* My debugging life
+* First bug hunting steps
+  * Printing
+  * Logging
+* Getting started with a debugger
+* Rreverrse debugging future
+
+.footnote[.red[*] Press 'P' for slide notes]
+
+???
+
+Who here uses debugger regularly?
+What languages are people mostly using?
+Huon's "Rreverse Debugging" blog post was the inspiration for this talk:
+* https://huonw.github.io/blog/2015/10/rreverse-debugging/
+
+---
+
+# Work life
+
+* I spend a lot of time debugging
+* Large C++ project (2.5M loc)
+* Many developers involved (>100)
+* Lots of unfamiliar (to me) code
+* Lots of weird bugs reported by QA and customers
+* Crash dumps to inspect
+* At work I use debuggers daily
+
+???
+
+Primarily MSVC debugger
+Always on the lookout for better tools
+
+---
+
+# At home
+
+* Small projects, mostly Rust, some C and C++ (1000s loc)
+* Mostly just my code
+* Only run by me
+* Don't need debugger often
+* Lifetime issues and race conditions less frequent in Rust
+* Debugger still useful with algorithmic bugs
+* And bugs when calling C or other unsafe code
+
+???
+
+I'm not going to say there won't be dangling pointers and race conditions in Rust.
+Unsafe is necessary sometimes, also, I've not worked on a large project.
+They're certainly rarer that in my own C code.
+
+---
+template: inverse
+
+# So you have a bug in your Rust
+
+???
+
+---
+
+# Read the code
+
+* Always a good start!
+* Not always easy to understand:
+  * Too much code
+  * Unfamiliar code
+  * Dynamic dispatch
+  * Branching
+
+---
+# println!
+
+Implement Debug trait on your types
+
+```rust
+// debug.rs
+#[derive(Debug)]
+struct Foo {
+    x: i32, y: i32
+}
+
+fn main() {
+    let foo = Foo { x: 1, y: 2 };
+    // {:?} formatter will use debug trait
+    println!("{:?}", foo);
+}
+```
+
+```bash
+$ rustc -g debug.rs && ./debug
+Foo { x: 1, y: 2 }
+```
+
+---
+
+# Scaling up
+
+* `println!` debugging doesn't scale
+* Compile time slows iteration
+* With many developers:
+  * Starts to clutter code
+  * Starts to impact performance
+  * Too much noise 
+
+---
+
+# Logging
+
+* Log crate on [crates.io](https://crates.io/crates/log/)
+* Now in Rust Nursery
+* Provides logging macros `error!`, `warn!`, `info!`, `debug!` and `trace!`
+* Can filter out noise
+* Too much logging:
+  * Code clutter
+  * Performance impact?
+
+---
+
+# panic! and assert!
+
+* `panic!` and `assert!` for when unexpected conditions happen
+* std libary functions may panic
+
+```rust
+// panic.rs
+fn diverges() -> ! {
+  panic!("This function never returns!");
+}
+
+fn main() {
+  diverges()
+}
+```
+
+```bash
+$ rustc -g panic.rs && ./panic
+thread '<main>' panicked at 'This function never returns!', panic.rs:2
+```
+
+---
+
+# RUST_BACKTRACE=1
+
+Backtraces aren't enabled by default
+
+```bash
+$ RUST_BACKTRACE=1 ./panic
+thread '<main>' panicked at 'This function never returns!', panic.rs:2
+stack backtrace:
+   1:     0x5610c0a95f10 - sys::backtrace::tracing::imp::write::haa19c02b4de52f3bG0t
+   2:     0x5610c0a98045 - panicking::log_panic::_<closure>::closure.41218
+   3:     0x5610c0a97ac0 - panicking::log_panic::h527fe484e9de8fe1W7x
+   4:     0x5610c0a92353 - sys_common::unwind::begin_unwind_inner::h51f64b1a34c60827fTs
+   5:     0x5610c0a917b7 - sys_common::unwind::begin_unwind::begin_unwind::h13337723494083387990
+                        at ../src/libstd/sys/common/unwind/mod.rs:237
+   6:     0x5610c0a91739 - diverges::hef6e339f7749a66feaa
+                        at /home/cam/Projects/rr+rust/<std macros>:3
+   7:     0x5610c0a918e8 - main::h9f863a2aaf425a0fBaa
+                        at /home/cam/Projects/rr+rust/panic.rs:5
+   8:     0x5610c0a97864 - sys_common::unwind::try::try_fn::h11901883998771707766
+   9:     0x5610c0a953b8 - __rust_try
+  10:     0x5610c0a97506 - rt::lang_start::hc150f651dd2af18b44x
+  11:     0x5610c0a91929 - main
+  12:     0x7fd1e58d6a3f - __libc_start_main
+  13:     0x5610c0a915f8 - _start
+  14:                0x0 - <unknown>
+```
+
+???
+
+Compile with rustc -g for source line numbers. 
+Cargo build defaults to debug profile with -g by default
+Discussion about if this should be on by default in cargo test https://internals.rust-lang.org/t/cargo-test-and-backtraces/2518/9
+
+---
+
+# Symbols
+
+* Debuggers need symbols
+* Enable with `rustc -g`
+* Or `cargo` profiles
+
+```ini
+# The development profile, used for `cargo build`
+[profile.dev]
+opt-level = 0  # Controls the --opt-level the compiler builds with
+debug = true   # Controls whether the compiler passes `-g`
+
+# The release profile, used for `cargo build --release`
+[profile.release]
+opt-level = 3
+debug = false
+```
+
+???
+
+My work projects always generate symbols for release - crashes happen in release!
+
+---
+
+# rust-gdb and rust-lldb
+
+* GDB and LLDB aren't Rust aware
+* Rust provides `rust-gdb` and `rust-lldb` wrappers
+* These add pretty printing for some Rust types
+
+---
+
+# Pretty printing
+
+A trivial Rust program
+
+```rust
+// pretty.rs
+const COLORS: [&'static str;7] =
+  ["red", "yellow", "pink", "green", "purple", "orange", "blue"];
+
+struct Label {
+    index: usize,
+    color: &'static str
+}
+
+fn main() {
+    // create a Vec of Label
+    let labels: Vec<Label> = (0..10).map(|i| {
+        Label { index: i, color: COLORS[i % COLORS.len()] }
+      }).collect();
+    // print them
+    for label in labels {
+        println!("{}: {}", label.index, label.color);
+    }
+}
+```
+
+---
+
+# Pretty output
+
+```bash
+$ ./pretty 
+0: red
+1: yellow
+2: pink
+3: green
+4: purple
+5: orange
+6: blue
+7: red
+8: yellow
+9: pink
+```
+
+---
+
+# GDB
+
+GDB doesn't know about Rust
+
+```bash
+$ gdb -q ./pretty
+Reading symbols from ./pretty...done.
+warning: Missing auto-load script at offset 0 in section
+.debug_gdb_scripts of file /home/cam/pretty.
+Use `info auto-load python-scripts [REGEXP]' to list them.
+```
+
+Pay attention to that warning!
+
+```bash
+(gdb) b 14
+Breakpoint 1 at 0x4d1f: file pretty.rs, line 14.
+(gdb) r
+Starting program: /home/cam/pretty 
+
+Breakpoint 1, pretty::main () at pretty.rs:14
+14	        println!("{}: {}", label.index, label.color);
+(gdb) p label
+$1 = {index = 0, color = {
+    data_ptr = 0x55555559155c <str4488> 
+        "redyellowpinkgreenpurpleorangebluepretty.rs: \n", 
+    length = 3}}
+```
+
+OK, what does that all mean!?
+
+???
+
+Rust appears to compile gdb scripts into the elf!
+
+---
+
+# Rust GDB
+
+This time, use the `rust-gdb` wrapper
+
+```bash
+$ rust-gdb -q ./pretty
+Reading symbols from ./pretty...done.
+(gdb) b 14
+Breakpoint 1 at 0x4d1f: file pretty.rs, line 14.
+(gdb) r
+Starting program: /home/cam/pretty 
+
+Breakpoint 1, pretty::main () at pretty.rs:14
+14	        println!("{}: {}", label.index, label.color);
+(gdb) p label
+$1 = Label = {index = 0, color = "red"}
+```
+
+That's better!
+
+???
+
+There are some limitations though.
+There's a similar wrapper for lldb
+
+---
+
+template: inverse
+
+# Questions
+
+???
+
+---
+
+# References
+
+* [Huon's rreverrse debugging blog post](https://huonw.github.io/blog/2015/10/rreverse-debugging/)
+* [rr project site](http://rr-project.org/)
+* [A Firefox developer on debugging with rr](http://fitzgeraldnick.com/weblog/64/)
+* [How rr works presentation](https://mozilla.github.io/rr/rr.html)
+
+
+    </textarea>
+    <script src="remark.min.js"></script>
+    <script>
+      var slideshow = remark.create({
+        ratio: '4:3',
+        highlightStyle: 'github',
+      });
+    </script>
+  </body>
+</html>

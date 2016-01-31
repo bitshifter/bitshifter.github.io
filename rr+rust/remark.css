@@ -1,0 +1,110 @@
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Fira Sans'), url("FiraSans-Regular.woff") format('woff');
+}
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Fira Sans Medium'), url("FiraSans-Medium.woff") format('woff');
+}
+@font-face {
+  font-family: 'Source Serif Pro';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Source Serif Pro'), url("SourceSerifPro-Regular.woff") format('woff');
+}
+@font-face {
+  font-family: 'Source Serif Pro';
+  font-style: italic;
+  font-weight: 400;
+  src: url("Heuristica-Italic.woff") format('woff');
+}
+@font-face {
+  font-family: 'Source Serif Pro';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Source Serif Pro Bold'), url("SourceSerifPro-Bold.woff") format('woff');
+}
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Source Code Pro'), url("SourceCodePro-Regular.woff") format('woff');
+}
+body {
+  font-family: "Source Serif Pro", Georgia, Times, "Times New Roman", serif;
+  -webkit-font-feature-settings: "kern", "liga";
+  -moz-font-feature-settings: "kern", "liga";
+  font-feature-settings: "kern", "liga";
+}
+h1, h2, h3, h4, h5, h6, nav, #versioninfo {
+  font-family: "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  line-height: 1.1;
+}
+h1, h2, h3 {
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+h1 {
+  margin-bottom: 20px;
+}
+h4, h5, h6 {
+  margin-top: 12px;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+}
+h5, h6 {
+  text-decoration: underline;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 500;
+  padding: .1em .4em;
+  border-bottom: 2px solid #ddd;
+}
+h2 {
+  font-size: 26px;
+  padding: .2em .5em;
+  border-bottom: 1px solid #ddd;
+}
+h3 {
+  font-size: 24px;
+  padding: .2em .7em;
+  border-bottom: 1px solid #DDE8FC;
+}
+h4 {
+  font-size: 22px;
+}
+h5 {
+  font-size: 20px;
+}
+h6 {
+  font-size: 18px;
+}
+.red { color: #fa0000; }
+.footnote {
+  position: absolute;
+  bottom: 3em;
+}
+/*.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }*/
+.inverse {
+  background: #272822;
+  color: #777872;
+  text-shadow: 0 0 20px #333;
+}
+.inverse h1, .inverse h2 {
+  color: #f3f3f3;
+  line-height: 0.8em;
+}
+
+/* Slide-specific styling */
+#slide-inverse .footnote {
+  bottom: 12px;
+  left: 20px;
+}
