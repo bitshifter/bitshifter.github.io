@@ -187,9 +187,9 @@ stack backtrace:
    5:     0x5610c0a917b7 - sys_common::unwind::begin_unwind::begin_unwind::h13337723494083387990
                         at ../src/libstd/sys/common/unwind/mod.rs:237
    6:     0x5610c0a91739 - diverges::hef6e339f7749a66feaa
-                        at /home/cam/Projects/rr+rust/<std macros>:3
+                        at /home/cam/<std macros>:3
    7:     0x5610c0a918e8 - main::h9f863a2aaf425a0fBaa
-                        at /home/cam/Projects/rr+rust/panic.rs:5
+                        at /home/cam/panic.rs:5
    8:     0x5610c0a97864 - sys_common::unwind::try::try_fn::h11901883998771707766
    9:     0x5610c0a953b8 - __rust_try
   10:     0x5610c0a97506 - rt::lang_start::hc150f651dd2af18b44x
@@ -430,6 +430,87 @@ This process is common for graphics debuggers like RenderDoc, but the scope is m
 ???
 
 See LCA talk and other rr internals talks for more detail
+
+---
+
+# Quick example
+
+```rust
+println!("Guess the number!");
+loop {
+    println!("Please input your guess.");
+    let guess = read_guess();
+    println!("You guessed: {}", guess);
+    match guess.cmp(&secret_number) {
+        Ordering::Less    => println!("Too small!"),
+        Ordering::Greater => println!("Too big!"),
+        Ordering::Equal   => {
+            println!("You win!");
+            break;
+        }
+    }
+}
+```
+
+```bash
+$ rr record ./guess
+rr: Saving the execution of `./guess' to trace directory `/home/cam/.rr/guess-0'.
+```
+
+---
+
+# Quick example
+
+```bash
+$ rr replay -d rust-gdb ~/.rr/guess-0
+
+(rr) c
+Continuing.
+Guess the number!
+Please input your guess.
+You guessed: 94
+Too big!
+Please input your guess.
+You guessed: 92
+Too small!
+Please input your guess.
+You guessed: 93
+You win!
+
+Program received signal SIGKILL, Killed.
+0x0000000070000002 in ?? ()
+```
+
+???
+
+Playback is deterministic, the numbers are always the same
+
+---
+
+# Quick example
+
+```bash
+(rr) b 28
+Breakpoint 1 at 0x55872d5a51eb: file guess.rs, line 28.
+(rr) rc
+Continuing.
+
+Breakpoint 1, guess::main () at guess.rs:28
+28	        match guess.cmp(&secret_number) {
+(rr) p guess
+$1 = 93
+(rr) rc
+Continuing.
+
+Breakpoint 1, guess::main () at guess.rs:28
+28	        match guess.cmp(&secret_number) {
+(rr) p guess
+$2 = 92
+```
+
+???
+
+Can step back and inspect earlier state
 
 ---
 template: inverse
