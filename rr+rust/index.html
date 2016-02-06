@@ -131,6 +131,7 @@ Foo { x: 1, y: 2 }
 
 * `println!` debugging doesn't scale
 * Compile time slows iteration
+* Time to trigger bug again slows iteration
 * With many developers:
   * Starts to clutter code
   * Starts to impact performance
@@ -360,30 +361,75 @@ template: inverse
 
 ---
 
-# A day in the life
+# The crime scene
 
-A recent bug at work:
+An example of a hard to trace bug:
 * Main thread generates draw commands
 * Render thread processes draw commands
 * A particular draw command executes callbacks to run 3rd party code
 * A few crash reports with differents crashes inside callback
 * Looks like callback is pointing to deleted data
   * Data race - callback data didn't live long enough
-* OK, but when was it deleted? Some time ago...
+* OK, but when was it deleted? Some time ago on a different thread...
 
 Note: this is C++, one of the reasons I'm excited about Rust is I hope to see the back of these kinds of bugs!
+
+???
+
+Bugs don't need to be quite so exotic for rr to be useful
 
 ---
 
 # Wouldn't it be great...
 
 * If you could run the program in reverse
-* And trace back to where things went wrong
+* And step back to the cause of a problem
 
 ---
 template: inverse
 
 # rr
+
+---
+
+# Reverse debugging
+
+* Record trace with rr
+* Playback trace in gdb
+* Stop at some problem point
+* Step backwards to see how it happened
+
+---
+
+# What is this magic?
+
+* Replay must be the same every time
+* Most code is deterministic
+* rr records the non-deterministic parts
+  * e.g. clock_gettime(), rtdsc, file read()
+* Replay emulates these calls by playing back recorded state
+
+???
+
+If you saw the talk at LCA2016 this was discussed in a lot more detail
+This process is common for graphics debuggers like RenderDoc, but the scope is much larger
+
+---
+
+# Limitations of rr
+
+* Only Linux on Intel supported
+* Requires Linux kernel > 3.4
+* Requires specific Intel CPU features (> Nahelem)
+* Unlikely to happen on Windows or Mac
+* Some syscalls not supported
+* No parallelism (not deterministic)
+* Doesn't like my GL projects :(
+
+
+???
+
+See LCA talk and other rr internals talks for more detail
 
 ---
 template: inverse
@@ -400,6 +446,7 @@ template: inverse
 * [rr project site](http://rr-project.org/)
 * [A Firefox developer on debugging with rr](http://fitzgeraldnick.com/weblog/64/)
 * [How rr works presentation](https://mozilla.github.io/rr/rr.html)
+* [Record and replay with rr LCA2016 talk](https://youtu.be/4hSIrjL7IR8)
 
 
     </textarea>
