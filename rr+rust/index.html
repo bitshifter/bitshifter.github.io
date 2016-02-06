@@ -13,85 +13,30 @@ layout: true
 class: center, middle, inverse
 ---
 
-# Rust, debugging & rr
+# Debugging & Rust
 
 ---
 layout: false
 
 # Overview
 
-* My debugging life
-* First bug hunting steps
-* Getting started with a debugger
-* Bugs from hell
-* The future of debugging the past
-
-.footnote[.red[*] Press 'P' for slide notes]
-
-???
-
-Who here uses debugger regularly?
-What languages are people mostly using?
-Huon's "Rreverse Debugging" blog post was the inspiration for this talk:
-* https://huonw.github.io/blog/2015/10/rreverse-debugging/
-
----
-
-template: inverse
-
-# My debugging life
-
-???
-
----
-
-# At work
-
-* I spend a lot of time debugging
-* Large C++ project (2.5M loc)
-* Many developers involved (>100)
-* Lots of unfamiliar (to me) code
-* Lots of weird bugs reported by QA and customers
-* Crash dumps to inspect
-* At work I use debuggers most days
-
-???
-
-Primarily MSVC debugger
-Always on the lookout for better tools
-
----
-
-# At home
-
-* Small projects, mostly Rust, some C and C++ (1000s loc)
-* Mostly just my code
-* Only run by me
-* Don't need debugger often
-* Lifetime issues and race conditions less frequent in Rust
-* Debugger still useful with algorithmic bugs
-* And bugs when calling C or other unsafe code
-
-???
-
-I'm not going to say there won't be dangling pointers and race conditions in Rust.
-Unsafe is necessary sometimes, also, I've not worked on a large project.
-They're certainly rarer that in my own C code.
+* Printing and logging
+* Panic and backtraces
+* Symbols and debuggers
+* Debugging in reverse
 
 ---
 template: inverse
 
-# So your Rust has a bug
-first steps
-
-???
+# First steps
 
 ---
 
 # Read the code
 
 * Always a good start!
-* Not always easy to understand:
+* Obvious? Easy to skip this step
+* Not always easy to understand code:
   * Too much code
   * Unfamiliar code
   * Dynamic dispatch
@@ -100,6 +45,7 @@ first steps
 ???
 
 Pretty obvious yet sometimes seemingly overlooked
+Overreliance on tools
 
 ---
 # println!
@@ -480,6 +426,8 @@ You win!
 Program received signal SIGKILL, Killed.
 0x0000000070000002 in ?? ()
 ```
+
+Note the `-d rust-gdb` to use the Rust gdb wrapper.
 
 ???
 
