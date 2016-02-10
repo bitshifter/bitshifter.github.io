@@ -58,17 +58,21 @@ Implement `Debug` trait on your types
 struct Foo {
     x: i32, y: i32
 }
-
 fn main() {
     let foo = Foo { x: 1, y: 2 };
-    // {:?} formatter will use debug trait
+    //println!("{}, foo); // needs core::fmt::Display trait
     println!("{:?}", foo);
+    println!("{:#?}", foo);
 }
 ```
 
 ```bash
 $ rustc -g debug.rs && ./debug
 Foo { x: 1, y: 2 }
+Foo {
+    x: 1,
+    y: 2
+}
 ```
 
 ---
@@ -370,7 +374,8 @@ This process is common for graphics debuggers like RenderDoc, but the scope is m
 * Unlikely to happen on Windows or Mac
 * Some syscalls not supported
 * No parallelism (not deterministic)
-* Doesn't like my GL projects :(
+* Didn't like my NVIDIA GPU drivers, Intel OK
+  * use `LIBGL_ALWAYS_SOFTWARE=1` for OpenGL applications
 
 
 ???
@@ -455,6 +460,8 @@ Breakpoint 1, guess::main () at guess.rs:28
 (rr) p guess
 $2 = 92
 ```
+
+Use reverse version of gdb commands; `rc`, `rn`, `rs`.
 
 ???
 
