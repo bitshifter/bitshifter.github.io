@@ -12,8 +12,13 @@ name: inverse
 layout: true
 class: center, middle, inverse
 ---
+background-image: url(bugs.jpg)
 
 # Debugging & Rust
+
+???
+
+Bug courtesy of Assasins Creed :)
 
 ---
 layout: false
@@ -27,27 +32,12 @@ layout: false
 
 ---
 template: inverse
+background-image: url(printing.jpg)
 
-# First steps
-
----
-
-# Read the code
-
-* Always a good start!
-* Obvious? Easy to skip this step
-* Not always easy to understand code:
-  * Too much code
-  * Unfamiliar code
-  * Dynamic dispatch
-  * Branching
-
-???
-
-Pretty obvious yet sometimes seemingly overlooked
-Overreliance on tools
+# Printing & Logging
 
 ---
+
 # println!
 
 Implement `Debug` trait on your types
@@ -98,6 +88,10 @@ Foo {
 * Too much logging:
   * Code clutter
   * Performance impact?
+
+---
+template: inverse
+background-image: url(dont-panic.jpg)
 
 ---
 
@@ -158,8 +152,9 @@ Discussion about if this should be on by default in cargo test https://internals
 
 ---
 template: inverse
+background-image: url(debugging.jpg)
 
-# Debugging time
+# Debugging
 
 ???
 
@@ -306,12 +301,13 @@ There's a similar wrapper for lldb
 
 ---
 template: inverse
+background-image: url(cctv.jpg)
 
-# Bugs from hell
+# Crash Scene Investigation
 
 ---
 
-# The crime scene
+# Some nasty crash
 
 An example of a hard to trace bug:
 * Main thread generates draw commands
@@ -336,13 +332,8 @@ Bugs don't need to be quite so exotic for rr to be useful
 * And step back to the cause of a problem
 
 ---
-template: inverse
 
-# rr
-
----
-
-# Reverse debugging
+# Introducing rr
 
 * Record trace with rr
 * Playback trace in gdb
@@ -469,8 +460,9 @@ Can step back and inspect earlier state
 
 ---
 template: inverse
+background-image: url(questions.jpg)
 
-# Questions
+# Questions?
 
 ???
 
