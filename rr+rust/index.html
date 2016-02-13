@@ -16,9 +16,8 @@ background-image: url(bugs.jpg)
 
 # Debugging & Rust
 
+.left[.footnote[[*] bug screenshot courtesy of Assasin's Creed]]
 ???
-
-Bug courtesy of Assasins Creed :)
 
 ---
 layout: false
@@ -300,16 +299,11 @@ There are some limitations though.
 There's a similar wrapper for lldb
 
 ---
-template: inverse
-background-image: url(cctv.jpg)
 
 # Crash Scene Investigation
 
----
-
-# Some nasty crash
-
 An example of a hard to trace bug:
+
 * Main thread generates draw commands
 * Render thread processes draw commands
 * A particular draw command executes callbacks to run 3rd party code
@@ -318,11 +312,17 @@ An example of a hard to trace bug:
   * Data race - callback data didn't live long enough
 * OK, but when was it deleted? Some time ago on a different thread...
 
-Note: this is C++, one of the reasons I'm excited about Rust is I hope to see the back of these kinds of bugs!
+Note: this example is from C++ project, one of the reasons I'm excited about Rust is I hope to see the back of these kinds of bugs!
 
 ???
 
 Bugs don't need to be quite so exotic for rr to be useful
+
+---
+template: inverse
+background-image: url(cctv.jpg)
+
+# Record & Replay
 
 ---
 
@@ -335,6 +335,7 @@ Bugs don't need to be quite so exotic for rr to be useful
 
 # Introducing rr
 
+* [rr-project.org](http://rr-project.org/)
 * Record trace with rr
 * Playback trace in gdb
 * Stop at some problem point
@@ -465,8 +466,6 @@ background-image: url(questions.jpg)
 # Questions?
 
 ???
-
----
 
 # References
 

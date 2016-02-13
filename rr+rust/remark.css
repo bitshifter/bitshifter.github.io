@@ -120,8 +120,3 @@ code {
   line-height: 0.8em;
 }
 
-/* Slide-specific styling */
-#slide-inverse .footnote {
-  bottom: 12px;
-  left: 20px;
-}
