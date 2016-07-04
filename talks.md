@@ -1,7 +1,6 @@
 ---
 layout: page
-title: Presentations
-permalink: /presentations/
+title: Talks
 ---
 
 I've given a couple of presentations at the Sydney Rust Meetup:
