@@ -1,10 +1,24 @@
-<html>
-<head>
-<title>HTMLing like it's 1993</title>
-</head>
-<body>
-  <h1>Slides</h1>
-  <p>Rust Sydney Meetup 1.0.0 Talk: <a href="cpp2rust/index.html">From C++ to Rust</a></p>
-  <p>Rust Sydney Meetup 8 Talk: <a href="rr+rust/index.html">Debugging, Rust & rr</a></p>
-</body>
-</html>
+---
+layout: default
+---
+
+<div class="home">
+
+  <h1 class="page-heading">Posts</h1>
+
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+
+        <h2>
+          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        </h2>
+        {{ post.excerpt }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+
+</div>
