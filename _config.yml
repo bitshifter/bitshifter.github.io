@@ -5,29 +5,44 @@
 # For technical reasons, this file is *NOT* reloaded automatically when you use
 # 'jekyll serve'. If you change this file, please restart the server process.
 
-# Site settings
-title: Nothing to see here
+# Permalinks
+permalink:          pretty
+
+# Setup
+title:              Nothing to see here
+#tagline:           The Jekyll Butler
+url:                http://bitshifter.github.io
+paginate:           5
+baseurl:            ""
+exclude:            ["Session.vim", "*.swp", "*.orig"]
+
 #email: cameron.hart@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Maybe this will be a blog about programming in C/C++ and Rust.
   Or maybe it will be a desolate wasteland of infrequent posts and spam bot
   comments.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://bitshifter.github.io" # the base hostname & protocol for your site
 twitter_username: bitshifternz
 github_username:  bitshifter
-exclude: ["Session.vim", "*.swp"]
-keep_files: [".git"]
 
-# Build settings
+# Markdown
 markdown: kramdown
-
 kramdown:
   input: GFM
 
-# Settings required for Lanyon theme
-permalink:           pretty
+# Assets
+#
+# We specify the directory for Jekyll so we can use @imports.
+sass:
+  sass_dir:          _sass
+  style:            :compressed
 
-paginate: 5
+# About/contact
+author:
+  name:              Cameron Hart
+  url:               https://twitter.com/bitshifternz
+#  email:             cameron.hart@gmail.com
 
-gems: [jekyll-paginate]
+# Gems
+gems:
+  - jekyll-paginate
+  - jekyll-gist
