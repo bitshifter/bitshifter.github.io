@@ -12,7 +12,7 @@ description: > # this means to ignore newlines until "baseurl:"
   Maybe this will be a blog about programming in C/C++ and Rust.
   Or maybe it will be a desolate wasteland of infrequent posts and spam bot
   comments.
-baseurl: "/blog" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://bitshifter.github.io" # the base hostname & protocol for your site
 twitter_username: bitshifternz
 github_username:  bitshifter
