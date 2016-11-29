@@ -1,0 +1,48 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+
+# Permalinks
+permalink:          pretty
+
+# Setup
+title:              Nothing to see here
+#tagline:           The Jekyll Butler
+url:                http://bitshifter.github.io
+paginate:           5
+baseurl:            ""
+exclude:            ["Session.vim", "*.swp", "*.orig"]
+
+#email: cameron.hart@gmail.com
+description: > # this means to ignore newlines until "baseurl:"
+  Maybe this will be a blog about programming in C/C++ and Rust.
+  Or maybe it will be a desolate wasteland of infrequent posts and spam bot
+  comments.
+twitter_username: bitshifternz
+github_username:  bitshifter
+
+# Markdown
+markdown: kramdown
+kramdown:
+  input: GFM
+
+# Assets
+#
+# We specify the directory for Jekyll so we can use @imports.
+sass:
+  sass_dir:          _sass
+  style:            :compressed
+
+# About/contact
+author:
+  name:              Cameron Hart
+  url:               https://twitter.com/bitshifternz
+#  email:             cameron.hart@gmail.com
+
+# Gems
+gems:
+  - jekyll-paginate
+  - jekyll-gist
