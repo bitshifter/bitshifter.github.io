@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>An Introduction to Rust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="remark.css">
+  </head>
+  <body>
+    <textarea id="source">
+
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+background-image: url(rust_logo.png)
+
+# An Introduction to Rust
+
+---
+layout: false
+
+# Thanks!
+
+I threw this together at the last minute based on other peoples presentations:
+
+* Daniel Collin ([@daniel_collin](http://twitter.com/daniel_collin)) from DICE whose slides I based this on
+* Alex Crichton from Mozilla Research whose were used in Daniel's presentation
+
+---
+template: inverse
+
+# What is Rust?
+
+Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.
+
+---
+
+# A short history
+
+* Rust grew out of a personal project by Mozilla employee Graydon Hoare
+* Mozilla sponsored starting in 2009
+* Rust itself is community driven under Apache/MIT licence
+* Went 1.0 in May 2015
+* Mozilla are also developing a new browser engine in Rust called Servo
+
+---
+
+# Why Rust?
+
+* C/C++: More control, less safety
+* Java/.NET/Python: Less control, more safety
+* Rust: More control, more safety
+
+---
+
+# Systems programming
+
+* Fine grained control over allocations
+* No mandatory garbage collector
+* Minimal runtime
+* Statically typed
+
+---
+
+# Runs fast
+
+* Compiles to an executable binary
+* LLVM backend (Same backend as Clang for Mac/iOS/PS4)
+* LLVM's suite of optimizations
+* Competitive with C/C++
+
+---
+
+# Prevents almost all crashes
+
+* _Safe by default_
+* Sophisticated type system and analysis
+* No segfaults
+* No null pointers
+* No dangling pointers
+
+---
+
+# Eliminates data races
+
+* _Ownership_ guarantees
+* _Borrowing_ prevents dangling pointers
+* Strong, safe abstractions
+
+---
+template: inverse
+
+# Ownership
+
+Variables are moved to new locations, preventing the previous location from using them. There is only every one owner of data! 
+
+---
+
+# Ownership
+
+```rust
+int main() {
+    int* data = malloc(sizeof(int));
+    *data = 3;
+    foo(slot);
+    foo(slot); // use after free!
+}
+
+void foo(int* data) {
+    printf("The number was: %d\n", *data);
+    free(data);
+}
+
+```
+
+```bash
+a.out(62940,0x7fff7b9ea310) malloc: *** error for object 0x7fecb0c03b10:
+pointer being freed was not allocated
+*** set a breakpoint in malloc_error_break to debug
+zsh: abort      ./a.out
+```
+
+---
+
+# Ownership
+
+```rust
+fn foo(slot: Box<u32>) {
+    println!("The number was: {}", slot);
+}
+
+fn main() {
+    let data = Box::new(3);
+    foo(data); // moves the value!
+    foo(data); // error: use of moved value
+}
+```
+
+```bash
+test.rs:6:9: 6:13 error: use of moved value: `data` [E0382]
+test.rs:6     foo(data); // error: use of moved value
+                 ^~~~
+test.rs:5:9: 5:13 note: `data` moved here because it has type 'Box<u32>',
+                         which is non-copyable
+test.rs:5     foo(data); // moves the value!
+                 ^~~~
+error: aborting due to previous error
+
+```
+
+???
+
+In C++ use after move is not a compile error.
+
+---
+
+# Ownership
+
+The equivalent code in Modern C++
+
+```cpp
+#include <iostream>
+#include <memory>
+
+void foo(std::unique_ptr<int> slot) {
+    std::cout << "The number was: " << *slot << '\n';
+}
+
+int main()
+{
+    auto data = std::make_unique<int>(3);
+    foo(std::move(data)); // moves the value!
+    foo(std::move(data)); // error? use of moved value
+}
+```
+
+```bash
+The number was: 3
+Segmentation fault (core dumped)
+```
+
+---
+
+# Ownership
+
+```rust
+fn foo() -> Box<u32> {
+    let three = Box::new(3);
+    return three; // transfer ownership
+}
+
+fn main() {
+    // acquire ownership of return value
+    let my_three = foo();
+}
+
+```
+
+---
+template: inverse
+# Borrowing
+
+Owned values can be borrowed in Rust to allow usage for a certain period of time.
+
+---
+
+# Borrowing
+
+```rust
+// The `&` sigil means "borrowed reference"
+fn foo(slot: &Vec<u32>) { /* ... */ }
+
+fn main() {
+    let data = Vec::new();
+
+    // doesn't move!
+    foo(&data);
+    foo(&data);
+}
+```
+
+---
+
+# Borrowing
+
+Borrowed values are only valid for a particular _lifetime_
+
+```rust
+let a: &u32;
+{
+    let b = 3;
+    a = &b; // error! `b` does not live long enough
+}
+
+```
+
+```rust
+let b = 3;
+let a: &u32;
+a = &b; // ok, `b` has the same lifetime as `a`
+
+```
+
+---
+
+# Borrowing
+
+Borrowing prevents _moving_
+
+```rust
+let a = Vec::new();
+let b = &a;
+work_with(a); // error!
+
+```
+
+```rust
+let a = Vec::new();
+{
+    let b = &a;
+}
+work_with(a); // ok
+```
+
+---
+
+# Borrowing
+
+A mistake that happens in C/C++:
+
+```rust
+fn main() {
+    println!("Your number was: {}", *foo());
+}
+
+// Tries to return borrowed reference to `a`
+fn foo() -> &u32 {
+    let a = 3;
+    return &a;
+}
+```
+
+---
+
+# Borrowing
+
+Borrows can be nested
+
+```rust
+struct MyStruct { inner: u32 }
+
+fn get(s: &MyStruct) -> &u32 {
+    &s.inner
+}
+
+fn main() {
+    let s = MyStruct { inner: 3 };
+    let inner = get(&s); // same lifetime as `s`
+}
+```
+
+---
+
+# Borrowing
+
+Borrowed values can become owned values through _cloning_
+
+```rust
+fn clone_vector(v: &Vec<u32>) -> Vec<u32> {
+    v.clone()
+}
+```
+
+---
+template: inverse
+
+# Memory Management
+
+Rust has fine-grained memory management, but is automatically managed once created.
+
+---
+
+# Memory Management
+
+Each variable has a _scope_ it is valid for, and it is automatically deallocated when it goes out of scope
+
+```rust
+fn main() {
+    // main owns 'data'
+    let data = Box::new(4);
+    // The data goes out of scope, it is free'd
+}
+
+```
+
+---
+
+# Memory Management
+
+Also possible to explicitly free data using _drop_
+
+```rust
+fn main() {
+    // main owns 'data'
+    let data = Box::new(4);
+    // Do something with data here..
+    // ...
+    // Now free data
+    drop(data);
+    // Compile error if we try to use data 
+    println!("Trying to use data {}", data);
+}
+```
+
+---
+
+# Memory Management
+
+Reference counting is another way of managing memory
+
+```rust
+use std::rc::Rc;
+
+fn main() {
+    let data = Rc::new(3); // reference count of 1
+    {
+        let data2 = data.clone(); // reference count of 2
+        use_data(data2); // transfer ownership of `data2`
+    } // reference count of 1
+    use_data(data); // transfer ownership of `data`
+} // reference count of 0, memory deallocated
+
+fn use_data(data: Rc<u32>) {}
+```
+
+---
+template: inverse
+
+# Mutability
+
+Values are _immutable_ by default in Rust, and must be tagged as being _mutable_.
+
+---
+
+# Mutability
+
+```rust
+let a = 4;
+a = 5; // error!
+```
+
+```rust
+let mut a = 4;
+a = 5; // ok
+```
+
+---
+
+# Mutability
+
+Mutability is also a part of the type of a borrowed pointer
+
+```rust
+fn inc(i: &i32) {
+    *i += 1; // error!
+}
+```
+
+```rust
+fn inc(i: &mut i32) {
+    *i += 1; // ok
+}
+```
+
+---
+
+# Mutability
+
+Borrowed pointers may coerce
+
+```rust
+let a = &mut 1;
+let b: &i32 = a; // ok
+let c: &mut i32 = b; // error!
+```
+
+---
+
+# Mutability
+
+Values can be _frozen_ by borrowing
+
+```rust
+let mut a = Vec::new();
+{
+    let b = &a; // freezes `a`
+    a.push(1);  // error!
+}
+a.push(2); // ok
+```
+
+---
+
+# Mutability
+
+Mutability propagates deeply into owned types
+
+```rust
+struct A { b: B }
+struct B { c: i32 }
+fn main() {
+    let mut a = A { b: B { c: 2 } };
+    a.b.c = 3;
+    a.b = B { c: 4 };
+    a = A { b: B { c: 5 } };
+
+    let frozen = a;
+    frozen.b.c = 4; // error!
+}
+```
+
+---
+template: inverse
+
+# Concurrency
+
+Using ownership to prevent data races
+
+---
+
+# Concurrency
+
+Parallelism is achieved at the granularity of an OS thread but it's also possible to use libraries like threadpool
+
+```rust
+// Spawn a child thread to be run in parallel
+spawn(move || {
+    expensive_computation();
+});
+
+other_expensive_computation();
+```
+
+---
+
+# Concurrency
+
+Safety is achieve by requiring spawn to use 'move' closure to capture variables
+
+```rust
+use std::thread;
+
+fn main() {
+    let mut a = Vec::new();
+    thread::spawn(move || {
+        a.push("foo");
+    });
+    a.push("bar"); // error!
+}
+```
+
+---
+
+# Concurrency
+
+Threads can communicate with channels
+
+```rust
+let (tx, rx) = channel();
+
+spawn(move || {
+    tx.send(expensive_computation());
+});
+
+// Do some work in the meantime
+let answer = rx.recv();
+```
+
+
+
+---
+
+# Concurrency
+
+Tasks can also share memory
+
+```rust
+use std::collections::HashMap;
+use std::sync::Arc;
+use std::thread;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert("tomato", "red");
+    map.insert("celery", "green");
+    map.insert("carrot", "orange");
+
+    let arc1 = Arc::new(map);
+    let arc2 = arc1.clone();
+
+    spawn(move || println!("Celery is `{}`", arc1["celery"]));
+    spawn(move || println!("Carrots are `{}`", arc2["carrot"]));
+}
+```
+
+---
+
+# Concurrency
+
+Using a Mutex it's possible to modify shared state
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+// Mutex is design so it be owner of a piece of data and
+// use borrowing to lend it to others 
+fn main() {
+    let data = Arc::new(Mutex::new(4));
+    for _ in 0..10 {
+       let thread_data = data.clone();
+       thread::spawn(move || {
+           let mut data = thread_data.lock().unwrap();
+           *data += 1;
+        });
+    }
+}
+```
+
+---
+template: inverse
+
+# Data types impl and traits
+
+---
+
+# Structs
+
+```rust
+struct Point {
+    x: f32,
+    y: f32,
+}
+
+fn main() {
+    let p = Point { x: 1.0, y: 2.0 };
+}
+```
+
+---
+
+# Impl
+
+```rust
+struct Circle {
+    x: f64,
+    y: f64,
+    radius: f64,
+}
+
+impl Circle {
+    fn area(&self) -> f64 {
+        std::f64::consts::PI * (self.radius * self.radius)
+    }
+}
+
+fn main() {
+    let c = Circle { x: 0.0, y: 0.0, radius: 2.0 };
+    println!("{}", c.area());
+}
+```
+
+---
+
+# Enums
+
+```rust
+enum Shape {
+    Circle,
+    Square
+}
+
+fn test(shape: Shape) {
+    match shape {
+        Circle => { /* ... */ }
+        Square => { /* ... */ }
+    }
+}
+```
+
+---
+
+# Enums
+
+Enums can have data. This is compiled into a union + tag
+
+```rust
+enum Shape {
+    Circle(Point, f64),
+    Rectangle(Point, Point),
+}
+
+match shape {
+    Circle(center, radius) => {
+        draw_circle(center, radius)
+    }
+    Rectangle(ul, lr) => {
+        draw_rectangle(ul, lr)
+    }
+}
+```
+
+---
+
+# & pointers
+
+```rust
+let a: &int = ...;         // never null!
+let b: Option<&int> = ...; // may be null
+
+// represented as a null pointer
+let c: Option<&int> = None;
+```
+
+---
+
+# &mut pointers
+
+Any &mut pointer is the only pointer to its data
+
+```rust
+let mut a = 1;
+
+let b = &mut a; // ok
+let c = &mut a; // error!
+```
+
+---
+
+# Traits
+
+```rust
+struct Circle {
+    x: f64,
+    y: f64,
+    radius: f64,
+}
+
+trait HasArea {
+    fn area(&self) -> f64;
+}
+
+impl HasArea for Circle {
+    fn area(&self) -> f64 {
+        std::f64::consts::PI * (self.radius * self.radius)
+    }
+}
+```
+
+---
+
+# Traits in generics
+
+```rust
+fn print_area<T>(shape: T) {
+    println!("This shape has an area of {}", shape.area());
+}
+```
+
+```
+error: no method named `area` found for type `T` in the current scope
+```
+
+```rust
+fn print_area<T: HasArea>(shape: T) {
+    println!("This shape has an area of {}", shape.area());
+}
+```
+
+---
+
+# Impl traits on any type
+
+Traits can also be applied on existing types
+
+```rust
+trait HasArea {
+    fn area(&self) -> f64;
+}
+
+impl HasArea for i32 {
+    fn area(&self) -> f64 {
+        println!("this is silly");
+
+        *self as f64
+    }
+}
+
+fn main() {
+    5.area(); // Considered bad style!
+}
+```
+
+---
+template: inverse
+
+# Breaking the rules
+
+---
+
+# Unsafe blocks
+
+* Possible to skip some compiler checks
+* Used to build safe code around unsafe blocks
+* Can audit only unsafe blocks for issues
+* FFI (Foreign Function Interface) is always unsafe
+
+---
+
+# Unsafe blocks
+
+```rust
+fn main() {
+    let a = 3;
+
+    // Turn off some compiler checks,
+    // "I know what I'm doing"
+    unsafe {
+        let b = &a as *const i32 as *mut i32;
+        *b = 4;
+    }
+
+    println!("{}", a); // prints 4
+}
+```
+
+---
+
+# Transmuting
+
+Transform one type to another
+
+```rust
+unsafe fn transmute<T, U>(t: T) -> U {
+    /* ... */
+}
+
+```rust
+// Invalid promotion to a mutable pointer
+let a: &int = &3;
+let b: &mut int = unsafe { transmute(a) };
+```
+
+---
+
+# Inline assembly
+
+```rust
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+fn foo() {
+    unsafe {
+        asm!("nop");
+    }
+}
+```
+
+---
+
+# FFI
+
+```rust
+extern {
+    fn write(fd: i32, data: *const u8, len: u32) -> i32;
+}
+
+fn main() {
+    let data = b"Hello, world!\n";
+
+    unsafe {
+        write(1, &data[0], data.len() as u32);
+    }
+}
+```
+
+---
+
+# _Fast_  FFI
+
+```asm
+_ZN4main20h9abc3392beeae1c4saaE:
+	.cfi_startproc
+	leaq	byte_str2755(%rip), %rsi
+	movl	$1, %edi
+	movl	$14, %edx
+	jmp	write@PLT
+```
+
+---
+template: inverse
+
+# Crates and cargo
+
+---
+
+# Cargo
+
+* Cargo is Rusts package manager
+* Makes it possible to download dependencies for a project
+* Invokes _rustc_ or other tools to build projects
+* Uses _crates_ for packaging up modules in a library
+* Standard build and distribution system, making working with Rust projects easier
+
+---
+
+# Cargo
+
+Defining a _Cargo.toml_ file for a project
+
+```ini
+[package]
+name = "hello_world"
+version = "0.1.0"
+authors = ["Your Name you@example.com"]
+
+[dependencies]
+regex = "0.1.41"
+```
+
+---
+
+# Cargo
+
+```rust
+extern crate regex;
+
+use regex::Regex;
+
+fn main() {
+    let re = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
+    println!("Did our date match? {}", re.is_match("2014-01-01"));
+}
+```
+
+---
+
+# Cargo
+
+```bash
+$ cargo build
+    Updating registry `https://github.com/rust-lang/crates.io-index`
+ Downloading memchr v0.1.5
+ Downloading libc v0.1.10
+ Downloading regex-synatx v0.2.1
+ Downloading memchr v0.1.5
+ Downloading aho-corasick v0.3.0
+ Downloading regex v0.1.41
+   Compiling memchr v0.1.5
+   Compiling libc v0.1.10
+   Compiling regex-synatx v0.2.1
+   Compiling memchr v0.1.5
+   Compiling aho-corasick v0.3.0
+   Compiling regex v0.1.41
+   Compiling foo v0.1.0 (file:///path/to/project/hello_world)
+```
+
+---
+
+# Cargo
+
+Easy to test code. Lets say we have a project called _adder_
+
+```rust
+#[test]
+fn it_works() {
+}
+```
+
+---
+
+# Cargo
+
+```bash
+$ cargo test
+   Compiling adder v0.0.1 (file:///home/you/projects/adder)
+     Running target/adder-91b3e234d4ed382a
+
+running 1 test
+test it_works ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured
+
+   Doc-tests adder
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured
+```
+
+---
+template: inverse
+
+# Should you use Rust?
+
+---
+
+# Should you use Rust?
+
+* C++ is modernising but slowly, e.g. C++17 :(
+* C++ will never ditch it's legacy
+* Rust is new - only went 1.0 a year ago
+  * 1.0 means language and std library is stable
+  * But still might not have features you need yet
+* The language is quite different
+  * concepts ownership, borrowing and lifetime are unique
+  * can be challenging to adjust to
+* More accessible to people from high level languages
+  * people from languages like Ruby
+  * people who wouldn't touch C++
+* Community development process seems more agile than C++
+* Rust is moving quickly - already at 1.7!
+* Tied to Mozilla's health?
+* Too early to tell if it will become a mainstream language?
+* Did I mention no data races?
+
+---
+template: inverse
+
+# Questions?
+
+---
+
+# Links
+
+* [github.com/rust-lang/rust](http://github.com/rust-lang/rust)
+* [rust-lang.org](http://www.rust-lang.org)
+* [users.rust-lang.org](https://users.rust-lang.org)
+* [rustbyexample.com](http://rustbyexample.com)
+* [reddit.com/r/rust](http://reddit.com/r/rust)
+* [Fearless concurrency with Rust](http://blog.rust-lang.org/2015/04/10/Fearless-Concurrency.html)
+* [Rust for C/C++ programmers](https://github.com/nrc/r4cppp)
+* [What do C/C++ systems programmers think of Rust?](https://www.quora.com/What-do-C-C++-systems-programmers-think-of-Rust)
+* [#rust IRC channel](http://chat.mibbit.com/?server=irc.mozilla.org&channel=%23rust)
+
+    </textarea>
+    <script src="remark.min.js"></script>
+    <script>
+      var slideshow = remark.create({
+        ratio: '4:3',
+        highlightStyle: 'github',
+      });
+    </script>
+  </body>
+</html>
