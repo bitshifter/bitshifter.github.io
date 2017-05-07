@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Debugging Rust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="remark.css">
+  </head>
+  <body>
+    <textarea id="source">
+
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+background-image: url(bugs.jpg)
+
+# Contributing to Rust
+
+The tale of repr align
+
+???
+
+---
+layout: false
+
+# Overview
+
+* Finding something to contribute
+* What is alignment anyway
+* Chapter One
+* Chapter Two
+
+---
+template: inverse
+
+# Motivation
+
+---
+
+# Why did I want to do this?
+
+* Work on game engines in C++ by day
+* Enthusiastic about Open Source
+* Enthusiastic about Rust
+* Some time off work over summer
+* I could help make Rust better for game engine developers
+* Maybe contributing would be more interesting than my hobby projects?
+
+???
+
+Core team is focussed on broader things
+
+---
+
+# Finding a task
+
+* What is Rust missing that game engines need?
+* What is small enough that I could tackle?
+* What isn't being worked on already?
+
+???
+
+Don't want to put a heap of time into something that's already underway
+
+* My opinion, not exhaustive
+* Looking for areas that might be lower priority in general
+* Fast compile times
+* Control over memory allocation
+* Control over memory alignment
+* SIMD
+* https://github.com/tomaka/vulkano/blob/master/TROUBLES.md
+
+---
+
+# Where to look for tasks
+
+* This Week In Rust
+* E-Easy - https://github.com/rust-lang/rust/labels/E-easy
+* B-RFC-approved - https://github.com/rust-lang/rust/labels/E-easy
+* Internals forum - https://internals.rust-lang.org/
+
+---
+
+# Areas to contribute
+
+* The compiler
+* Standard libraries
+* RFCs
+* Documentation
+* Tooling (cargo, rustup, rustfmt, etc)
+* Infrastructure
+* External libraries
+* What solves your problem?
+* What is interesting to you?
+
+---
+template: inverse
+
+# RFC 1358
+
+Implement [repr(align)]
+
+---
+
+# [repr(align)]
+
+* RFC adds support to specify custom alignment on structs
+* Custom alignment is a very niche requirement
+* But when you need it, it's pretty annoying to deal with manually
+* Some hardware and APIs require aligned memory
+* Align to cache line (e.g. avoid false sharing)
+* LLVM should do most of the work right?
+* No one else looking at it right now
+* Had some prior experience with LLVM, seems achievable
+* RFC 1358 - https://github.com/alexcrichton/rfcs/blob/repr-align/text/0000-repr-align.md
+* Tracking issue - https://github.com/rust-lang/rust/issues/33626
+
+
+---
+
+# What is alignment anyway
+
+* Most of the time, people don't need to know about it
+* "Hardware" reads/writes memory in word sized chunks (e.g. 4 bytes on 32 bit) or larger
+* Data alignment means putting the data at a memory address equal to some multiple of the word size
+* Padding fields are added by compilers to ensure data is aligned correctly
+* Reading/writing at less granularity either doesn't work or is slower depending on hardware
+* One example is vector instructions on x86_64 will segfault if given an unaligned address (whoops!)
+
+???
+Thanks https://en.wikipedia.org/wiki/Data_structure_alignment
+
+---
+
+# Primitive alignment
+
+```rust
+#[repr(C)]
+struct S {
+  field1: i8,  // offset 0, 1 byte aligned
+  // 3 bytes padding
+  field2: i32, // offset 4, 4 byte aligned
+  // 0 bytes padding
+  field3: i16, // offset 6, 2 byte aligned
+  // 2 bytes padding
+} // struct is 12 bytes and 4 byte aligned
+```
+
+This is how a struct is aligned and padded without custom alignment on x86.
+
+???
+
+So if you imagine an array of these, the data alignment would be correct
+
+---
+
+# Primitive alignment
+
+* LLVM automatically determines padding between fields and at the end of the struct
+* LLVM ensures this is allocated on the stack at the right alignment
+* Rust allocator ensures this is allocated on the heap at the right alignment
+
+---
+
+# Field reordering
+
+```
+struct S {
+  field1: i8,  // offset 6, 1 byte aligned
+  field2: i32, // offset 0, 4 byte aligned
+  field3: i16, // offset 4, 2 byte aligned
+  // 2 bytes padding
+} // struct is 8 bytes and 4 byte aligned
+```
+
+* Rust reserves the right to reorder struct fields for better layout and size.
+* This is happening in nightly now.
+* `[repr(C)]` disables reordering and means the struct can be used with FFI.
+
+---
+
+# Custom alignment in Rust
+
+```rust
+#![feature(attr_literals)]
+#![feature(repr_align)]
+
+#[repr(align(16))]
+struct Align16(i32);
+
+struct Nested {
+  field1: i32,     // offset 1, 4 byte aligned
+  field2: Align16, // offset 0, 16 byte aligned
+  // 12 bytes padding
+} // struct is 32 bytes and 16 byte aligned
+```
+
+Notice the offsets in Nested, this struct layout has been re-ordered by Rust.
+
+---
+template: inverse
+
+# First attempt
+
+Sometime early January 2017
+
+---
+
+# This should just work TM
+
+* LLVM handles alignment right?
+* So just parse `[repr(align)]` tell LLVM about it and write some tests 
+* Job done!
+
+---
+
+# Where to start
+
+```rust
+// Raising alignment
+#[repr(align = "16")]
+struct Align16(i32);
+
+assert_eq!(mem::align_of::<Align16>(), 16);
+assert_eq!(mem::size_of::<Align16>(), 16);
+```
+
+* RFC has some example code, try make that work
+* Look at other uses of `repr` to work out how to parse
+* How to introspect a compiler?
+* Spend many days `println` debugging rustc to understand what it's doing
+* It takes 15 minutes at best to build stage 1 rustc on my laptop
+* A lot of time with very little forward progress at this point!
+
+---
+
+# 14/01/2017
+
+* Got the RFC example code working and announce on RFC task that I'm working on it and will have a PR soon!
+
+---
+
+# Custom alignment & LLVM
+
+* At some point I realise that just because `mem::align_of` and `mem::size_of` are reporting the right thing, it doesn't mean that everything is working
+* These have nothing to do with LLVM's picture of alignment
+* Seemingly no, you can't tell LLVM about custom alignment of types or fields
+* Needs to be managed from the Rust side
+* Need to emit alignment for `alloca` and manually pad fields and structs for custom alignment
+* I'm not going to get this done in my time off!
+
+---
+
+# 27/01/2017
+
+* Announce my realisation on tracking issue that this is harder than I thought :)
+
+---
+
+# A solution
+
+* Rust keeps track of ADT layout in `rustc::ty::layout::Layout`
+* Add a vector of custom alignment padding to this if `[repr(align))]` is used
+* Tell LLVM about custom padding fields and adjust various indices where required
+* Add a bunch of tests:
+* `src/test/run-pass` - check what's supposed to work works
+* `src/test/compile-fail` - check compile errors are handled correctly
+* `src/test/ui` - `print-type-sizes`
+
+---
+
+# 21/02/2017
+
+* Make a big push to get everything ready
+* Open PR for `repr(align)` support
+
+---
+template: inverse
+
+# Chapter Two
+The first 90 percent of the code accounts for the first 90 percent of the development time. The remaining 10 percent of the code accounts for the other 90 percent of the development time. - Tom Cargill, Bell Labs
+
+---
+
+# 22/02/2017
+
+* The awesome eddyb from the core compiler team assigned to review
+* Makes a bunch of small suggestions to improve PR, improving naming of things and so on
+* Compiler now supports literal attributes, so change `[repr(align = "n")]` to `[repr(align(n))]`
+* Address all feedback and update PR
+
+---
+
+# 25/02/2017
+
+* eddyb suggests that instead of maintaining the custom padding vector that we always emit field padding, not just for custom alignment.
+* This is a good suggestion, it means that repr align has the same code paths as normal code.
+* That also means it impacts all of Rust, so it's a bit scarey.
+* Ultimately, I'd made a big push to get the PR ready, but this meant I had a lot more work to do.
+
+---
+
+# Let's talk about time
+
+* I often wondered, where people find the time to do Open Source work?
+* I have a full time job working on proprietary software.
+* I only have a limited amount of time and enerty outside of work.
+* How do others balance this?
+* What I did find is after making a large initial time investment, it got easier to make progress in small increments.
+* I could do 30 mintues at breakfast or an hour or two in an evening and push things forward.
+* Of course in Rust you are not alone, the core team and community will help when they can.
+* You don't want things to drag on too long.
+* Rust is always changing, the longer your PR takes the more conflicts you will need to resolve, which is more time.
+* Some features are critical path, it might be blocking other work.
+* You make a big time investment, you kind of want to see it get used.
+
+---
+
+# Communication
+
+* There's a number of different communication channels you can use:
+  * IRC #rust-internals
+  * Forums - https://internals.rust-lang.org/
+  * Github - Issue tracker
+  * Reddit - https://www.reddit.com/r/rust
+* IRC is popular, but it was usually pretty dead during the hours I tended to work.
+* Tried asking for help in the forums but it didn't yeild results in my case.
+* Most of my communication was via the github issues related to my changes.
+* Do whatever works I guess!
+
+---
+
+# Debugging the compiler
+
+* What do you do when the compiler doesn't compile?
+* This hadn't really been a probem before, but now I was making a significant change.
+* Ask for help!
+* Enable more debug info `cp src/bootstrap/config.toml.example config.toml`
+* Can enable LLVM assertions/debuginfo, disable Rust optimization, etc.
+* This can make compilation very slow!
+* Other debugging tips:
+* `export RUST_BACKTRACE=full`
+* `export RUST_LOG=rustc_trans=debug`
+* `sudo ~/.cargo/bin/rust-gdb -p <rustc pid>`
+* `break abort` - breaks on LLVM assertion
+* Make sure you are looking at the right thread in gdb!
+
+---
+
+# The home stretch
+
+* 20/3/2017
+  * A PR from eddyb that I'm waiting on gets merged to master
+  * At some point eddyb goes on vacation (I assume)
+* 8/4/2017
+  * I go on vacation
+* 12/4/2017
+  * The struct field reordering change gets merged to master which breaks stage 1 compiler again
+  * Still on vacation
+  * Getting poked on github becase people are waiting on my PR :)
+* 19/4/2017
+  * Back from vacation, eddyb spots the compiler breaking problem in my code
+* 21/4/2017
+ * Final PR ready, all tests passing, PR accepted
+ * A test fails on ARM, don't have hardware but work out what it is and fix it.
+
+---
+template: inverse
+
+# 23/4/2017 
+bors submits the PR to master!
+
+---
+
+# 25/4/2017
+
+* Looking through the issue tracker, I notice a regression in nightly rust which sounds related to my change.
+* Create a repro and fix the bug.
+* Obviously this wasn't covered by Rust's test suite.
+* Eddyb makes me a minimal test case and I submit a fix.
+* Possibly this wasn't the only thing I've broken out there in Rust land!
+
+---
+
+# So what does it all mean?
+
+---
+
+# Closing thoughts
+
+* It was definitely rewarding getting my change in there.
+* It was a lot more work than I anticipated
+  * estimated 1 month, actual time more like 4 months!
+* Keep that in mind when chosing something to work on
+* I was able to make the time, but what if I couldn't?
+* I'd like to continue contributing 
+  * I think it's also important to spend some time working on my own Rust projects.
+* I'm sure I won't underestimate what's involved next time! /s
+
+---
+template: inverse
+
+# Questions?
+
+    </textarea>
+    <script src="remark.min.js"></script>
+    <script>
+      var slideshow = remark.create({
+        ratio: '4:3',
+        highlightStyle: 'github',
+      });
+    </script>
+  </body>
+</html>
