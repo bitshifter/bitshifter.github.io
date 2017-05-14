@@ -39,12 +39,12 @@ template: inverse
 
 # Why did I want to do this?
 
-* Work on game engines in C++ by day
 * Enthusiastic about Open Source
 * Enthusiastic about Rust
 * Some time off work over summer
-* I could help make Rust better for game engine developers
-* Maybe contributing would be more interesting than my hobby projects?
+* Work on game engines in C++ by day
+* Maybe I could help make Rust better for game engine developers
+* Maybe contributing would be more interesting than my hobby projects
 
 ???
 
@@ -69,29 +69,6 @@ Don't want to put a heap of time into something that's already underway
 * Control over memory alignment
 * SIMD
 * https://github.com/tomaka/vulkano/blob/master/TROUBLES.md
-
----
-
-# Where to look for tasks
-
-* This Week In Rust
-* E-Easy - https://github.com/rust-lang/rust/labels/E-easy
-* B-RFC-approved - https://github.com/rust-lang/rust/labels/E-easy
-* Internals forum - https://internals.rust-lang.org/
-
----
-
-# Areas to contribute
-
-* The compiler
-* Standard libraries
-* RFCs
-* Documentation
-* Tooling (cargo, rustup, rustfmt, etc)
-* Infrastructure
-* External libraries
-* What solves your problem?
-* What is interesting to you?
 
 ---
 template: inverse
@@ -151,14 +128,15 @@ This is how a struct is aligned and padded without custom alignment on x86.
 ???
 
 So if you imagine an array of these, the data alignment would be correct
+`%S = type { i8, [3 x i8], i32, [0 x i8], i16, [2 x i8] }`
 
 ---
 
 # Primitive alignment
 
-* LLVM automatically determines padding between fields and at the end of the struct
-* LLVM ensures this is allocated on the stack at the right alignment
-* Rust allocator ensures this is allocated on the heap at the right alignment
+* LLVM automatically determines padding between fields and at the end of the struct.
+* LLVM ensures this is allocated on the stack at the right alignment.
+* Rust allocator ensures this is allocated on the heap at the right alignment.
 
 ---
 
@@ -169,13 +147,17 @@ struct S {
   field1: i8,  // offset 6, 1 byte aligned
   field2: i32, // offset 0, 4 byte aligned
   field3: i16, // offset 4, 2 byte aligned
-  // 2 bytes padding
+  // 1 bytes padding
 } // struct is 8 bytes and 4 byte aligned
 ```
 
 * Rust reserves the right to reorder struct fields for better layout and size.
 * This is happening in nightly now.
 * `[repr(C)]` disables reordering and means the struct can be used with FFI.
+
+???
+
+`%S = type { i32, [0 x i8], i16, [0 x i8], i8, [1 x i8] }`
 
 ---
 
@@ -200,16 +182,16 @@ Notice the offsets in Nested, this struct layout has been re-ordered by Rust.
 ---
 template: inverse
 
-# First attempt
+# Early January 2017
 
-Sometime early January 2017
+Make a start
 
 ---
 
 # This should just work TM
 
 * LLVM handles alignment right?
-* So just parse `[repr(align)]` tell LLVM about it and write some tests 
+* So just parse `[repr(align)]` tell LLVM about it and write some tests.
 * Job done!
 
 ---
@@ -217,7 +199,6 @@ Sometime early January 2017
 # Where to start
 
 ```rust
-// Raising alignment
 #[repr(align = "16")]
 struct Align16(i32);
 
@@ -225,12 +206,25 @@ assert_eq!(mem::align_of::<Align16>(), 16);
 assert_eq!(mem::size_of::<Align16>(), 16);
 ```
 
-* RFC has some example code, try make that work
-* Look at other uses of `repr` to work out how to parse
+* RFC has some example code, try make that work.
+* Look at other uses of `repr` to work out how to parse.
 * How to introspect a compiler?
-* Spend many days `println` debugging rustc to understand what it's doing
-* It takes 15 minutes at best to build stage 1 rustc on my laptop
+* Spend many days `println` debugging rustc to understand what it's doing.
+* It takes 15 minutes at best to build stage 1 rustc on my laptop.
 * A lot of time with very little forward progress at this point!
+
+---
+
+# Working on rustc
+
+* Read `CONTRIBUTING.md`
+* If you have already read it, it might have changed!
+* `x.py build --stage 1` build stage 1 compiler
+* `x.py test --stage 1 src/tests/run-pass --test-args align-struct.rs` build stage 1 and run matching test
+* `x.py test --stage 1` not that useful, some tests require a stage 2 compiler and will fail at stage 1
+* `x.py test src/tools/tidy` rust lint checks
+* On my machine it takes about an hour for a full stage 2 compiler build and test run
+* `src/librustc/README.txt` contains some high level documentation of the compiler
 
 ---
 
@@ -242,12 +236,12 @@ assert_eq!(mem::size_of::<Align16>(), 16);
 
 # Custom alignment & LLVM
 
-* At some point I realise that just because `mem::align_of` and `mem::size_of` are reporting the right thing, it doesn't mean that everything is working
-* These have nothing to do with LLVM's picture of alignment
-* Seemingly no, you can't tell LLVM about custom alignment of types or fields
-* Needs to be managed from the Rust side
-* Need to emit alignment for `alloca` and manually pad fields and structs for custom alignment
-* I'm not going to get this done in my time off!
+* At some point I realise that just because `mem::align_of` and `mem::size_of` are reporting the right thing, it doesn't mean that everything is working.
+* These have nothing to do with LLVM's picture of alignment.
+* Seemingly no, you can't tell LLVM about custom alignment of types or fields.
+* Needs to be managed from the Rust side.
+* Need to emit alignment for `alloca` and manually pad fields and structs for custom alignment.
+* I'm not going to get this done in my time off work!
 
 ---
 
@@ -259,9 +253,9 @@ assert_eq!(mem::size_of::<Align16>(), 16);
 
 # A solution
 
-* Rust keeps track of ADT layout in `rustc::ty::layout::Layout`
-* Add a vector of custom alignment padding to this if `[repr(align))]` is used
-* Tell LLVM about custom padding fields and adjust various indices where required
+* Rust keeps track of ADT layout in `rustc::ty::layout::Layout`.
+* Add a vector of custom alignment padding to this if `[repr(align))]` is used.
+* Tell LLVM about custom padding fields and adjust various indices where required.
 * Add a bunch of tests:
 * `src/test/run-pass` - check what's supposed to work works
 * `src/test/compile-fail` - check compile errors are handled correctly
@@ -271,8 +265,8 @@ assert_eq!(mem::size_of::<Align16>(), 16);
 
 # 21/02/2017
 
-* Make a big push to get everything ready
-* Open PR for `repr(align)` support
+* Make a big push to get everything ready.
+* Open PR for `repr(align)` support.
 
 ---
 template: inverse
@@ -284,18 +278,18 @@ The first 90 percent of the code accounts for the first 90 percent of the develo
 
 # 22/02/2017
 
-* The awesome eddyb from the core compiler team assigned to review
-* Makes a bunch of small suggestions to improve PR, improving naming of things and so on
-* Compiler now supports literal attributes, so change `[repr(align = "n")]` to `[repr(align(n))]`
-* Address all feedback and update PR
+* The awesome Eddyb from the core compiler team assigned to review.
+* Makes a bunch of small suggestions to improve PR, improving naming of things and so on.
+* Compiler now supports literal attributes, so change `[repr(align = "n")]` to `[repr(align(n))]`.
+* Address all feedback and update PR.
 
 ---
 
 # 25/02/2017
 
-* eddyb suggests that instead of maintaining the custom padding vector that we always emit field padding, not just for custom alignment.
+* Eddyb suggests that instead of maintaining the custom padding vector that we always emit field padding, not just for custom alignment.
 * This is a good suggestion, it means that repr align has the same code paths as normal code.
-* That also means it impacts all of Rust, so it's a bit scarey.
+* That also means it impacts all of Rust, so it's a big change.
 * Ultimately, I'd made a big push to get the PR ready, but this meant I had a lot more work to do.
 
 ---
@@ -304,7 +298,7 @@ The first 90 percent of the code accounts for the first 90 percent of the develo
 
 * I often wondered, where people find the time to do Open Source work?
 * I have a full time job working on proprietary software.
-* I only have a limited amount of time and enerty outside of work.
+* I only have a limited amount of time and energy outside of work.
 * How do others balance this?
 * What I did find is after making a large initial time investment, it got easier to make progress in small increments.
 * I could do 30 mintues at breakfast or an hour or two in an evening and push things forward.
@@ -343,15 +337,14 @@ The first 90 percent of the code accounts for the first 90 percent of the develo
 * `export RUST_LOG=rustc_trans=debug`
 * `sudo ~/.cargo/bin/rust-gdb -p <rustc pid>`
 * `break abort` - breaks on LLVM assertion
-* Make sure you are looking at the right thread in gdb!
 
 ---
 
-# The home stretch
+# A flurry of (in)activity
 
 * 20/3/2017
-  * A PR from eddyb that I'm waiting on gets merged to master
-  * At some point eddyb goes on vacation (I assume)
+  * A PR from Eddyb that I'm waiting on gets merged to master
+  * At some point Eddyb goes on vacation (I assume)
 * 8/4/2017
   * I go on vacation
 * 12/4/2017
@@ -359,7 +352,7 @@ The first 90 percent of the code accounts for the first 90 percent of the develo
   * Still on vacation
   * Getting poked on github becase people are waiting on my PR :)
 * 19/4/2017
-  * Back from vacation, eddyb spots the compiler breaking problem in my code
+  * Back from vacation, Eddyb spots the compiler breaking problem in my code
 * 21/4/2017
  * Final PR ready, all tests passing, PR accepted
  * A test fails on ARM, don't have hardware but work out what it is and fix it.
@@ -384,16 +377,63 @@ bors submits the PR to master!
 
 # So what does it all mean?
 
+This:
+
+```rust
+#[repr(align(64))]
+pub struct Align64(i32);
+
+pub struct Nested64 {
+    a: Align64,
+    b: i32,
+}
+
+#[no_mangle]
+pub fn nested64(a: Align64, b: i32) -> Nested64 {
+    Nested64 { a, b }
+}
+```
+
+---
+
+# So what does it all mean?
+
+Becomes this:
+
+```
+%Nested64 = type { %Align64, [0 x i8], i32, [60 x i8] }
+%Align64 = type { i32, [60 x i8] }
+
+; Function Attrs: nounwind uwtable
+define void @nested64(
+  %Nested64* noalias nocapture sret dereferenceable(128),
+  %Align64* noalias nocapture readonly dereferenceable(64),
+  i32) unnamed_addr #0 {
+start:
+  %3 = bitcast %Align64* %1 to i8*
+  %4 = bitcast %Nested64* %0 to i8*
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* nonnull %4,
+    i8* nonnull %3, i64 64, i32 64, i1 false)
+  %5 = getelementptr inbounds %Nested64, %Nested64* %0, i64 0, i32 2
+  store i32 %2, i32* %5, align 4
+  ret void
+}
+```
+
+???
+
+Nightly release, debug was too much code. Could look at playpen though
+
 ---
 
 # Closing thoughts
 
 * It was definitely rewarding getting my change in there.
-* It was a lot more work than I anticipated
+* It was a lot more work than I anticipated;
   * estimated 1 month, actual time more like 4 months!
-* Keep that in mind when chosing something to work on
+* Keep that in mind when chosing something to work on.
 * I was able to make the time, but what if I couldn't?
-* I'd like to continue contributing 
+* I'd like to continue contributing;
   * I think it's also important to spend some time working on my own Rust projects.
 * I'm sure I won't underestimate what's involved next time! /s
 
@@ -401,6 +441,8 @@ bors submits the PR to master!
 template: inverse
 
 # Questions?
+
+---
 
     </textarea>
     <script src="remark.min.js"></script>
