@@ -12,23 +12,21 @@ name: inverse
 layout: true
 class: center, middle, inverse
 ---
-background-image: url(bugs.jpg)
 
 # Contributing to Rust
 
-The tale of repr align
-
-???
+The tale of repr align.
 
 ---
 layout: false
 
 # Overview
 
-* Finding something to contribute
-* What is alignment anyway
-* Chapter One
-* Chapter Two
+* Motivation
+* What is repr align?
+* Producing a PR
+* Completing a PR
+* Closing thoughts
 
 ---
 template: inverse
@@ -39,12 +37,12 @@ template: inverse
 
 # Why did I want to do this?
 
-* Enthusiastic about Open Source
-* Enthusiastic about Rust
-* Some time off work over summer
-* Work on game engines in C++ by day
-* Maybe I could help make Rust better for game engine developers
-* Maybe contributing would be more interesting than my hobby projects
+* Enthusiastic about Open Source.
+* Enthusiastic about Rust.
+* Some time off work over summer.
+* Work on game engines in C++ by day.
+* Maybe I could help make Rust better for game engine developers?
+* Maybe contributing would be more interesting than my hobby projects?
 
 ???
 
@@ -81,28 +79,25 @@ Implement [repr(align)]
 
 # [repr(align)]
 
-* RFC adds support to specify custom alignment on structs
-* Custom alignment is a very niche requirement
-* But when you need it, it's pretty annoying to deal with manually
-* Some hardware and APIs require aligned memory
-* Align to cache line (e.g. avoid false sharing)
+* RFC 1358 adds support for specifying custom alignment on structs.
+* Custom alignment is a very niche requirement.
+* But when you need it, it's pretty annoying to deal with manually.
+* Some hardware and APIs require aligned memory.
+* Align to cache line (e.g. avoid false sharing).
 * LLVM should do most of the work right?
-* No one else looking at it right now
-* Had some prior experience with LLVM, seems achievable
-* RFC 1358 - https://github.com/alexcrichton/rfcs/blob/repr-align/text/0000-repr-align.md
-* Tracking issue - https://github.com/rust-lang/rust/issues/33626
-
+* No one else appeared to be working on it.
+* I had some prior experience with LLVM, seems achievable.
 
 ---
 
 # What is alignment anyway
 
-* Most of the time, people don't need to know about it
-* "Hardware" reads/writes memory in word sized chunks (e.g. 4 bytes on 32 bit) or larger
-* Data alignment means putting the data at a memory address equal to some multiple of the word size
-* Padding fields are added by compilers to ensure data is aligned correctly
-* Reading/writing at less granularity either doesn't work or is slower depending on hardware
-* One example is vector instructions on x86_64 will segfault if given an unaligned address (whoops!)
+* Most of the time, people don't need to know about it.
+* "Hardware" reads/writes memory in word sized chunks (e.g. 4 bytes on 32 bit) or larger.
+* Data alignment means putting the data at a memory address equal to some multiple of the word size.
+* Padding fields are added by compilers to ensure data is aligned correctly.
+* Reading/writing at less granularity either doesn't work or is slower depending on hardware.
+* One example is vector instructions on x86_64 will segfault if given an unaligned address (whoops!).
 
 ???
 Thanks https://en.wikipedia.org/wiki/Data_structure_alignment
@@ -142,7 +137,7 @@ So if you imagine an array of these, the data alignment would be correct
 
 # Field reordering
 
-```
+```rust
 struct S {
   field1: i8,  // offset 6, 1 byte aligned
   field2: i32, // offset 0, 4 byte aligned
@@ -184,7 +179,7 @@ template: inverse
 
 # Early January 2017
 
-Make a start
+Making a start
 
 ---
 
@@ -215,22 +210,35 @@ assert_eq!(mem::size_of::<Align16>(), 16);
 
 ---
 
-# Working on rustc
+# Working on Rust
 
 * Read `CONTRIBUTING.md`
 * If you have already read it, it might have changed!
-* `x.py build --stage 1` build stage 1 compiler
-* `x.py test --stage 1 src/tests/run-pass --test-args align-struct.rs` build stage 1 and run matching test
-* `x.py test --stage 1` not that useful, some tests require a stage 2 compiler and will fail at stage 1
-* `x.py test src/tools/tidy` rust lint checks
-* On my machine it takes about an hour for a full stage 2 compiler build and test run
-* `src/librustc/README.txt` contains some high level documentation of the compiler
+* Compiler builds in multiple stages, 0 to 2, using previous stage to build the next. See `src/bootstrap/README.md` for more about that.
+* `x.py build --stage 1` builds the stage 1 compiler,
+* `x.py test --stage 1 src/tests/run-pass --test-args align-struct.rs` builds stage 1 and runs matching tests.
+* `x.py test --stage 1` not that useful, some tests require a stage 2 compiler and will fail at stage 1.
+* `x.py test src/tools/tidy` performs rust lint checks.
+* On my machine it takes about an hour for a full stage 2 compiler build and test run.
 
 ---
 
+# The anatomy of the Rust compiler
+
+* Rust consists of a number of core crates:
+  * `libsyntax` contains things purely concerned with syntax, e.g. parser, AST, macro expander, etc.
+  * `librustc` contains the high-level analysis passes, such as the type checker, borrow checker, etc. It is the heart of the compiler.
+  * `librustc_back` contains some very low-level details that are specific to different LLVM targets.
+  * `librustc_trans` contains the code to convert from Rust IR into LLVM IR, and then from LLVM IR into machine code.
+  * `librustc_driver` invokes the compiler from `libsyntax`, then the analysis phases from `librustc`, and finally the lowering and codegen passes from `librustc_trans`.
+* `src/librustc/README.txt` contains more high level documentation of the compiler.
+
+---
+class: center, middle
+
 # 14/01/2017
 
-* Got the RFC example code working and announce on RFC task that I'm working on it and will have a PR soon!
+Got the RFC example code working and announce on RFC task that I'm working on it and will have a PR soon!
 
 ---
 
@@ -244,16 +252,17 @@ assert_eq!(mem::size_of::<Align16>(), 16);
 * I'm not going to get this done in my time off work!
 
 ---
+class: center, middle
 
 # 27/01/2017
 
-* Announce my realisation on tracking issue that this is harder than I thought :)
+Announce my realisation on tracking issue that this is harder than I thought :)
 
 ---
 
-# A solution
+# An initial solution
 
-* Rust keeps track of ADT layout in `rustc::ty::layout::Layout`.
+* Rust keeps track of ADT layout in `librustc` `ty::layout::Layout` enum.
 * Add a vector of custom alignment padding to this if `[repr(align))]` is used.
 * Tell LLVM about custom padding fields and adjust various indices where required.
 * Add a bunch of tests:
@@ -262,35 +271,36 @@ assert_eq!(mem::size_of::<Align16>(), 16);
 * `src/test/ui` - `print-type-sizes`
 
 ---
+class: center, middle
 
 # 21/02/2017
 
-* Make a big push to get everything ready.
-* Open PR for `repr(align)` support.
+Make a big push to get everything ready and open PR for `repr(align)` support.
 
 ---
 template: inverse
 
-# Chapter Two
+# Part Two
 The first 90 percent of the code accounts for the first 90 percent of the development time. The remaining 10 percent of the code accounts for the other 90 percent of the development time. - Tom Cargill, Bell Labs
 
 ---
 
 # 22/02/2017
 
-* The awesome Eddyb from the core compiler team assigned to review.
-* Makes a bunch of small suggestions to improve PR, improving naming of things and so on.
-* Compiler now supports literal attributes, so change `[repr(align = "n")]` to `[repr(align(n))]`.
-* Address all feedback and update PR.
+* The awesome EddyB from the core compiler team is assigned to review my PR.
+* He makes a few of small suggestions to improve PR, improving naming of things and so on.
+* The compiler now supports literal attributes:
+  * so change `[repr(align = "n")]` to `[repr(align(n))]`.
+* I address all feedback and update PR.
 
 ---
 
 # 25/02/2017
 
-* Eddyb suggests that instead of maintaining the custom padding vector that we always emit field padding, not just for custom alignment.
+* After disucssions with the core compiler team, Eddyb suggests that instead of maintaining the custom padding vector that we always emit field padding, not just for custom alignment.
 * This is a good suggestion, it means that repr align has the same code paths as normal code.
 * That also means it impacts all of Rust, so it's a big change.
-* Ultimately, I'd made a big push to get the PR ready, but this meant I had a lot more work to do.
+* Ultimately I'd made a big push to get the PR ready, but this meant I had a lot more work to do.
 
 ---
 
@@ -320,41 +330,46 @@ The first 90 percent of the code accounts for the first 90 percent of the develo
 * IRC is popular, but it was usually pretty dead during the hours I tended to work.
 * Tried asking for help in the forums but it didn't yeild results in my case.
 * Most of my communication was via the github issues related to my changes.
-* Do whatever works I guess!
+  * 51 comments on tracking issue
+  * 151 comments on pull request!
+  * Most of that is EddyB guiding me, thank you EddyB!
+* Do whatever work for you.
 
 ---
 
 # Debugging the compiler
 
-* What do you do when the compiler doesn't compile?
+* After making this change it took a long time before the compiler would compile itself.
 * This hadn't really been a probem before, but now I was making a significant change.
+* Lots of code in `librustc_trans` used hard coded indices for accessing fields, these were no longer correct.
+* What do you do when the compiler doesn't compile?
 * Ask for help!
 * Enable more debug info `cp src/bootstrap/config.toml.example config.toml`
 * Can enable LLVM assertions/debuginfo, disable Rust optimization, etc.
 * This can make compilation very slow!
 * Other debugging tips:
-* `export RUST_BACKTRACE=full`
-* `export RUST_LOG=rustc_trans=debug`
-* `sudo ~/.cargo/bin/rust-gdb -p <rustc pid>`
-* `break abort` - breaks on LLVM assertion
+  * `export RUST_BACKTRACE=full`
+  * `export RUST_LOG=rustc_trans=debug`
+  * `sudo ~/.cargo/bin/rust-gdb -p <rustc pid>`
+  * `break abort` - breaks on LLVM assertion
 
 ---
 
 # A flurry of (in)activity
 
 * 20/3/2017
-  * A PR from Eddyb that I'm waiting on gets merged to master
-  * At some point Eddyb goes on vacation (I assume)
+  * A PR from EddyB that I'm waiting on gets merged to master.
+  * At some point EddyB goes on vacation (I assume).
 * 8/4/2017
-  * I go on vacation
+  * I go on vacation.
 * 12/4/2017
-  * The struct field reordering change gets merged to master which breaks stage 1 compiler again
-  * Still on vacation
+  * The struct field reordering change gets merged to master which breaks stage 1 compiler again.
+  * I'm still on vacation.
   * Getting poked on github becase people are waiting on my PR :)
 * 19/4/2017
-  * Back from vacation, Eddyb spots the compiler breaking problem in my code
+  * Back from vacation, Eddyb spots the compiler breaking problem in my code, saving me a lot of debugging time!
 * 21/4/2017
- * Final PR ready, all tests passing, PR accepted
+ * Final PR ready, all tests passing, PR accepted.
  * A test fails on ARM, don't have hardware but work out what it is and fix it.
 
 ---
@@ -367,10 +382,10 @@ bors submits the PR to master!
 
 # 25/4/2017
 
-* Looking through the issue tracker, I notice a regression in nightly rust which sounds related to my change.
+* Looking through the issue tracker, I notice a regression in Nightly Rust which sounds related to my change.
 * Create a repro and fix the bug.
 * Obviously this wasn't covered by Rust's test suite.
-* Eddyb makes me a minimal test case and I submit a fix.
+* EddyB makes me a minimal test case and I submit a fix.
 * Possibly this wasn't the only thing I've broken out there in Rust land!
 
 ---
@@ -380,6 +395,9 @@ bors submits the PR to master!
 This:
 
 ```rust
+#![feature(attr_literals)]
+#![feature(repr_align)]
+
 #[repr(align(64))]
 pub struct Align64(i32);
 
@@ -394,13 +412,15 @@ pub fn nested64(a: Align64, b: i32) -> Nested64 {
 }
 ```
 
+Note: `[repr(align)]` is feature gated, I don't know what the processes or timeline for stabalisation is.
+
 ---
 
 # So what does it all mean?
 
 Becomes this:
 
-```
+```ir
 %Nested64 = type { %Align64, [0 x i8], i32, [60 x i8] }
 %Align64 = type { i32, [60 x i8] }
 
@@ -430,19 +450,27 @@ Nightly release, debug was too much code. Could look at playpen though
 
 * It was definitely rewarding getting my change in there.
 * It was a lot more work than I anticipated;
-  * estimated 1 month, actual time more like 4 months!
-* Keep that in mind when chosing something to work on.
-* I was able to make the time, but what if I couldn't?
-* I'd like to continue contributing;
+  * Estimated 1 month, actual time more like 4 months (part time)!
+  * Keep that in mind when chosing something to work on.
+  * I was able to make the time, but what if I couldn't?
+* Final PR was only +692 and -86 lines of code;
+  * Working on large complex projects often doesn't involve writing a lot of code.
   * I think it's also important to spend some time working on my own Rust projects.
+* I'd like to continue contributing when I have the time.
 * I'm sure I won't underestimate what's involved next time! /s
+
+---
+# Links
+
+* RFC 1358 - https://github.com/rust-lang/rfcs/blob/master/text/1358-repr-align.md
+* Tracking issue for RFC - https://github.com/rust-lang/rust/issues/33626
+* Pull request - https://github.com/rust-lang/rust/pull/39999
+* Merge commit - https://github.com/rust-lang/rust/commit/6d841da4a0d7629f826117f99052e3d4a7997a7e
 
 ---
 template: inverse
 
 # Questions?
-
----
 
     </textarea>
     <script src="remark.min.js"></script>
