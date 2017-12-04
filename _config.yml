@@ -43,6 +43,6 @@ author:
 #  email:             cameron.hart@gmail.com
 
 # Plugins
-plugins:
+gems:
   - jekyll-paginate
   - jekyll-gist
