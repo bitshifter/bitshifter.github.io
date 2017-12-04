@@ -19,7 +19,7 @@ test bench_f64            ... bench:         150 ns/iter (+/- 3)
 
 Something is very wrong here. One SSE benchmark is orders of magnitude slower than all of the other benchmarks. That doesn't make much sense - time to look at some assembly.
 
-To generate assembly via cargo you can run specify `RUSTFLAGS=--emit asm` before running `cargo bench`. Since I'm only interested in the assembly output for now I'm running
+To generate assembly via cargo you can run specify `RUSTFLAGS=--emit asm` before running `cargo bench`. Since we're only interested in the assembly output for now I'm running
 
 ```
 RUSTFLAGS="--emit asm" cargo bench --no-run
@@ -100,9 +100,9 @@ fn bench_f32(b: &mut Bencher) {
 }
 ```
 
-The problem here is the perennial problem with micro-benchmarking suites - is my code actually being run. What is happening here is the result of the fold call is discarded. Rust returns the value of the last expression if it's not followed by a semi-colon. Because the fold ends with a semi-colon, the closure returns nothing. To fix this and stop the optimizer from very rightly removing unnecessary work we need to either add an explicit return statement or remove the final semi-colon.
+The problem here is the perennial problem with micro-benchmarking suites - is my code actually being run. What is happening here is the result of the `fold` call is discarded. Rust returns the value of the last expression if it's not followed by a semi-colon. Because the `fold` ends with a semi-colon, the closure returns nothing. To fix this and stop the optimizer from very rightly removing unnecessary work we need to either add an explicit return statement or remove the semi-colon following the `fold`.
 
-Doing this results in a compile error
+Returning from all of the `fold` calls results in a compile error
 
 ```
 LLVM ERROR: Cannot select: intrinsic %llvm.x86.sse41.dpps
@@ -191,7 +191,7 @@ But below our dot product there's a lot of `vaddss` calls
 	jne	.LBB16_10
 ```
 
-So what's happened here? Yet again the optimizer is being clever. It realizes that the dot product calculation is invariant, so it's moved it out of the loop. The fold now consists of a loop summing `num_iterations` of the dot product. Even this has been loop unrolled by the compiler, which is why there are so many `vaddss`.
+So what's happened here? Yet again the optimizer is being clever. It realizes that the dot product calculation is invariant, so it's moved it out of the loop. The `fold` now consists of a loop summing `num_iterations` of the dot product. Even this has been loop unrolled by the compiler, which is why there are so many `vaddss`.
 
 # In Conclusion
 
