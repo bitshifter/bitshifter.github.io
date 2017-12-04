@@ -42,7 +42,7 @@ author:
   url:               https://twitter.com/bitshifternz
 #  email:             cameron.hart@gmail.com
 
-# Gems
-gems:
+# Plugins
+plugins:
   - jekyll-paginate
   - jekyll-gist
