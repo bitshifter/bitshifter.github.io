@@ -7,7 +7,7 @@ categories: blog
 
 Today I read [Hugo Tunius](https://twitter.com/K0nserv)' blog post [Exploring SIMD on Rust](https://hugotunius.se/2017/12/01/exploring-simd-in-rust.html), in which after some experimentation he didn't get the performance boost he expected to see from SIMD. I've also been meaning to have more of a play with SIMD so I thought I'd take a look at his [git repo](https://github.com/k0nserv/vector-benchmarks) and see if I can work out what's going on.
 
-Hugo mentioned he was having trouble with Bencher, so let's start there. Running `cargo bench` gave these results
+Hugo mentioned he was having trouble with [Bencher](https://doc.rust-lang.org/1.1.0/test/struct.Bencher.html), so let's start there. Running `cargo bench` gave these results
 
 ```
 running 4 tests
@@ -27,7 +27,7 @@ RUSTFLAGS="--emit asm" cargo bench --no-run
 
 This generates some AT&T style assembly output to `.s` files in the `target/release/deps` directory.  Ideally I'd prefer Intel format with demangled symbols but I don't think `rustc --emit` gives any control over this.
 
-Comparing the assembly from `bench_f32` and `bench_f32_sse` it's pretty clear what the difference is. All of the work happens between bencher functions that record the start and end times - the mangled calls to [`_ZN3std4time7Instant3now17he141c6f08d993cf9E@PLT`](https://doc.rust-lang.org/std/time/struct.Instant.html#method.now) and [`_ZN3std4time7Instant7elapsed17hc3711b876336edbcE@PLT`](https://doc.rust-lang.org/std/time/struct.Instant.html#method.elapsed). This is the assembly for `bench_f32`
+Comparing the assembly from `bench_f32` and `bench_f32_sse` there's some clear differences. All of the work happens between bencher functions that record the start and end times - the mangled calls to [`_ZN3std4time7Instant3now17he141c6f08d993cf9E@PLT`](https://doc.rust-lang.org/std/time/struct.Instant.html#method.now) and [`_ZN3std4time7Instant7elapsed17hc3711b876336edbcE@PLT`](https://doc.rust-lang.org/std/time/struct.Instant.html#method.elapsed). This is the assembly for `bench_f32`
 
 ```
 	movq	%rdi, %r14
@@ -49,7 +49,7 @@ Comparing the assembly from `bench_f32` and `bench_f32_sse` it's pretty clear wh
 	movl	%edx, 16(%r14)
 ```
 
-and the assembly of `bench_f32_sse`
+And the assembly of `bench_f32_sse`
 
 
 ```
@@ -85,7 +85,7 @@ and the assembly of `bench_f32_sse`
 	movl	%edx, 16(%r14)
 ```
 
-Without going through everything that's going on in those listings one is obviously a lot longer than the other. But why? In the first listing there should be a bunch of math happening between the two calls to `_ZN3std4time7Instant7elapsed17hebf7091c45b5403bE` to calculate a dot product, but there is only a call to `num_iterations`. The second listing has a call to the mangled function name for `dot_sse`. The compiler seems to be optimizing away all of the bench code except for the function call to `dot_sse`.
+Without going through everything that's going on in those listings one is obviously a lot longer than the other, but why? In the first listing there should be a bunch of math happening between the two calls to `_ZN3std4time7Instant7elapsed17hebf7091c45b5403bE` to calculate a dot product, but there is only a call to `num_iterations`. The second listing has a call to the mangled function name for `dot_sse`. The compiler seems to be optimizing away all of the `bench_f32*` code except for the function call to `dot_sse`.
 
 Let's look at the Rust code for `bench_f32`
 
@@ -100,7 +100,7 @@ fn bench_f32(b: &mut Bencher) {
 }
 ```
 
-The problem here is the perennial problem with micro-benchmarking suites - is my code actually being run. What is happening here is the result of the `fold` call is discarded. Rust returns the value of the last expression if it's not followed by a semi-colon. Because the `fold` ends with a semi-colon, the closure returns nothing. To fix this and stop the optimizer from very rightly removing unnecessary work we need to either add an explicit return statement or remove the semi-colon following the `fold`.
+The problem here is the perennial problem with micro-benchmarking suites - is my code actually being run. What is happening is the result of the `fold` call is discarded. Rust returns the value of the last expression if it's not followed by a semi-colon. Because the `fold` ends with a semi-colon, the closure returns nothing, well `()` to be precise. To fix this and stop the optimizer from very rightly removing unnecessary work we need to either add an explicit return statement or remove the semi-colon following the `fold`.
 
 Returning from all of the `fold` calls results in a compile error
 
@@ -197,6 +197,6 @@ So what's happened here? Yet again the optimizer is being clever. It realizes th
 
 Micro-benchmarks are hard. Even when they're testing the right thing they can still be wrong due to other influences like other software on the system or different CPU pressures than when the code is run in a real program.
 
-In this case we found that the code that was expected to be benchmarked wasn't being run at all in most cases. Firstly due to the small omission of a return value and a clever optimizing compiler. When the return was fixed and it was run, it was only executed once, because again the compiler was smart enough to optimize away the loop invariant.
+In this case we found that the code that was expected to be benchmarked wasn't being run at all in most cases. Firstly due to the small omission of a return value and a clever optimizing compiler. When the return was fixed and it was run the dot code was only executed once rather than the expected `num_iterations` time because again the compiler was smart enough to optimize away the loop invariant.
 
-We still haven't answered the question is SSE faster but we have at least determined why it doesn't appear to be in this benchmark.
+We still haven't answered the question is SSE faster but we have at least determined why it doesn't appear to be in this benchmark. The way I'd go about that would be to generate a `Vec` of data to dot product and fold on that, rather than an invariant.
