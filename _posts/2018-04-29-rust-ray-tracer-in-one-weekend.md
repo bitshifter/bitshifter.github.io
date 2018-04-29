@@ -6,7 +6,7 @@ categories: blog
 
 I was inspired to work through [Peter Shirley](https://twitter.com/Peter_shirley)'s [Ray Tracing in a Weekend](https://in1weekend.blogspot.com.au/2016/01/ray-tracing-in-one-weekend.html) mini book (for brevity RTIAW) but I wanted to write it in Rust instead of the C++ that's used in the book. I found out about the book via [@aras_p](https://twitter.com/aras_p)'s [blog series](http://aras-p.info/blog/2018/03/28/Daily-Pathtracer-Part-0-Intro/) about a [toy path tracer](https://github.com/aras-p/ToyPathTracer) he's been building.
 
-My Rust implementation can be found [here](https://github.com/bitshifter/pathtrace-rs) and the book's C++ version [here](https://github.com/petershirley/raytracinginoneweekend).
+My Rust implementation can be found [here](https://github.com/bitshifter/pathtrace-rs/tree/2018-04-29) and the book's C++ version [here](https://github.com/petershirley/raytracinginoneweekend).
 
 This post will describe how I went about translating a C++ project to Rust, so it's really intended to be an introduction to Rust for C++ programmers. I will introduce some of the Rust features I used and how they compare to both the C++ used in RTIAW's code and more "Modern" C++ features that are similar to Rust. I probably won't talk about ray tracing much at all so if you are interested in learning about that I recommend reading Peter's book!
 
@@ -225,7 +225,7 @@ One difference here is the way the material is stored. The C++ version stores a 
 
 ## Summing Up
 
-These seemed like some of the more interesting differences between the C++ version and my Rust implementation. There are of course other interesting things but I think this post has got quite long enough. The Rust code is [here](https://github.com/bitshifter/pathtrace-rs) if you want to take a look.
+These seemed like some of the more interesting differences between the C++ version and my Rust implementation. There are of course other interesting things but I think this post has got quite long enough. The Rust code this post was based on is [here](https://github.com/bitshifter/pathtrace-rs/tree/2018-04-29) if you want to take a look.
 
 Hopefully at some point I will find some time to add some more features to this path tracer and to start on some optimization work with [Rayon](https://github.com/rayon-rs/rayon) and SIMD.
 
