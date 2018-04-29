@@ -209,7 +209,7 @@ class hitable  {
 };
 ```
 
-In this instance since we only ever deal with sphere's I didn't bother creating a Rust trait and just added a hit method to my sphere type. This means that my spheres are all stored in contiguous memory unlike the C++ code where each sphere hitable is heap allocated. This probably explains the performance difference I saw in my Rust version. There will be less cache misses. Not that my sphere implementation is efficient, it contains data like the material which wouldn't be used most of the time so a future optimization would be to split the sphere data into a structure of arrays for better cache utilisation and future SIMD.
+In this instance since we only ever deal with sphere's I didn't bother creating a `Hitable` trait and just added a `hit` method to my `Sphere` type. This meant that my spheres can stored in contiguous memory unlike the C++ code where each `sphere` is stored as a `hitable`  pointer, which is heap allocated. This probably explains the performance difference I saw in my Rust version - there will be less cache misses. Not that my `Sphere` implementation is particularly efficient, it contains data like the material which wouldn't be used most of the time so a future optimization would be to split the sphere data into a structure of arrays for better cache utilisation and SIMD usage.
 
 I name my Rust implementation of `hit_record` `RayHit`:
 
