@@ -139,36 +139,35 @@ struct RayHit;
 
 struct Lambertian {
     Vec3 albedo;
+    optional<tuple<Vec3, Ray>> scatter(
+	    const Vec3&, const Ray&, const RayHit&);
 };
 
 struct Metal {
     Vec3 albedo;
     float fuzz;
+    optional<tuple<Vec3, Ray>> scatter(
+	    const Vec3&, const Ray&, const RayHit&);
 };
 
 struct Dielectric {
     float ref_idx;
+    optional<tuple<Vec3, Ray>> scatter(
+	    const Vec3&, const Ray&, const RayHit&);
 };
 
 typedef variant<Lambertian, Metal, Dielectric> Material;
 
-optional<tuple<Vec3, Ray>> scatter_lambertian(
-	const Vec3&, const Ray&, const RayHit&);
-optional<tuple<Vec3, Ray>> scatter_metal(
-	const Vec3&, float, const Ray&, const RayHit&);
-optional<tuple<Vec3, Ray>> scatter_dielectric(
-	float, const Ray&, const RayHit&);
-
 optional<tuple<Vec3, Ray>> scatter(
     const Material & mat, const Ray& ray, const RayHit & hit) {
     if (auto p = std::get_if<Lambertian>(&mat)) {
-        return scatter_lambertian(p->albedo, ray, hit);
+        return p->scatter(ray, hit);
     }
     else if (auto p = std::get_if<Metal>(&mat)) {
-        return scatter_metal(p->albedo, p->fuzz, ray, hit);
+        return p->scatter(ray, hit);
     }
     else if (auto p = std::get_if<Dielectric>(&mat)) {
-        return scatter_dielectric(p->ref_idx, ray, hit);
+        return p->scatter(ray, hit);
     }
     return {};
 }
