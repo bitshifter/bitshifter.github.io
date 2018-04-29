@@ -226,6 +226,9 @@ One difference here is the way the material is stored. The C++ version stores a 
 
 ## Summing Up
 
-These seemed like some of the more interesting differences between the C++ version and my Rust implementation. There are of course other interesting things but I think this post has got quite long enough.
+These seemed like some of the more interesting differences between the C++ version and my Rust implementation. There are of course other interesting things but I think this post has got quite long enough. The Rust code is [here](https://github.com/bitshifter/pathtrace-rs) if you want to take a look.
 
 Hopefully at some point I will find some time to add some more features to this path tracer and to start on some optimization work with [Rayon](https://github.com/rayon-rs/rayon) and SIMD.
+
+I haven't got around to setting up a comment system on my blog so if you have any comments or questions you can find me on twitter at [@bitshifternz](https://twitter.com/bitshifternz).
+
