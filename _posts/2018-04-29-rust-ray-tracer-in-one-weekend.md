@@ -8,7 +8,7 @@ I was inspired to work through [Peter Shirley](https://twitter.com/Peter_shirley
 
 My Rust implementation can be found [here](https://github.com/bitshifter/pathtrace-rs) and the book's C++ version [here](https://github.com/petershirley/raytracinginoneweekend).
 
-This post will describe how I went about translating a C++ project to Rust, so it's really intended to be an introduction to Rust for C++ programmers. I will introduce some of the Rust features I used and how they compare to both the C++ used in RTIAW's code and C++ features that are similar to Rust. I probably won't talk about ray tracing much at all so if you are interested in learning about that I recommend reading Peter's book!
+This post will describe how I went about translating a C++ project to Rust, so it's really intended to be an introduction to Rust for C++ programmers. I will introduce some of the Rust features I used and how they compare to both the C++ used in RTIAW's code and more "Modern" C++ features that are similar to Rust. I probably won't talk about ray tracing much at all so if you are interested in learning about that I recommend reading Peter's book!
 
 Additionally neither the book C++ or my Rust are optimized code, Aras's blog series covers a lot of different optimizations he's performed, I have not done that yet. My Rust implementation does appear to perform faster than the C++ (~40 seconds compared to ~90 seconds for a similar sized scene). I have not investigated why this is the case, but I have some ideas which will be covered later. I mostly wanted to check that my code was in the same ball park and it certainly seems to be.
 
@@ -208,7 +208,7 @@ class hitable  {
 };
 ```
 
-In this instance since we only ever deal with sphere's I didn't bother creating a Rust trait and just added a hit method to my sphere type. This means that my spheres are all stored in contiguous memory unlike the C++ code where each sphere hitable is heap allocated. This probably explains the performance difference I saw in my Rust version. There will be less cache misses. Not that my sphere implementation is efficient, it contains data like the material which wouldn't be used most of the time so a future optimization would be to split the sphere data into a structure of arrays for better cache utilisation and future SIMD.
+In this instance since we only ever deal with sphere's I didn't bother creating a `Hitable` trait and just added a `hit` method to my `Sphere` type. This meant that my spheres can stored in contiguous memory unlike the C++ code where each `sphere` is stored as a `hitable`  pointer, which is heap allocated. This probably explains the performance difference I saw in my Rust version - there will be less cache misses. Not that my `Sphere` implementation is particularly efficient, it contains data like the material which wouldn't be used most of the time so a future optimization would be to split the sphere data into a structure of arrays for better cache utilisation and SIMD usage.
 
 I name my Rust implementation of `hit_record` `RayHit`:
 
