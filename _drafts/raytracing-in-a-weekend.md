@@ -10,7 +10,7 @@ My Rust implementation can be found [here](https://github.com/bitshifter/pathtra
 
 This post will describe how I went about translating a C++ project to Rust, so it's really intended to be an introduction to Rust for C++ programmers. I will introduce some of the Rust features I used and how they compare to both the C++ used in RTIAW's code and C++ features that are similar to Rust. I probably won't talk about ray tracing much at all so if you are interested in learning about that I recommend reading Peter's book!
 
-Additionally neither the book C++ or my Rust are optimized code, Aras's blog series covers a lot of different optimizations he's performed, I have not done that yet. My Rust implementation does appear to perform faster than he C++ implementation (~40 seconds compared to ~90 seconds for a similar sized scene). I have not investigated why this is the case, but I have some ideas which will be covered later. I mostly wanted to check that my code was in the same ball park and it certainly seems to be.
+Additionally neither the book C++ or my Rust are optimized code, Aras's blog series covers a lot of different optimizations he's performed, I have not done that yet. My Rust implementation does appear to perform faster than the C++ (~40 seconds compared to ~90 seconds for a similar sized scene). I have not investigated why this is the case, but I have some ideas which will be covered later. I mostly wanted to check that my code was in the same ball park and it certainly seems to be.
 
 ## Materials
 
@@ -230,5 +230,5 @@ These seemed like some of the more interesting differences between the C++ versi
 
 Hopefully at some point I will find some time to add some more features to this path tracer and to start on some optimization work with [Rayon](https://github.com/rayon-rs/rayon) and SIMD.
 
-I haven't got around to setting up a comment system on my blog so if you have any comments or questions you can find me on twitter at [@bitshifternz](https://twitter.com/bitshifternz).
+I haven't got around to setting up a comment system on my blog so if you have any comments or questions hit me up on twitter at [@bitshifternz](https://twitter.com/bitshifternz).
 
