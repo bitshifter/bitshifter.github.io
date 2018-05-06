@@ -107,3 +107,5 @@ After changing my loop to use iterators it was a one line change to my main loop
 I still have a lot of optimisations I want to try, primarily making my spheres [SOA](https://en.wikipedia.org/wiki/AOS_and_SOA#Structure_of_arrays) and trying out Rust's SIMD support.
 
 The code for this post can be found on [github](https://github.com/bitshifter/pathtrace-rs/tree/2018-05-05-post).
+
+If you have any feedback you can comment on the [/r/rust](https://www.reddit.com/r/rust/comments/8hj03a/path_tracing_in_parallel_with_rayon/) or [twitter](https://twitter.com/bitshifternz/status/993264433450254336) threads.
