@@ -16,24 +16,24 @@ RTIAW introduces three materials, Lambertian, Metal and Dielectric. These materi
 
 ```c++
 class material  {
-    public:
-        virtual bool scatter(
-			const ray& r_in,
-			const hit_record& rec,
-			vec3& attenuation,
-			ray& scattered) const = 0;
+  public:
+    virtual bool scatter(
+      const ray& r_in,
+      const hit_record& rec,
+      vec3& attenuation,
+      ray& scattered) const = 0;
 };
 
 class metal : public material {
-    public:
-        metal(const vec3& a, float f);
-        virtual bool scatter(
-			const ray& r_in,
-			const hit_record& rec,
-			vec3& attenuation,
-			ray& scattered) const;
-        vec3 albedo;
-        float fuzz;
+  public:
+    metal(const vec3& a, float f);
+    virtual bool scatter(
+      const ray& r_in,
+      const hit_record& rec,
+      vec3& attenuation,
+      ray& scattered) const;
+    vec3 albedo;
+    float fuzz;
 };
 ```
 
@@ -41,30 +41,30 @@ Rust doesn't have classes, it's not strictly speaking an OOP language (see [is R
 
 ```rust
 pub trait Material {
-	fn scatter(
-		&self,
-		r_in: &Ray,
-		rec: &HitRecord,
-		attenuation: &mut Vec3,
-		scattered: &mut Vec)
-	-> bool;
+  fn scatter(
+    &self,
+    r_in: &Ray,
+    rec: &HitRecord,
+    attenuation: &mut Vec3,
+    scattered: &mut Vec)
+  -> bool;
 }
 
 struct Metal {
-	albedo: Vec3,
-	fuzz: f32,
+  albedo: Vec3,
+  fuzz: f32,
 }
 
 impl Material for Metal {
-	fn scatter(
-		&self,
-		r_in: &Ray,
-		rec: &HitRecord,
-		attenuation: &mut Vec3,
-		scattered: &mut Vec
-	) -> bool {
-		// do stuff
-	}
+  fn scatter(
+    &self,
+    r_in: &Ray,
+    rec: &HitRecord,
+    attenuation: &mut Vec3,
+    scattered: &mut Vec
+  ) -> bool {
+    // do stuff
+  }
 }
 ```
 
@@ -77,9 +77,9 @@ Since there are a small number of materials and the data size of the different t
 ```rust
 #[derive(Clone, Copy)]
 pub enum Material {
-    Lambertian { albedo: Vec3 },
-    Metal { albedo: Vec3, fuzz: f32 },
-    Dielectric { ref_idx: f32 },
+  Lambertian { albedo: Vec3 },
+  Metal { albedo: Vec3, fuzz: f32 },
+  Dielectric { ref_idx: f32 },
 }
 ```
 
@@ -87,20 +87,20 @@ Each enum variant contains data fields. I've named my fields for clarity but you
 
 ```rust
 impl Material {
-    fn scatter(&self, ray: &Ray, ray_hit: &RayHit, rng: &mut Rng)
-	-> Option<(Vec3, Ray)> {
-        match *self {
-            Material::Lambertian { albedo } => {
-				// lambertian implementation
-			}
-            Material::Metal { albedo, fuzz } => {
-				// metal implementation
-			}
-            Material::Dielectric { ref_idx } => {
-				// dielectric implementation
-			}
-        }
+  fn scatter(&self, ray: &Ray, ray_hit: &RayHit, rng: &mut Rng)
+  -> Option<(Vec3, Ray)> {
+    match *self {
+      Material::Lambertian { albedo } => {
+        // lambertian implementation
+      }
+      Material::Metal { albedo, fuzz } => {
+        // metal implementation
+      }
+      Material::Dielectric { ref_idx } => {
+        // dielectric implementation
+      }
     }
+  }
 }
 ```
 
@@ -112,9 +112,9 @@ This `scatter` call and it's return value are handled like so:
 
 ```rust
 if let Some((attenuation, scattered)) =
-	ray_hit.material.scatter(ray_in, &ray_hit, rng)
+  ray_hit.material.scatter(ray_in, &ray_hit, rng)
 {
-	// do stuff
+  // do stuff
 }
 ```
 
@@ -136,38 +136,38 @@ struct Ray { Vec3 origin; Vec3 direction; };
 struct RayHit;
 
 struct Lambertian {
-    Vec3 albedo;
-    optional<tuple<Vec3, Ray>> scatter(
-	    const Vec3&, const Ray&, const RayHit&);
+  Vec3 albedo;
+  optional<tuple<Vec3, Ray>> scatter(
+    const Vec3&, const Ray&, const RayHit&);
 };
 
 struct Metal {
-    Vec3 albedo;
-    float fuzz;
-    optional<tuple<Vec3, Ray>> scatter(
-	    const Vec3&, const Ray&, const RayHit&);
+  Vec3 albedo;
+  float fuzz;
+  optional<tuple<Vec3, Ray>> scatter(
+    const Vec3&, const Ray&, const RayHit&);
 };
 
 struct Dielectric {
-    float ref_idx;
-    optional<tuple<Vec3, Ray>> scatter(
-	    const Vec3&, const Ray&, const RayHit&);
+  float ref_idx;
+  optional<tuple<Vec3, Ray>> scatter(
+    const Vec3&, const Ray&, const RayHit&);
 };
 
 typedef variant<Lambertian, Metal, Dielectric> Material;
 
 optional<tuple<Vec3, Ray>> scatter(
     const Material & mat, const Ray& ray, const RayHit & hit) {
-    if (auto p = std::get_if<Lambertian>(&mat)) {
-        return p->scatter(ray, hit);
-    }
-    else if (auto p = std::get_if<Metal>(&mat)) {
-        return p->scatter(ray, hit);
-    }
-    else if (auto p = std::get_if<Dielectric>(&mat)) {
-        return p->scatter(ray, hit);
-    }
-    return {};
+  if (auto p = std::get_if<Lambertian>(&mat)) {
+    return p->scatter(ray, hit);
+  }
+  else if (auto p = std::get_if<Metal>(&mat)) {
+    return p->scatter(ray, hit);
+  }
+  else if (auto p = std::get_if<Dielectric>(&mat)) {
+    return p->scatter(ray, hit);
+  }
+  return {};
 }
 
 // dummy function declaration to prevent dead code removal
@@ -175,11 +175,11 @@ void dummy(const Vec3&, const Ray&);
 
 // dummy function to call the scatter code
 void test(const Ray& ray, const RayHit& hit, const Material& mat) {
-    if (auto result = scatter(mat, ray, hit)) {
-        const auto & attenuation = std::get<0>(*result);
-        const auto & scattered = std::get<1>(*result);
-        dummy(attenuation, scattered);
-    }
+  if (auto result = scatter(mat, ray, hit)) {
+    const auto & attenuation = std::get<0>(*result);
+    const auto & scattered = std::get<1>(*result);
+    dummy(attenuation, scattered);
+  }
 }
 ```
 
@@ -191,18 +191,19 @@ RTIAW introduces a ray collision result structure `hit_record` and a `hitable` a
 class material;
 
 struct hit_record {
-    float t;  
-    vec3 p;
-    vec3 normal; 
-    material *mat_ptr;
+  float t;  
+  vec3 p;
+  vec3 normal; 
+  material *mat_ptr;
 };
 
 class hitable  {
-    public:
-        virtual bool hit(const ray& r,
-			float t_min,
-			float t_max,
-			hit_record& rec) const = 0;
+  public:
+    virtual bool hit(
+      const ray& r,
+      float t_min,
+      float t_max,
+      hit_record& rec) const = 0;
 };
 ```
 
@@ -212,10 +213,10 @@ I name my Rust implementation of `hit_record` `RayHit`:
 
 ```rust
 struct RayHit {
-    t: f32,
-    point: Vec3,
-    normal: Vec3,
-    material: Material,
+  t: f32,
+  point: Vec3,
+  normal: Vec3,
+  material: Material,
 }
 ```
 
