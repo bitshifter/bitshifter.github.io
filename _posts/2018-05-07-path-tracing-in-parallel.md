@@ -36,7 +36,7 @@ The above code is looping through all `j` rows and all `i` columns and ray casti
 
 I don't strictly need to keep this structure to use Rayon, but processing each row in parallel sounds like an OK starting point.
 
-If I was to parallise this in C++ I would make sure the output buffer is pre-created (not just reserved) since I know exactly how big it is beforehand. In C++ I would determine the output address from the i and j values and just write there since I know each thread will be writing to a different location there are no data races, assuming I don't make any mistakes. To do the same in Rust would require each thread to have a mutable reference to the output buffer, but multiple mutable references are not allowed in safe Rust. You can achieve this in unsafe Rust, and that's what the iterators are using behind the scenes which is presented as a safe API for the programmer. Coming from C++ I'm not used to Rust's heavier use of iterators and it usually takes me a while to translate my loops into idiomatic Rust.
+If I was to parallelise this in C++ I would make sure the output buffer is pre-created (not just reserved) since I know exactly how big it is beforehand. In C++ I would determine the output address from the i and j values and just write there since I know each thread will be writing to a different location there are no data races, assuming I don't make any mistakes. To do the same in Rust would require each thread to have a mutable reference to the output buffer, but multiple mutable references are not allowed in safe Rust. You can achieve this in unsafe Rust, and that's what the iterators are using behind the scenes which is presented as a safe API for the programmer. Coming from C++ I'm not used to Rust's heavier use of iterators and it usually takes me a while to translate my loops into idiomatic Rust.
 
 There is a base `Iterator` trait which all `Iterators` are built from:
 
@@ -100,8 +100,10 @@ error[E0387]: cannot borrow data mutably in a captured outer variable in an `Fn`
 
 I had added a counter to the `Scene` struct which is updated in calls to `ray_trace`, so this method takes `&mut self`. I made the counter a `std::sync::atomic::AtomicUsize`. The other race was the `rng` which was captured in the `for_each` closure of the main loop. I just construct a new `rng` for each row instead.
 
-Once these issues were fixed it compiled and ran in ~10 seconds, nearly a 4x speed up which is what I would hope for on a 4 core machine. Although, I do have 8 logical cores my understanding is I probably wouldn't get any extra speed out of these, unfortunately my BIOS doesn't have an option to disable hyperthreading.
+Once these issues were fixed it compiled and ran in ~10 seconds, nearly a 4x speed up which is what I would hope for on a 4 core machine. Although, I do have 8 logical cores my understanding is I probably wouldn't get any extra speed out of these, unfortunately my BIOS doesn't have an option to disable hyper threading.
 
 After changing my loop to use iterators it was a one line change to my main loop to make it run in parallel using Rayon and thanks to Rust all the data races in my code failed to actually compile. That is much easier to deal with than data races happening at runtime.
+
+I still have a lot of optimisations I want to try, primarily making my spheres [SOA](https://en.wikipedia.org/wiki/AOS_and_SOA#Structure_of_arrays) and trying out Rust's SIMD support.
 
 The code for this post can be found on [github](https://github.com/bitshifter/pathtrace-rs/tree/2018-05-05-post).
