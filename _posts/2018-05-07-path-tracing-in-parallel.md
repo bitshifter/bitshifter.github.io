@@ -100,4 +100,8 @@ error[E0387]: cannot borrow data mutably in a captured outer variable in an `Fn`
 
 I had added a counter to the `Scene` struct which is updated in calls to `ray_trace`, so this method takes `&mut self`. I made the counter a `std::sync::atomic::AtomicUsize`. The other race was the `rng` which was captured in the `for_each` closure of the main loop. I just construct a new `rng` for each row instead.
 
-Once these issues were fixed it compiled and ran in ~10 seconds, nearly a 4x speed up which is what I would hope for on a 4 core machine. After changing my loop to use iterators it was a one line change to make it run in parallel using Rayon and thanks to Rust all the data races in my code failed to actually compile which is much easier to deal with than data races happening at runtime.
+Once these issues were fixed it compiled and ran in ~10 seconds, nearly a 4x speed up which is what I would hope for on a 4 core machine. Although, I do have 8 logical cores my understanding is I probably wouldn't get any extra speed out of these, unfortunately my BIOS doesn't have an option to disable hyperthreading.
+
+After changing my loop to use iterators it was a one line change to my main loop to make it run in parallel using Rayon and thanks to Rust all the data races in my code failed to actually compile. That is much easier to deal with than data races happening at runtime.
+
+The code for this post can be found on [github](https://github.com/bitshifter/pathtrace-rs/tree/2018-05-05-post).
