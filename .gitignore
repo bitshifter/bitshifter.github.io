@@ -42,3 +42,6 @@ validation-report.json
 
 # Folders to ignore
 node_modules
+
+# Bundle
+Gemfile.lock
