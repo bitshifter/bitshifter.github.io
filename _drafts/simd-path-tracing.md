@@ -66,7 +66,7 @@ Another thing worth mentioning is the SIMD intrinsics are all labelled unsafe, u
 
 Most of the advice I've heard around using SIMD is just making your math types use it not the way to get performance and that you are better to just write SIMD math code without wrappers. One reason is `Vec3` is only using 3 of the available SIMD lanes, so even on SSE you're only 75% occupancy and you won't get any benefit from larger registers. Another reason is components in a `Vec3` are related but values in SIMD vector lanes have no semantic relationship. In practice what this means is doing operations across lanes like a dot product is cumbersome and not that efficient. See "The Awkward Vec4 Dot Product" slide on page 43 of this [GDC presentation](https://deplinenoise.files.wordpress.com/2015/03/gdc2015_afredriksson_simd.pdf).
 
-Given all of the above it's not surprising that Aras [blogged](http://aras-p.info/blog/2018/04/10/Daily-Pathtracer-Part-7-Initial-SIMD/) that he didn't see much of a gain from converting his `float3` struct to SIMD. It's actually one of the last things I implemented to try and reach my performance target. I followed the same post he did on ["How to write a maths library in 2016"](http://www.codersnotes.com/notes/maths-lib-2016/) except for course in Rust rather than C++. This actually gave me a pretty big boost, from 10Mrays/s to 20.7Mrays/s. That's a large gain so why did I see this when Aras's C++ version only saw a slight change?
+Given all of the above it's not surprising that Aras [blogged](http://aras-p.info/blog/2018/04/10/Daily-Pathtracer-Part-7-Initial-SIMD/) that he didn't see much of a gain from converting his `float3` struct to SIMD. It's actually one of the last things I implemented to tied. I followed the same post he did on ["How to write a maths library in 2016"](http://www.codersnotes.com/notes/maths-lib-2016/) except for course in Rust rather than C++. This actually gave me a pretty big boost, from 10Mrays/s to 20.7Mrays/s without any other optimisations. That's a large gain so why did I see this when Aras's C++ version only saw a slight change?
 
 I think the answer has to do with my next topic.
 
@@ -112,7 +112,7 @@ impl Sphere {
 
 Reasonably straight forward, the first five lines are simple math operations before some conditionals to determine if the ray hit or not. To convert this to SSE2 first we need to load the data into the SIMD registers, do the math bit and finally extract which one of the SIMD lanes contains the result we're after (the nearest hit point).
 
-First we need to splat x, y, and z components of the ray origin and direction into SSE registers. They we need to iterate over 4 spheres at a time, loading 4 x, y and z components of the sphere's centre points into registers containing 4 x components, 4 y components and so on.
+First we need to splat `x`, `y`, and `z` components of the ray origin and direction into SSE registers. They we need to iterate over 4 spheres at a time, loading 4 `x`, `y` and `z` components of the sphere's centre points into registers containing 4 x components, 4 y components and so on.
 
 We use the `_mm_set_ps1` intrinsic to splat each ray origin and direction component into across 4 lanes of a SIMD variable.
 
@@ -434,9 +434,9 @@ So in this case my AVX2 version was faster, which is nice but not really an appl
 
 So what differences are remaining? A couple of things stood out in my profiling:
 
-The C++ compiler appeared to be linking in an SSE2 implementation of sin and cos, Rust is using the f64 sin and cos in the MSVC toolchain version of the compiler
+The C++ compiler appeared to be linking in an SSE2 implementation of sin and cos, Rust is using the `f64` sin and cos in the MSVC toolchain version of the compiler
 
-Rayon was higher overhead than enki - the C thread pool Aras was using. There were some pretty deep callstacks in Rayon and the hot function that was showing up in VTune was pretty large. Enki by comparison is pretty simple.
+Rayon was higher overhead than Enki (the C thread pool Aras is using). There were some pretty callstacks in Rayon and the hot function that was showing up in VTune was pretty large. Enki by comparison is pretty simple.
 
 Addressing these things might get me a bit closer.
 
