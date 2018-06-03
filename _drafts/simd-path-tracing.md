@@ -278,33 +278,36 @@ macro_rules! _mm_shuffle {
 }
 ```
 
-This macro works kind of backwards from what I'd expect, so to reverse the order of the SIMD lanes you would do:
+So for example to reverse the order of the SIMD lanes you would do:
 
 ```rust
 _mm_shuffle_ps(a, a, _mm_shuffle!(0, 1, 2, 3))
 ```
 
-Which is saying move lane 0 to lane 3, lane 1 to lane 2, lane 2 to lane 1 and lane 3 to lane 0.
+Which is saying move lane 0 to lane 3, lane 1 to lane 2, lane 2 to lane 1 and lane 3 to lane 0. Lane 3 is the left most lane and lane 0 is the rightmost, which seems backwards but I assume it's due to x86 being little endian. As you can see `_mm_shuffle_ps` does take two operands, so you can interleave lanes from two values into the result but I haven't found a use for that so far.
 
 So given that, if we put some values into `hmin`:
 
 ```
-let a = _mm_set_ps(0.0, 1.0, 2.0, 3.0);
-// a = __m128(3.0, 2.0, 1.0, 0.0)
+let a = _mm_loadu_ps([A, B, C, D]);
+// a = [A, B, C, D]
 let b = _mm_shuffle_ps(a, a, _mm_shuffle!(0, 0, 3, 2));
-// b = __m128(1.0, 0.0, 3.0, 3.0)
-let c = _mm_min_ps(a, b);
-// c = __m128(1.0, 0.0, 1.0, 0.0)
-let d = _shuffle_ps(c, c, _mm_shuffle!(0, 0, 0, 1));
-// d = __m128(0.0, 1.0, 1.0, 1.0)
+// b = [D, D, A, B];
+let c = mm_min_ps(a, b);
+// c = [min(A, D), min(B, D), min(C, A), min(D, B)];
+let d = _mm_shuffle_ps(c, c, _mm_shuffle!(0, 0, 0, 1));
+// d = [min(A, D), min(A, D), min(A, D), min(C, A)];
 let e = _mm_min_ps(c, d);
-// e = __m128(0.0, 0.0, 1.0, 0.0)
+// e = [min(A, D), min(A, B, D), min(A, C, D), min(A, B, C, D)]
 let f = _mm_cvtss_f32(e);
-// f = 0
+// f = min(A, B, C, D)
 ```
+
+The result in lane 0 has been compared with all of the values in the 4 lanes. I thought this was a nice example of the kind of problems that need to be solved when working with SIMD.
 
 # Alignment
 
+As I mentioned earlier that the best way that I'm aware of to load data into SSE registers is with a f32 array aligned to 16 bytes
 repr align wrapper. Probably could just use a union...
 
 # SIMD wrapper and AVX2
@@ -316,20 +319,6 @@ Wrapper
 How it's included
 
 No compile time switching yet and not sure how to do it.
-
-# Floats in Rust
-
-No -ffast-math
-
-Agner link
-
-PartialOrd and Ord
-
-sin and cos on MSVC
-
-Precision and smallpt scene
-
-Rayon versus Enki
 
 # Final performance results
 
