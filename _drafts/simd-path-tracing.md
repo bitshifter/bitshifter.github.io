@@ -440,4 +440,6 @@ Rayon was higher overhead than Enki (the C thread pool Aras is using). There wer
 
 Addressing these things might get me a bit closer.
 
+It's also a bit surprising that AVX2 didn't make a huge difference, it seemed to be bottlenecked on performing square roots.
+
 If you made it this far well done, thanks for reading. I promise my next post will be shorter!
