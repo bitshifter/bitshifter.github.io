@@ -437,4 +437,4 @@ Addressing these things might get me a bit closer.
 
 It's also a bit surprising that AVX2 didn't make a huge difference, it seemed to be bottlenecked on performing square roots.
 
-If you made it this far well done, thanks for reading! I covered a lot in the post but at the same time I left out a lot of details. If you want to know more take a look my [spheres_simd_wrapped branch](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_wrapped) which has my most optimised code and feel free to ask questions or give feedback via [@bitshifternz](https://twitter.com/bitshifternz) on Twitter.
+If you made it this far well done, thanks for reading! I covered a lot in the post but at the same time I left out a lot of details. If you want to know more take a look my [spheres_simd_wrapped branch](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_wrapped) which has my most optimised code and feel free to ask questions or give feedback via [@bitshifternz](https://twitter.com/bitshifternz) on Twitter or on my [/r/rust post](https://www.reddit.com/r/rust/comments/8od5n9/optimising_path_tracing_with_simd/) on Reddit.
