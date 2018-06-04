@@ -19,7 +19,7 @@ This is potentially going to turn into a long post, so here's what I'm going to 
 * [A very quick introduction to SIMD](#what-is-simd)
 * [SIMD support in Rust](#simd-support-in-rust)
 * [Rewriting Vec3 to use SSE2](#converting-vec3-to-sse2)
-* [A seque into floating point in Rust](#floating-point-in-rust)
+* [A segue into floating point in Rust](#floating-point-in-rust)
 * [Preparing data for SIMD with Structure of Arrays](#preparing-data-for-simd)
 * [Getting the result out again](#getting-the-result-out-again)
 * [Loading aligned data](#aligning-data)
@@ -75,7 +75,7 @@ I think every game I've ever worked on has enabled to the fast math compiler set
 
 My theory on why I saw a large jump going from precise IEEE 754 floats to SSE was in part due to the lack of `-ffast-math` optimisations. This is speculation on my part though, I haven't done any digging to back it up.
 
-A more well known floating point wart in Rust is the distinction between `PartialOrd` and `Ord` traits. This distinction exists because floating point can be `Nan` which means that it doesn't support [total order](https://en.wikipedia.org/wiki/Total_order) which is required by `Ord` but not `PartialOrd`. As a consequence you can't use a lot of standard library functions like [sort](https://doc.rust-lang.org/std/primitive.slice.html#method.sort) with floats. This is an ergonomics issue rather than a performance issue but it is one I ran into working on this so I thought I'd mention it. I've seen the [noisy_float](https://crates.io/crates/noisy_float) crate recommended as a work around for float ergonmics issues but I haven't tried it.
+A more well known floating point wart in Rust is the distinction between `PartialOrd` and `Ord` traits. This distinction exists because floating point can be `Nan` which means that it doesn't support [total order](https://en.wikipedia.org/wiki/Total_order) which is required by `Ord` but not `PartialOrd`. As a consequence you can't use a lot of standard library functions like [sort](https://doc.rust-lang.org/std/primitive.slice.html#method.sort) with floats. This is an ergonomics issue rather than a performance issue but it is one I ran into working on this so I thought I'd mention it. I've seen the [noisy_float](https://crates.io/crates/noisy_float) crate recommended as a work around for float ergonomics issues but I haven't tried it.
 
 # Preparing data for SIMD
 
@@ -229,7 +229,7 @@ for (((centre_x, centre_y), centre_z), radius_sq) in self
 }
 ```
 
-Because I'm iterating in chunks of 4 I make sure the arrays sizes are a multiple of 4, adding some bougus spheres to the end to pad the array out of necessary. I did try using `get_unchecked` on each array instead of `chunks(4)` and `zip` but at the time it appeared to be slower. I might try it again though as the iterator version is a bit obtuse and generates a lot of code. Note that I'm using `_mm_loadu_ps` because my `Vec<f32>` arrays are not 16 byte aligned. I'll talk about that later.
+Because I'm iterating in chunks of 4 I make sure the arrays sizes are a multiple of 4, adding some bogus spheres to the end to pad the array out of necessary. I did try using `get_unchecked` on each array instead of `chunks(4)` and `zip` but at the time it appeared to be slower. I might try it again though as the iterator version is a bit obtuse and generates a lot of code. Note that I'm using `_mm_loadu_ps` because my `Vec<f32>` arrays are not 16 byte aligned. I'll talk about that later.
 
 # Getting the result out again
 
@@ -343,7 +343,7 @@ I had intended to write a wrapper later after getting some hands on experience w
 let discr = nb * nb - c;
 ```
 
-is a lot easier to read and write than
+Is a lot easier to read and write than
 
 ```rust
 let discr = _mm_sub_ps(_mm_mul_ps(nb, nb), c);
