@@ -8,9 +8,9 @@ Following on from [path tracing in parallel with Rayon]({{ site.baseurl }}{% pos
 
 ![the final result](/public/img/output_lit.png)
 
-My initial unoptimized code was processing 10Mrays/s on my laptop. Aras's code (with GPGPU disabled) was doing 45.5Mrays/s. I had a long way to go from here! My unoptimized code can be found on [this branch](https://github.com/bitshifter/pathtrace-rs/tree/emissive).
+My initial unoptimized code was processing 10Mrays/s on my laptop. Aras's code (with GPGPU disabled) was doing 45.5Mrays/s. I had a long way to go from here!
 
-tl;dr did I match the C++ in Rust? Almost. My SSE4.1 version is doing 41.2Mrays/s about 10% slower than the target 45.5Mrays/s running on Windows on my laptop. The long answer is more complicated but I will go into that later. My fully (so far) optimised version lives [here](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_wrapped).
+tl;dr did I match the C++ in Rust? Almost. My SSE4.1 version is doing 41.2Mrays/s about 10% slower than the target 45.5Mrays/s running on Windows on my laptop. The long answer is more complicated but I will go into that later.
 
 # Overview
 
@@ -411,9 +411,9 @@ I primarily testing performance on my laptop running Window 10 home. I'm compili
 | Wrapped SSE4.1 w/ LTO     |    41.2 |
 | Wrapped AVX2 w/ LTO       |    45.0 |
 
-The difference between the `Plain SSE4.1` and `Wrapped SSE4.1` are because I added the `hmin` changes and aligned `SpheresSoA` data at the same time as I added the SIMD wrappers. LTO stands for link time optimisation. It did give a nice increase in performance, but at a large increase in build time.
+The difference between the 'Plain SSE4.1' and 'Wrapped SSE4.1' are because I added the `hmin` changes and aligned `SpheresSoA` data at the same time as I added the SIMD wrappers. LTO stands for link time optimisation. It did give a nice increase in performance, but at a large increase in build time.
 
-I do most of my development on Linux and was confused for a long time because my Linux performance was much higher than what I was seeing in Windows on the same laptop. At the same time the Linux peaks were higher but it fluctuated a lot as the path tracer ran. The Windows numbers were lower but stable. This difference is very likely due to CPU frequency scaling differences between Linux and Windows. It does make benchmarking on a Linux laptop a bit unreliable though.
+I do most of my development on Linux and was confused for a long time because my Linux performance was much higher than what I was seeing in Windows on the same laptop. At the same time the Linux peaks were higher but it fluctuated a lot as the path tracer ran. The Windows numbers were lower but stable. This difference is very likely due to CPU frequency scaling differences between Linux and Windows. It does make benchmarking on my Linux laptop a bit unreliable though.
 
 I did occasionally test on a desktop machine too, which gave the following results:
 
