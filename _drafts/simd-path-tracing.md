@@ -12,23 +12,21 @@ My initial unoptimized code was processing 10Mrays/s on my laptop. Aras's code (
 
 tl;dr did I match the C++ in Rust? Almost. My SSE4.1 version is doing 41.2Mrays/s about 10% slower than the target 45.5Mrays/s running on Windows on my laptop. The long answer is more complicated but I will go into that later. My fully (so far) optimised version lives [here](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_wrapped).
 
-# My Process
+# Overview
 
-This is potentially going to turn into a long post, so as an outline my process went like:
+This is potentially going to turn into a long post, so here's what I'm going to try and cover:
 
-* Read up on SIMD support in Rust
-* Convert my array of sphere structs (AoS) to structure of arrays (SoA)
-* Rewrite the math part of ray sphere intersection in SSE2 using scalar code to extract the result
-* Examined how Aras's code extracted the hit result in SIMD and copied that with a few modifications
-* Fixed a dumb performance bug
-* Made my SoA spheres use aligned memory
-* Wrote a wrapper for the SSE2 code
-* Added an AVX2 implementation of my wrapper which is used if AVX2 is enabled at compile time
-* Rewrote my `Vec3` class to use SSE2 under the hood
+* [A very quick introduction to SIMD](#what-is-simd)
+* [SIMD support in Rust](#simd-support-in-rust)
+* [Rewriting Vec3 to use SSE2](#converting-vec3-to-sse2)
+* [A seque into floating point in Rust](#floating-point-in-rust)
+* [Preparing data for SIMD with Structure of Arrays](#preparing-data-for-simd)
+* [Getting the result out again](#getting-the-result-out-again)
+* [Loading aligned data](#aligning-data)
+* [Writing a SIMD wrapper and supporting AVX2](#simd-wrapper-with-avx2-support)
+* [Final performance results](#final-performance-results)
 
-At each step I was checking performance to see how far off the target I was.
-
-# SIMD
+# What is SIMD?
 
 A big motivation for me doing this was to write some SIMD code. I knew what SIMD was but I'd never actually written any, or none of significance at least.
 
@@ -38,14 +36,15 @@ If you are unfamiliar with SIMD, it stands for Single Instruction Multiple Data.
 
 The image above shows adding two SIMD vectors which each contain 4 elements together in the single instruction. This increases the throughput of math heavy code. On Intel SSE2 has been available since 2001, providing 128 bit registers which can hold 4 floats or 2 doubles. More recent chips have AVX which added 256 bit registers and AVX512 which added 512 bit registers.
 
-In this path tracer we're performing collision detection of a ray against an array of spheres, one sphere at a time. With SIMD we could check 4 or even 8 spheres at a time. That sounds like a good performance boost!
+In this path tracer we're performing collision detection of a ray against an array of spheres, one sphere at a time. With SIMD we could check 4 or even 8 spheres at a time.
 
-There's a few good references I'm using for this (aside from Aras's code):
+There's a few good references I'm using for this:
+ * [Aras's path tracing blog series](http://aras-p.info/blog/2018/03/28/Daily-Pathtracer-Part-0-Intro/) particularly parts [7](http://aras-p.info/blog/2018/04/10/Daily-Pathtracer-Part-7-Initial-SIMD/), [8](http://aras-p.info/blog/2018/04/11/Daily-Pathtracer-8-SSE-HitSpheres/) and [9](http://aras-p.info/blog/2018/04/13/Daily-Pathtracer-9-A-wild-ryg-appears/)
  * [Intel Intrinsics Guide](https://software.intel.com/sites/landingpage/IntrinsicsGuide/#)
  * [Rust std::arch Module documentation](https://doc.rust-lang.org/std/arch/index.html)
  * [Agner Fog's Instruction tables with latencies, throughput and micro-ops](http://www.agner.org/optimize/instruction_tables.pdf)
 
-# SIMD in Rust
+# SIMD support in Rust
 
 Rust SIMD support is available in the nightly compiler and should make it into a stable Rust release soon. There are a couple of related RFCs around SIMD support.
 
@@ -62,11 +61,11 @@ One thing that is not currently being stabilised is cross platform abstraction a
 
 Another thing worth mentioning is the SIMD intrinsics are all labelled unsafe, using intrinsics is a bit like calling FFI functions, they aren't playing by Rust's rules and are thus unsafe. Optimised code often sacrifices a bit of safety and readability for speed, this will be no exception.
 
-# Converting Vec3 to SIMD
+# Converting Vec3 to SSE2
 
 Most of the advice I've heard around using SIMD is just making your math types use it not the way to get performance and that you are better to just write SIMD math code without wrappers. One reason is `Vec3` is only using 3 of the available SIMD lanes, so even on SSE you're only 75% occupancy and you won't get any benefit from larger registers. Another reason is components in a `Vec3` are related but values in SIMD vector lanes have no semantic relationship. In practice what this means is doing operations across lanes like a dot product is cumbersome and not that efficient. See "The Awkward Vec4 Dot Product" slide on page 43 of this [GDC presentation](https://deplinenoise.files.wordpress.com/2015/03/gdc2015_afredriksson_simd.pdf).
 
-Given all of the above it's not surprising that Aras [blogged](http://aras-p.info/blog/2018/04/10/Daily-Pathtracer-Part-7-Initial-SIMD/) that he didn't see much of a gain from converting his `float3` struct to SIMD. It's actually one of the last things I implemented to tied. I followed the same post he did on ["How to write a maths library in 2016"](http://www.codersnotes.com/notes/maths-lib-2016/) except for course in Rust rather than C++. This actually gave me a pretty big boost, from 10Mrays/s to 20.7Mrays/s without any other optimisations. That's a large gain so why did I see this when Aras's C++ version only saw a slight change?
+Given all of the above it's not surprising that Aras blogged that he didn't see much of a gain from converting his `float3` struct to SIMD. It's actually one of the last things I implemented to tied. I followed the same post he did on ["How to write a maths library in 2016"](http://www.codersnotes.com/notes/maths-lib-2016/) except for course in Rust rather than C++. This actually gave me a pretty big boost, from 10Mrays/s to 20.7Mrays/s without any other optimisations. That's a large gain so why did I see this when Aras's C++ version only saw a slight change?
 
 I think the answer has to do with my next topic.
 
@@ -78,7 +77,7 @@ My theory on why I saw a large jump going from precise IEEE 754 floats to SSE wa
 
 A more well known floating point wart in Rust is the distinction between `PartialOrd` and `Ord` traits. This distinction exists because floating point can be `Nan` which means that it doesn't support [total order](https://en.wikipedia.org/wiki/Total_order) which is required by `Ord` but not `PartialOrd`. As a consequence you can't use a lot of standard library functions like [sort](https://doc.rust-lang.org/std/primitive.slice.html#method.sort) with floats. This is an ergonomics issue rather than a performance issue but it is one I ran into working on this so I thought I'd mention it.
 
-# SIMD ray sphere hit test
+# Preparing data for SIMD
 
 As I mentioned earlier, SSE2 should allow testing a ray against 4 spheres at a time, sounds simple enough. The original scalar hit test code looks like so:
 
@@ -112,9 +111,9 @@ impl Sphere {
 
 Reasonably straight forward, the first five lines are simple math operations before some conditionals to determine if the ray hit or not. To convert this to SSE2 first we need to load the data into the SIMD registers, do the math bit and finally extract which one of the SIMD lanes contains the result we're after (the nearest hit point).
 
-First we need to splat `x`, `y`, and `z` components of the ray origin and direction into SSE registers. They we need to iterate over 4 spheres at a time, loading 4 `x`, `y` and `z` components of the sphere's centre points into registers containing 4 x components, 4 y components and so on.
+First we need to splat `x`, `y`, and `z` components of the ray origin and direction into SSE registers. They we need to iterate over 4 spheres at a time, loading 4 `x`, `y` and `z` components of the sphere's centre points into registers containing 4 `x` components, 4 `y` components and so on.
 
-We use the `_mm_set_ps1` intrinsic to splat each ray origin and direction component into across 4 lanes of a SIMD variable.
+For the ray data use the `_mm_set_ps1` intrinsic to splat each ray origin and direction component into across 4 lanes of an SSE register.
 
 ```rust
 // load ray origin
@@ -127,11 +126,7 @@ let rd_y = _mm_set_ps1(ray.direction.get_y());
 let rd_z = _mm_set_ps1(ray.direction.get_z());
 ```
 
-This is probably a good time to talk about SoA.
-
-# Structure of Arrays
-
-There are 3 ways that I'm aware of to load the sphere data into SSE vectors:
+There are 3 ways that I'm aware of to load the sphere data for SSE:
 
 * `_mm_set_ps` which takes 4 `f32` parameters
 * `_mm_loadu_ps` which takes an unaligned `*const f32` pointer
@@ -165,7 +160,7 @@ pub fn load_aligned_and_add(a: &[f32;4], b: &[f32;4]) -> __m128 {
 }
 ```
 
-And the output
+And the generated assembly:
 
 ```
 playground::set_and_add:
@@ -211,7 +206,7 @@ pub struct SpheresSoA {
 }
 ```
 
-There are other advantages to SoA. In the above structure I'm storing precalculated values for `radius * radius` and `1.0 / radius` as if you look at the original `hit` function `radius` on it's own is never actually used. Before switching to SoA adding precalculated values to my `Sphere` struct actually made things slower, presumably because I'd increased the size of the `Sphere` struct, reducing my CPU cache utilisation. With `SpheresSoA` if the `determinant > 0.0` check doesn't pass then the `radius_inv` data will never be accessed, so it's not wastefully pulled into CPU cache. Switching to SoA did speed up my scalar code too although I didn't note down the performance numbers at the time.
+There are other advantages to SoA. In the above structure I'm storing precalculated values for `radius * radius` and `1.0 / radius` as if you look at the original `hit` function `radius` on it's own is never actually used. Before switching to SoA adding precalculated values to my `Sphere` struct actually made things slower, presumably because I'd increased the size of the `Sphere` struct, reducing my CPU cache utilisation. With `SpheresSoA` if there is no ray hit result then the `radius_inv` data will never be accessed, so it's not wastefully pulled into CPU cache. Switching to SoA did speed up my scalar code too although I didn't note down the performance numbers at the time.
 
 Now to iterator over four spheres at a time my loop looks like:
 
@@ -234,11 +229,11 @@ for (((centre_x, centre_y), centre_z), radius_sq) in self
 }
 ```
 
-I did try using `get_unchecked` on each array instead of `chunks(4)` and `zip` but at the time it appeared to be slower. I might try it again though as the iterator version is a bit obtuse and generates a lot of code. Note that I'm using `_mm_loadu_ps` because my `Vec<f32>` arrays are not 16 byte aligned. I'll talk about that later.
+Because I'm iterating in chunks of 4 I make sure the arrays sizes are a multiple of 4, adding some bougus spheres to the end to pad the array out of necessary. I did try using `get_unchecked` on each array instead of `chunks(4)` and `zip` but at the time it appeared to be slower. I might try it again though as the iterator version is a bit obtuse and generates a lot of code. Note that I'm using `_mm_loadu_ps` because my `Vec<f32>` arrays are not 16 byte aligned. I'll talk about that later.
 
 # Getting the result out again
 
-I won't paste the full SSE2 (I lie, I'm using a little SSE4.1) ray spheres intersection test source here because it's quite verbose, but it can be found [here](https://github.com/bitshifter/pathtrace-rs/blob/spheres_simd/src/collision.rs#L173) if you're interested. I mostly wrote this from scratch using the [Intel Intrinsics Guide](https://software.intel.com/sites/landingpage/IntrinsicsGuide/#) to match my scalar code to the SSE2 equivalent and using Aras's [post on SSE sphere collision](http://aras-p.info/blog/2018/04/11/Daily-Pathtracer-8-SSE-HitSpheres/) and subsequent post on [ryg's optimisations](http://aras-p.info/blog/2018/04/13/Daily-Pathtracer-9-A-wild-ryg-appears/) as a guide. I think I had got pretty close to completion at the end of one evening but wasn't sure how to extract the minimum hit result out of the SSE vector so just went for the scalar option:
+I won't paste the full SSE2 (actually I'm using a little SSE4.1) ray spheres intersection test source here because it's quite verbose, but it can be found [here](https://github.com/bitshifter/pathtrace-rs/blob/spheres_simd/src/collision.rs#L173) if you're interested. I mostly wrote this from scratch using the [Intel Intrinsics Guide](https://software.intel.com/sites/landingpage/IntrinsicsGuide/#) to match my scalar code to the SSE2 equivalent and using Aras's [post on SSE sphere collision](http://aras-p.info/blog/2018/04/11/Daily-Pathtracer-8-SSE-HitSpheres/) and subsequent post on [ryg's optimisations](http://aras-p.info/blog/2018/04/13/Daily-Pathtracer-9-A-wild-ryg-appears/) as a guide. I think I had got pretty close to completion at the end of one evening but wasn't sure how to extract the minimum hit result out of the SSE vector so just went for the scalar option:
 
 ```rust
 // copy results out into scalar code to get return value (if any)
@@ -267,7 +262,7 @@ _mm_cvtss_f32(v)
 
 What this is doing is combining `_mm_shuffle_ps` and `_mm_min_ps` to compare all of the lanes with each other and shuffle the minimum value into lane 0 (the lowest 32 bits of the vector).
 
-The shuffle is using a macro that encodes where lanes are being shuffled from, it's a Rust implementation of the `_MM_SHUFFLE` macro found in `xmmintrin.h`:
+The shuffle is using a macro that encodes where lanes are being shuffled from, it's a Rust implementation of the `_MM_SHUFFLE` macro found in [`xmmintrin.h`](https://clang.llvm.org/doxygen/xmmintrin_8h.html#a65a052b655bd49ff3fe128b61847df9f):
 
 ```rust
 macro_rules! _mm_shuffle {
@@ -283,7 +278,7 @@ So for example to reverse the order of the SIMD lanes you would do:
 _mm_shuffle_ps(a, a, _mm_shuffle!(0, 1, 2, 3))
 ```
 
-Which is saying move lane 0 to lane 3, lane 1 to lane 2, lane 2 to lane 1 and lane 3 to lane 0. Lane 3 is the left most lane and lane 0 is the rightmost, which seems backwards but I assume it's due to x86 being little endian. As you can see `_mm_shuffle_ps` takes two operands, so you can interleave lanes from two values into the result but I haven't found a use for that so far.
+Which is saying move lane 0 to lane 3, lane 1 to lane 2, lane 2 to lane 1 and lane 3 to lane 0. Lane 3 is the left most lane and lane 0 is the rightmost, which seems backwards but I assume it's due to x86 being little endian. As you can see `_mm_shuffle_ps` takes two operands, so you can interleave lanes from two values into the result but I haven't had a use for that so far.
 
 So given that, if we put some values into `hmin`:
 
@@ -304,7 +299,7 @@ let f = _mm_cvtss_f32(e);
 
 The result in lane 0 has been compared with all of the values in the 4 lanes. I thought this was a nice example of the kind of problems that need to be solved when working with SIMD.
 
-# Alignment
+# Aligning data
 
 As I mentioned earlier that the best way that I'm aware of to load data into SSE registers is with a `f32` array aligned to 16 bytes so you can use the `_mm_load_ps` intrinsic. Unfortunately Rust's `std::Vec` doesn't support custom allocators so there's no way to specify a specific alignment for my `Vec<f32>`.
 
@@ -340,7 +335,7 @@ pub struct SpheresSoA {
 
 So I can remove the `chunks(4)` from my ray spheres intersection loop as they spheres are already in `ArrayF32xN` sized chunks.
 
-# SIMD wrapper and AVX2
+# SIMD wrapper with AVX2 support
 
 I had intended to write a wrapper later after getting some hands on experience with SSE intrinsics. One reason being that 
 
@@ -403,7 +398,7 @@ rustflags = ["-C", "target-feature=+avx2"]
 
 # Final performance results
 
-I primarily testing performance on my laptop running Window 10 home. My performance numbers for each iteration of my path tracer are:
+I primarily testing performance on my laptop running Window 10 home. I'm compiling with `cargo build --release` of course. My performance numbers for each iteration of my path tracer are:
 
 | Feature                   | Mrays/s |
 | ------------------------- | -------:|
@@ -442,4 +437,4 @@ Addressing these things might get me a bit closer.
 
 It's also a bit surprising that AVX2 didn't make a huge difference, it seemed to be bottlenecked on performing square roots.
 
-If you made it this far well done, thanks for reading. I promise my next post will be shorter!
+If you made it this far well done, thanks for reading! I covered a lot in the post but at the same time I left out a lot of details. If you want to know more take a look my [spheres_simd_wrapped branch](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_wrapped) which has my most optimised code and feel free to ask questions or give feedback via [@bitshifternz](https://twitter.com/bitshifternz) on Twitter.
