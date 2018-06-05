@@ -398,7 +398,7 @@ rustflags = ["-C", "target-feature=+avx2"]
 
 # Final performance results
 
-I primarily testing performance on my laptop running Window 10 home. I'm compiling with `cargo build --release` of course. My performance numbers for each iteration of my path tracer are:
+I primarily testing performance on my laptop running Window 10 home. I'm compiling with `cargo build --release` of course with `rustc 1.28.0-nightly (71e87be38 2018-05-22)`. My performance numbers for each iteration of my path tracer are:
 
 | Feature                   | Mrays/s |
 | ------------------------- | -------:|
