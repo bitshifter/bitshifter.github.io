@@ -65,7 +65,7 @@ Another thing worth mentioning is the SIMD intrinsics are all labelled unsafe, u
 
 Most of the advice I've heard around using SIMD is just making your math types use it not the way to get performance and that you are better to just write SIMD math code without wrappers. One reason is `Vec3` is only using 3 of the available SIMD lanes, so even on SSE you're only 75% occupancy and you won't get any benefit from larger registers. Another reason is components in a `Vec3` are related but values in SIMD vector lanes have no semantic relationship. In practice what this means is doing operations across lanes like a dot product is cumbersome and not that efficient. See "The Awkward Vec4 Dot Product" slide on page 43 of this [GDC presentation](https://deplinenoise.files.wordpress.com/2015/03/gdc2015_afredriksson_simd.pdf).
 
-Given all of the above it's not surprising that Aras blogged that he didn't see much of a gain from converting his `float3` struct to SIMD. It's actually one of the last things I implemented to tied. I followed the same post he did on ["How to write a maths library in 2016"](http://www.codersnotes.com/notes/maths-lib-2016/) except for course in Rust rather than C++. My SSE2 `Vec3` can be found [here](https://github.com/bitshifter/pathtrace-rs/blob/vec3_sse/src/vmath.rs). This actually gave me a pretty big boost, from 10Mrays/s to 20.7Mrays/s without any other optimisations. That's a large gain so why did I see this when Aras's C++ version only saw a slight change?
+Given all of the above it's not surprising that Aras blogged that he didn't see much of a gain from converting his `float3` struct to SIMD. It's actually one of the last things I implemented. I followed the same post he did on ["How to write a maths library in 2016"](http://www.codersnotes.com/notes/maths-lib-2016/) except for course in Rust rather than C++. My SSE2 `Vec3` can be found [here](https://github.com/bitshifter/pathtrace-rs/blob/vec3_sse/src/vmath.rs). This actually gave me a pretty big boost, from 10Mrays/s to 20.7Mrays/s without any other optimisations. That's a large gain so why did I see this when Aras's C++ version only saw a slight change?
 
 I think the answer has to do with my next topic.
 
@@ -398,7 +398,7 @@ rustflags = ["-C", "target-feature=+avx2"]
 
 # Final performance results
 
-I primarily testing performance on my laptop running Window 10 home. I'm compiling with `cargo build --release` of course. My performance numbers for each iteration of my path tracer are:
+I primarily testing performance on my laptop running Window 10 home. I'm compiling with `cargo build --release` of course with `rustc 1.28.0-nightly (71e87be38 2018-05-22)`. My performance numbers for each iteration of my path tracer are:
 
 | Feature                   | Mrays/s |
 | ------------------------- | -------:|
