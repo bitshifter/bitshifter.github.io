@@ -122,6 +122,14 @@ Looking again at the assembly listing on [godbolt](https://godbolt.org/g/h4WyUG)
 
 I do not know what the Rust calling convention is but there seems to be a lot of saving and restoring registers to and from the stack around the call to `check_for`. So there's definitely some overhead in performing this check at runtime and that's certainly noticeable comparing the results of my compile time AVX2 performance (51.1Mrays/s) to runtime checked AVX2 performance (47.6Mrays/s). If you know exactly what hardware your program is going to be running on it's better to use the compile time method. In my case, the `hit` method is called millions of times so this overhead adds up. If I could perform this check in an outer function then it should reduce the overhead of the runtime check.
 
+# Wrappers and runtime feature selection
+
+In my previous post I also talked about my SIMD wrapper. The purpose of this wrapper was to provide an interface that uses the widest available registers to it. The idea being I write my ray spheres collision test function using my wrapped SIMD types - the main benefits being that I don't need different implementions of `hit` for each SIMD intrinsics I might want to support and also I get some nice ergonomics like being able to use operators like `+` or `-` on my SIMD types. Not to mention enforcing some type safety, for examle introducing a SIMD boolean type that is returned by comparison functions and is then passed into blend functions - making the implicit SSE conventions explicit through types.
+
+That's all very nice, but it only worked at compile time. The catch being runtime `#[target_feature(enable)]` only works on functions. My wrapper had a lot of functions. On top of that the `hit` function needed to know which version of the SIMD wrapper it needed to call. My wrapper worked by bringing in the appropriate module at compile time, it didn't work at a function level.
+
+I was interested in implementing a runtime option. My first attempt at SIMD was using the runtime `target_feature` method but I had dropped it to try and write a wrapper. I was skeptical that I would be able to get my wrapper working with runtime feature detection, at least not without things getting very complicated - but I thought I'd give it a try.
+
 # Final performance results
 
 Test results are from my laptop running Window 10 home. I'm compiling with `cargo build --release` of course with `rustc 1.28.0-nightly (71e87be38 2018-05-22)`. My performance numbers for each iteration of my path tracer are:
