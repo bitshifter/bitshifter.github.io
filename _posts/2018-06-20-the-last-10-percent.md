@@ -10,7 +10,7 @@ The other part of this post is about Rust's runtime and compile time CPU feature
 
 # Target feature selection
 
-As I mentioned in my previous post, Rust is about to stabilise several SIMD related features in 1.27.Apart from the SIMD intrinsics themselves, the ability to check for CPU target features (i.e. supported instruction sets) at both compile time and runtime.
+As I mentioned in my previous post, Rust is about to stabilise several SIMD related features in 1.27. Apart from the SIMD intrinsics themselves, this adds the ability to check for CPU target features (i.e. supported instruction sets) at both compile time and runtime.
 
 The static check involves using `#[cfg(target_feature = "<feature>")]` around blocks which turns code on or off at compile time. Here's an example of compile time feature selection:
 
@@ -64,7 +64,7 @@ pub fn add(a: &[f32], b: &[f32], c: &mut [f32]) {
 }
 ```
 
-If you look at the assembly listing on [godbolt](https://godbolt.org/g/9DGsCy) you can see both `add_scalar` and `add_sse2` are both in the assembly output (SSE2 is always available on x86-x64 targets) but `add_avx2` is not as AVX2 is not. The `add` function has inlined the SSE2 version. The target features available it compile time can be controlled via `rustc` flags.
+If you look at the assembly listing on [Compiler Explorer](https://godbolt.org/g/9DGsCy) you can see both `add_scalar` and `add_sse2` are both in the assembly output (SSE2 is always available on x86-x64 targets) but `add_avx2` is not as AVX2 is not. The `add` function has inlined the SSE2 version. The target features available it compile time can be controlled via `rustc` flags.
 
 The runtime check uses the `#[target_feature = "<feature>"]` attribute that can be used on functions to emit code using that feature. The functions must be marked as `unsafe` as if they were executed on a CPU that didn't support that feature the program would crash. The `is_x86_feature_detected!` can be used to determine if the feature is available at runtime and then call the appropriate function. Here's an example of runtime feature selection:
 
@@ -118,7 +118,7 @@ pub fn add(a: &[f32], b: &[f32], c: &mut [f32]) {
 }
 ```
 
-Looking again at the assembly listing on [godbolt](https://godbolt.org/g/h4WyUG) you can see a call to `std::stdsimd::arch::detect::os::check_for` which depending on the result jumps to the AVX2 implementation or passes through to the inlined SSE2 implementation (again, because SSE2 is always available on x86-64).
+Looking again at the assembly listing on [Compiler Explorer](https://godbolt.org/g/h4WyUG) you can see a call to `std::stdsimd::arch::detect::os::check_for` which depending on the result jumps to the AVX2 implementation or passes through to the inlined SSE2 implementation (again, because SSE2 is always available on x86-64).
 
 I do not know what the Rust calling convention is but there seems to be a lot of saving and restoring registers to and from the stack around the call to `check_for`.
 
