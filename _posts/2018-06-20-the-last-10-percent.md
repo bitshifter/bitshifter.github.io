@@ -244,3 +244,7 @@ Test results are from my laptop running Window 10 home. I'm compiling with `carg
 | Dynamic (AVX2) w/ LTO     |    47.6 |
 
 The static branch lives [here](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_static) and the dynamic branch [here](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_dynamic). My machine supports AVX2 so that's what the dynamic version ends up using.
+
+In summary, if you don't know what CPU your code is going to run on you could get a nice little boost by checking target features at runtime at the loss of a bit of flexibility around how you structure your code. If you have a fixed hardware target then it's better to compile for that hardware and avoid the overhead and code restrictions of `target_feature`.
+
+As always if you have any comments you can reach me on Twitter at [@bitshifternz](https://twitter.com/bitshifternz).
