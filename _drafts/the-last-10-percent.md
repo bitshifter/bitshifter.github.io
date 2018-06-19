@@ -4,7 +4,7 @@ title:  "Optimising path tracing: the last 10%"
 categories: blog
 ---
 
-In my last post on [optimising my Rust path tracer with SIMD]({{ site.baseurl }}{% post_url 2018-06-04-simd-path-tracing %}) I had got withing 10% of my performance target, that is Aras's C++ SSE4.1 path tracer. From profiling I had determined that the main differences were MSVC using SSE versions of `sinf` and `cosf` and differences between Rayon and enkiTS thread pools. The first thing I tried was implement an [SSE2 version of `sin_cos`](https://github.com/bitshifter/pathtrace-rs/blob/sse_sincos/src/simd.rs#L66) based off of [Julien Pommier's code](http://gruntthepeon.free.fr/ssemath/sse_mathfun.h) that I found via a bit of googling. This was enough to get my SSE4.1 implementation to match the performance of Aras's SSE4.1 code. I had a slight advantage in that I just call `sin_cos` as a single function versus separate `sin` and `cos` functions, but meh, I'm calling the performance target reached.
+In my last post on [optimising my Rust path tracer with SIMD]({{ site.baseurl }}{% post_url 2018-06-04-simd-path-tracing %}) I had got withing 10% of my performance target, that is Aras's C++ SSE4.1 path tracer. From profiling I had determined that the main differences were MSVC using SSE versions of `sinf` and `cosf` and differences between Rayon and enkiTS thread pools. The first thing I tried was implement an [SSE2 version of `sin_cos`](https://github.com/bitshifter/pathtrace-rs/blob/sse_sincos/src/simd.rs#L66) based off of [Julien Pommier's code](http://gruntthepeon.free.fr/ssemath/sse_mathfun.h) that I found via a bit of googling. This was enough to get my SSE4.1 implementation to match the performance of Aras's SSE4.1 code. I had a slight advantage in that I just call `sin_cos` as a single function versus separate `sin` and `cos` functions, but meh, I'm calling my performance target reached. [Final performance results](#final-performance-results) are at the end of this post if you just want to skip to that.
 
 The other part of this post is about Rust's runtime and compile time CPU feature detection and some wrong turns I took along the way.
 
@@ -120,15 +120,117 @@ pub fn add(a: &[f32], b: &[f32], c: &mut [f32]) {
 
 Looking again at the assembly listing on [godbolt](https://godbolt.org/g/h4WyUG) you can see a call to `std::stdsimd::arch::detect::os::check_for` which depending on the result jumps to the AVX2 implementation or passes through to the inlined SSE2 implementation (again, because SSE2 is always available on x86-64).
 
-I do not know what the Rust calling convention is but there seems to be a lot of saving and restoring registers to and from the stack around the call to `check_for`. So there's definitely some overhead in performing this check at runtime and that's certainly noticeable comparing the results of my compile time AVX2 performance (51.1Mrays/s) to runtime checked AVX2 performance (47.6Mrays/s). If you know exactly what hardware your program is going to be running on it's better to use the compile time method. In my case, the `hit` method is called millions of times so this overhead adds up. If I could perform this check in an outer function then it should reduce the overhead of the runtime check.
+I do not know what the Rust calling convention is but there seems to be a lot of saving and restoring registers to and from the stack around the call to `check_for`.
+
+```
+example::add:
+  pushq %rbp
+  pushq %r15
+  pushq %r14
+  pushq %r13
+  pushq %r12
+  pushq %rbx
+  pushq %rax
+  movq %r9, %r12
+  movq %r8, %r14
+  movq %rcx, %r13
+  movq %rdx, %r15
+  movq %rsi, %rbp
+  movq %rdi, %rbx
+  movl $15, %edi
+  callq std::stdsimd::arch::detect::os::check_for@PLT
+  testb %al, %al
+  je .LBB3_1
+  movq %rbx, %rdi
+  movq %rbp, %rsi
+  movq %r15, %rdx
+  movq %r13, %rcx
+  movq %r14, %r8
+  movq %r12, %r9
+  addq $8, %rsp
+  popq %rbx
+  popq %r12
+  popq %r13
+  popq %r14
+  popq %r15
+  popq %rbp
+  jmp example::add_avx2@PLT
+```
+
+So there's definitely some overhead in performing this check at runtime and that's certainly noticeable comparing the results of my compile time AVX2 performance (51.1Mrays/s) to runtime checked AVX2 performance (47.6Mrays/s). If you know exactly what hardware your program is going to be running on it's better to use the compile time method. In my case, the `hit` method is called millions of times so this overhead adds up. If I could perform this check in an outer function then it should reduce the overhead of the runtime check.
 
 # Wrappers and runtime feature selection
 
-In my previous post I also talked about my SIMD wrapper. The purpose of this wrapper was to provide an interface that uses the widest available registers to it. The idea being I write my ray spheres collision test function using my wrapped SIMD types - the main benefits being that I don't need different implementions of `hit` for each SIMD intrinsics I might want to support and also I get some nice ergonomics like being able to use operators like `+` or `-` on my SIMD types. Not to mention enforcing some type safety, for examle introducing a SIMD boolean type that is returned by comparison functions and is then passed into blend functions - making the implicit SSE conventions explicit through types.
+In my previous post I also talked about my [SIMD wrapper]({{ site.baseurl }}{% post_url 2018-06-04-simd-path-tracing %}#simd-wrapper-with-avx2-support). The purpose of this wrapper was to provide an interface that uses the widest available registers to it. The idea being I write my ray spheres collision test function using my wrapped SIMD types - the main benefits being that I have single implementation of my `hit` function using the wrapper type and also I get some nice ergonomics like being able to use operators like `+` or `-` on my wrapper types. Not to mention enforcing some type safety, for examle introducing a SIMD boolean type that is returned by comparison functions and is then passed into blend functions - making the implicit SSE conventions explicit through the type system.
 
-That's all very nice, but it only worked at compile time. The catch being runtime `#[target_feature(enable)]` only works on functions. My wrapper had a lot of functions. On top of that the `hit` function needed to know which version of the SIMD wrapper it needed to call. My wrapper worked by bringing in the appropriate module at compile time, it didn't work at a function level.
+That's all very nice, but it only worked at compile time. The catch being runtime `#[target_feature(enable)]` only works on functions. My compile time wrapper just imported a different module depeding on what features were available. My wrapper types had a lot of functions. On top of that the `hit` function needed to know which version of the SIMD wrapper it needed to call.
 
-I was interested in implementing a runtime option. My first attempt at SIMD was using the runtime `target_feature` method but I had dropped it to try and write a wrapper. I was skeptical that I would be able to get my wrapper working with runtime feature detection, at least not without things getting very complicated - but I thought I'd give it a try.
+I was interested in implementing a runtime option. My first attempt at SIMD was using the runtime `target_feature` method but I had dropped it to try and write a wrapper. I was skeptical that I would be able to get my wrapper working with runtime feature detection, at least not without things getting very complicated - but I thought I'd give it a try. Keep in mind, I haven't completed this code, I just went a long way down this path before I moved on to writing separate scalar, SSE4.1 and AVX2 implementations of my hit function.
+
+I figured one approach would be to make the hit function generic and then specify the SSE4.1 or AVX2 implementations as type parameters. I could then choose the appropriate branch at runtime. For this to work I needed to make traits for my wrapper types and all the trait methods needed to be unsafe, due to the `target_feature` requirement. Possibly these traits could have been simplified, but this is what I ended up with:
+
+```rust
+pub trait Bool32xN<T>: Sized + Copy + Clone + BitAnd + BitOr {
+    unsafe fn num_lanes() -> usize;
+    unsafe fn unwrap(self) -> T;
+    unsafe fn to_mask(self) -> i32;
+}
+
+pub trait Int32xN<T, BI, B: Bool32xN<BI>>: Sized + Copy + Clone + Add + Sub + Mul {
+    unsafe fn num_lanes() -> usize;
+    unsafe fn unwrap(self) -> T;
+    unsafe fn splat(i: i32) -> Self;
+    unsafe fn load_aligned(a: &[i32]) -> Self;
+    unsafe fn load_unaligned(a: &[i32]) -> Self;
+    unsafe fn store_aligned(self, a: &mut [i32]);
+    unsafe fn store_unaligned(self, a: &mut [i32]);
+    unsafe fn indices() -> Self;
+    unsafe fn blend(lhs: Self, rhs: Self, cond: B) -> Self;
+}
+
+pub trait Float32xN<T, BI, B: Bool32xN<BI>>: Sized + Copy + Clone + Add + Sub + Mul + Div {
+    unsafe fn num_lanes() -> usize;
+    unsafe fn unwrap(self) -> T;
+    unsafe fn splat(s: f32) -> Self;
+    unsafe fn from_x(v: Vec3) -> Self;
+    unsafe fn from_y(v: Vec3) -> Self;
+    unsafe fn from_z(v: Vec3) -> Self;
+    unsafe fn load_aligned(a: &[f32]) -> Self;
+    unsafe fn load_unaligned(a: &[f32]) -> Self;
+    unsafe fn store_aligned(self, a: &mut [f32]);
+    unsafe fn store_unaligned(self, a: &mut [f32]);
+    unsafe fn sqrt(self) -> Self;
+    unsafe fn hmin(self) -> f32;
+    unsafe fn eq(self, rhs: Self) -> B;
+    unsafe fn gt(self, rhs: Self) -> B;
+    unsafe fn lt(self, rhs: Self) -> B;
+    unsafe fn dot3(x0: Self, x1: Self, y0: Self, y1: Self, z0: Self, z1: Self) -> Self;
+    unsafe fn blend(lhs: Self, rhs: Self, cond: B) -> Self;
+}
+```
+
+The single letter type parameters are a bit cryptic, I was thinking about better names but was deferring that problem until later. The `hit` function signature also got quite complicated:
+
+```rust
+pub unsafe fn hit_simd<BI, FI, II, B, F, I>(
+    &self,
+    ray: &Ray,
+    t_min: f32,
+    t_max: f32,
+) -> Option<(RayHit, u32)>
+where
+    B: Bool32xN<BI> + BitAnd<Output = B>,
+    F: Float32xN<FI, BI, B> + Add<Output = F> + Sub<Output = F> + Mul<Output = F>,
+    I: Int32xN<II, BI, B> + Add<Output = I> {
+    // impl
+}
+```
+
+Again with the cryptic type parameter names. These basically represented the wrapper type for `f32`, `bool` and `i32` and the arch specific SIMD type, e.g. `__m128` and `__m256`. This got pretty close to compiling but at this point I the operators didn't compile and because the operators defined in `std::ops` they aren't labelled as `unsafe`. I guess I could have wrapped an unsafe function call from the safe op trait implementation but that seemed pretty unsafe. At that point I gave up and added an AVX2 version of the hit function. It took about an hour compared to the numerous hours I'd sunk into my generic approach. 
+
+There are obvious downsides to maintaining multiple implementations of the same function. Obviously adding some tests would help. But if I end up writing more types of ray collisions or add support for another arch I'm obviously adding a lot more code and potential sources of (maybe duplicated) bugs. But I did feel at this point things were getting too complicated for not much gain in the scheme of my little path tracing project.
+
+I thought this story might be interesting to people wanting to use the runtime target feature selection in Rust. It is really nice having one executable that can take advantage of the CPU features that it's running on but it also involves some constraints on how you author your code. The unfinished runtime wrapper code is [here](https://github.com/bitshifter/pathtrace-rs/commits/spheres_simd_traits) if you are interested.
 
 # Final performance results
 
