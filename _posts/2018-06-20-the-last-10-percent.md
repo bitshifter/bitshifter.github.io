@@ -159,6 +159,10 @@ example::add:
 
 So there's definitely some overhead in performing this check at runtime and that's certainly noticeable comparing the results of my compile time AVX2 performance (51.1Mrays/s) to runtime checked AVX2 performance (47.6Mrays/s). If you know exactly what hardware your program is going to be running on it's better to use the compile time method. In my case, the `hit` method is called millions of times so this overhead adds up. If I could perform this check in an outer function then it should reduce the overhead of the runtime check.
 
+## Update - 2018-06-23
+
+There was some great discussion on [/r/rust](https://www.reddit.com/r/rust/comments/8sexqk/optimising_path_tracing_with_simd_the_last_10/) about this point. It seems like this check should be getting inlined and that it wasn't is probably a bug. A [PR](https://github.com/rust-lang-nursery/stdsimd/pull/480) has already landed in the `stdsimd` library to fix this, thanks to [gnzlbg](https://github.com/gnzlbg). It might take a while for that change to make it into stable Rust. In the interim there were a couple of other good suggestions on how I could minimise the overhead. One was to store the target feature detection result in an enum and just use a match to branch to the appropriate function. This was on the premise that the branch should get predicted and avoiding an indirect jump (function pointer) would allow the compiler to optimise better. This has certainly worked out and now my runtime target feature code performance is the same as the compile time version.
+
 # Wrappers and runtime feature selection
 
 In my previous post I also talked about my [SIMD wrapper]({{ site.baseurl }}{% post_url 2018-06-04-simd-path-tracing %}#simd-wrapper-with-avx2-support). The purpose of this wrapper was to provide an interface that uses the widest available registers to it, the idea being I write my ray spheres collision test function using my wrapped SIMD types. The main benefits being that I have single implementation of my `hit` function using the wrapper type and also I get some nice ergonomics like being able to use operators like `+` or `-` on my wrapper types. Not to mention enforcing some type safety! For example introducing a SIMD boolean type that is returned by comparison functions and is then passed into blend functions - making the implicit SSE conventions explicit through the type system.
@@ -240,8 +244,10 @@ Test results are from my laptop running Window 10 home. I'm compiling with `carg
 | ------------------------- | -------:|
 | Aras's C++ SSE4.1 version |    45.5 |
 | Static SSE4.1 w/ LTO      |    45.8 |
-| Static AVX2 w/ LTO        |    51.1 |
-| Dynamic (AVX2) w/ LTO     |    47.6 |
+| Static AVX2 w/ LTO        |    52.1 |
+| Dynamic (AVX2) w/ LTO     |    52.1 |
+
+*Update 2018-06-23* Updated performance numbers for static and dynamic versions of the code - thanks to some caching of the target feature value the performance is about this same.
 
 The static branch lives [here](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_static) and the dynamic branch [here](https://github.com/bitshifter/pathtrace-rs/tree/spheres_simd_dynamic). My machine supports AVX2 so that's what the dynamic version ends up using.
 
