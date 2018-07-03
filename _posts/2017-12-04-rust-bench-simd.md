@@ -1,11 +1,13 @@
 ---
 layout: post
 title:  "Microbenching SIMD in Rust"
-date:   2017-12-04 19:03:02 +1000
-categories: blog
+excerpt_separator: <!--more-->
+tags: rust simd
 ---
 
 Today I read [Hugo Tunius](https://twitter.com/K0nserv)' blog post [Exploring SIMD on Rust](https://hugotunius.se/2017/12/01/exploring-simd-in-rust.html), in which after some experimentation he didn't get the performance boost he expected to see from SIMD. I've also been meaning to have more of a play with SIMD so I thought I'd take a look at his [git repo](https://github.com/k0nserv/vector-benchmarks) and see if I can work out what's going on.
+
+<!--more-->
 
 Hugo mentioned he was having trouble with [Bencher](https://doc.rust-lang.org/1.1.0/test/struct.Bencher.html), so let's start there. Running `cargo bench` gave these results
 

@@ -1,7 +1,8 @@
 ---
 layout: post
 title:  "Optimising path tracing with SIMD"
-categories: blog
+excerpt_separator: <!--more-->
+tags: rust simd raytracing
 ---
 
 Following on from [path tracing in parallel with Rayon]({{ site.baseurl }}{% post_url 2018-05-07-path-tracing-in-parallel %}) I had a lot of other optimisations I wanted to try. In particular I want to see if I could match the CPU performance of [@aras_p](https://twitter.com/aras_p)'s [C++ path tracer](https://github.com/aras-p/ToyPathTracer) in Rust. He'd done a fair amount of optimising so it seemed like a good target to aim for. To get a better comparison I copied his scene and also added his light sampling approach which he talks about [here](http://aras-p.info/blog/2018/03/28/Daily-Pathtracer-Part-1-Initial-C--/). I also implemented a live render loop mimicking his.
@@ -11,6 +12,8 @@ Following on from [path tracing in parallel with Rayon]({{ site.baseurl }}{% pos
 My initial unoptimized code was processing 10Mrays/s on my laptop. Aras's code (with GPGPU disabled) was doing 45.5Mrays/s. I had a long way to go from here!
 
 tl;dr did I match the C++ in Rust? Almost. My SSE4.1 version is doing 41.2Mrays/s about 10% slower than the target 45.5Mrays/s running on Windows on my laptop. The long answer is more complicated but I will go into that later.
+
+<!--more-->
 
 # Overview
 

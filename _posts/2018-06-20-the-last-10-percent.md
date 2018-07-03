@@ -1,12 +1,15 @@
 ---
 layout: post
 title:  "Optimising path tracing: the last 10%"
-categories: blog
+excerpt_separator: <!--more-->
+tags: rust simd raytracing
 ---
 
-In my last post on [optimising my Rust path tracer with SIMD]({{ site.baseurl }}{% post_url 2018-06-04-simd-path-tracing %}) I had got withing 10% of my performance target, that is Aras's C++ SSE4.1 path tracer. From profiling I had determined that the main differences were MSVC using SSE versions of `sinf` and `cosf` and differences between Rayon and enkiTS thread pools. The first thing I tried was implement an [SSE2 version of `sin_cos`](https://github.com/bitshifter/pathtrace-rs/blob/sse_sincos/src/simd.rs#L66) based off of [Julien Pommier's code](http://gruntthepeon.free.fr/ssemath/sse_mathfun.h) that I found via a bit of googling. This was enough to get my SSE4.1 implementation to match the performance of Aras's SSE4.1 code. I had a slight advantage in that I just call `sin_cos` as a single function versus separate `sin` and `cos` functions, but meh, I'm calling my performance target reached. [Final performance results](#final-performance-results) are at the end of this post if you just want to skip to that.
+In my last post on [optimising my Rust path tracer with SIMD]({{ site.baseurl }}{% post_url 2018-06-04-simd-path-tracing %}) I had got withing 10% of my performance target, that is Aras's C++ SSE4.1 path tracer. From profiling I had determined that the main differences were MSVC using SSE versions of `sinf` and `cosf` and differences between Rayon and enkiTS thread pools. The first thing I tried was implement an [SSE2 version of `sin_cos`](https://github.com/bitshifter/pathtrace-rs/blob/sse_sincos/src/simd.rs#L66) based off of [Julien Pommier's code](http://gruntthepeon.free.fr/ssemath/sse_mathfun.h) that I found via a bit of googling. This was enough to get my SSE4.1 implementation to match the performance of Aras's SSE4.1 code. I had a slight advantage in that I just call `sin_cos` as a single function versus separate `sin` and `cos` functions, but meh, I'm calling my performance target reached. [Final performance results]({{ site.baseurl }}{% post_url 2018-06-20-the-last-10-percent %}#final-performance-results) are at the end of this post if you just want to skip to that.
 
 The other part of this post is about Rust's runtime and compile time CPU feature detection and some wrong turns I took along the way.
+
+<!--more-->
 
 # Target feature selection
 

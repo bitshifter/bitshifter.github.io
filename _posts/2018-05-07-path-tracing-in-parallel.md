@@ -1,12 +1,15 @@
 ---
 layout: post
 title:  "Path tracing in parallel with Rayon"
-categories: blog
+excerpt_separator: <!--more-->
+tags: rust raytracing c++ multithreading
 ---
 
 The path tracer I talked about in my [previous post]({{ site.baseurl }}{% post_url 2018-04-29-rust-ray-tracer-in-one-weekend %}) runs on one core, but [my laptop's CPU](https://ark.intel.com/products/78930/Intel-Core-i7-4710HQ-Processor-6M-Cache-up-to-3_50-GHz) has 4 physical cores. That seems like an easy way to make this thing faster right? There's a Rust library called [Rayon](https://crates.io/crates/rayon) which provides parallel iterators to divide your data into tasks and run it across multiple threads.
 
 One of the properties of Rust's type system is it detects shared memory data races at compile time. This property is a product of Rust's ownership model which does not allow shared mutable state. You can read more about this in the [Fearless Concurrency](https://doc.rust-lang.org/book/second-edition/ch16-00-concurrency.html) chapter of the Rust Book or for a more formal analysis [Securing the Foundations of the Rust Programming Language](https://people.mpi-sws.org/~dreyer/papers/rustbelt/paper.pdf). As a consequence of this, Rayon's API also guarantees data-race freedom.
+
+<!--more-->
 
 # Iterators
 

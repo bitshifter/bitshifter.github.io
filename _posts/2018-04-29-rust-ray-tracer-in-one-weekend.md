@@ -1,7 +1,8 @@
 ---
 layout: post
 title:  "Ray Tracing in a Weekend in Rust"
-categories: blog
+excerpt_separator: <!--more-->
+tags: rust raytracing c++
 ---
 
 I was inspired to work through [Peter Shirley](https://twitter.com/Peter_shirley)'s [Ray Tracing in a Weekend](https://in1weekend.blogspot.com.au/2016/01/ray-tracing-in-one-weekend.html) mini book (for brevity RTIAW) but I wanted to write it in Rust instead of the C++ that's used in the book. I found out about the book via [@aras_p](https://twitter.com/aras_p)'s [blog series](http://aras-p.info/blog/2018/03/28/Daily-Pathtracer-Part-0-Intro/) about a [toy path tracer](https://github.com/aras-p/ToyPathTracer) he's been building.
@@ -9,6 +10,8 @@ I was inspired to work through [Peter Shirley](https://twitter.com/Peter_shirley
 This post will describe how I went about translating a C++ project to Rust, so it's really intended to be an introduction to Rust for C++ programmers. I will introduce some of the Rust features I used and how they compare to both the C++ used in RTIAW's code and more "Modern" C++ features that are similar to Rust. I probably won't talk about ray tracing much at all so if you are interested in learning about that I recommend reading Peter's book!
 
 Additionally neither the book C++ or my Rust are optimized code, Aras's blog series covers a lot of different optimizations he's performed, I have not done that yet. My Rust implementation does appear to perform faster than the C++ (~40 seconds compared to ~90 seconds for a similar sized scene). I have not investigated why this is the case, but I have some ideas which will be covered later. I mostly wanted to check that my code was in the same ball park and it certainly seems to be.
+
+<!--more-->
 
 ## Materials
 
