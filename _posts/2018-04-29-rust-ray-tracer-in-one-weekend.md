@@ -123,7 +123,7 @@ if let Some((attenuation, scattered)) =
 
 The [if let](https://doc.rust-lang.org/book/second-edition/ch06-03-if-let.html) syntax is a convenient way to perform pattern matching when you only care about one value, in this case the `Some`. Destructuring is being used again here to access the contents of the tuple returned in the `Option`.
 
-C++ does have support for both `tuple` in C++11 and `optional` in C++17 so I've written something somewhat equivalent to the Rust version using C++17 below. I find the Rust a lot more ergonomic and readable, not to mention there are no exceptions to worry about.
+C++ does have support for both `tuple` in C++11 and `optional` in C++17 so I've written something somewhat equivalent to the Rust version using C++17 below (also on [Compiler Explorer](https://godbolt.org/g/KHEz2k). I find the Rust a lot more ergonomic and readable.
 
 ```c++
 #include <optional>
@@ -141,20 +141,20 @@ struct RayHit;
 struct Lambertian {
   Vec3 albedo;
   optional<tuple<Vec3, Ray>> scatter(
-    const Vec3&, const Ray&, const RayHit&);
+    const Ray&, const RayHit&) const;
 };
 
 struct Metal {
   Vec3 albedo;
   float fuzz;
   optional<tuple<Vec3, Ray>> scatter(
-    const Vec3&, const Ray&, const RayHit&);
+    const Ray&, const RayHit&) const;
 };
 
 struct Dielectric {
   float ref_idx;
   optional<tuple<Vec3, Ray>> scatter(
-    const Vec3&, const Ray&, const RayHit&);
+    const Ray&, const RayHit&) const;
 };
 
 typedef variant<Lambertian, Metal, Dielectric> Material;
@@ -179,8 +179,7 @@ void dummy(const Vec3&, const Ray&);
 // dummy function to call the scatter code
 void test(const Ray& ray, const RayHit& hit, const Material& mat) {
   if (auto result = scatter(mat, ray, hit)) {
-    const auto & attenuation = std::get<0>(*result);
-    const auto & scattered = std::get<1>(*result);
+    const auto & [attenuation, scattered] = *result;
     dummy(attenuation, scattered);
   }
 }
