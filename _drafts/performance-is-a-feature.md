@@ -10,6 +10,9 @@ How do you avoid premature optimisation?
 Set targets
 
 Hardware specs
+Console is pretty easy
+PC - minimum, recommended. Balance between possible customer base and lowest common denominator hardware (e.g. if min spec is 2 cores that's going to limit how much you can scale on high end machines)
+Phones - I don't have any experience but I imagine it's a simiar process to setting PC targets
 
 CPU Frame time
 GPU Frame time
