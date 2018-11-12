@@ -11,4 +11,4 @@ Rust Sydney Meetup 8 Talk: [Debugging, Rust & rr](/rr+rust/index.html)
 
 Rust Sydney Meetup 11 Talk: [The tale of repr align](/repr-align/index.html)
 
-New Zealand Game Developer's Conference 2018: [A bevy of profilers](https://docs.google.com/presentation/d/1UGuWj0s-EGi7ELGhlf19ltTbskhJC2uXH-v8nvOI6ic/edit?usp=sharing)
+New Zealand Game Developer's Conference 2018: [A bevy of profilers](https://drive.google.com/file/d/1o-1gs3-WSZSU6DBxfM-sBG0p4gb9tHtO/view?usp=sharing)
