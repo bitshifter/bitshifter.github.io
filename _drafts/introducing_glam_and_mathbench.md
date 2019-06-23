@@ -5,15 +5,49 @@ excerpt_separator: <!--more-->
 tags: rust simd math performance
 ---
 
-`glam` is a simple and fast Rust 3D math library for games and graphics.
+`glam` is a simple and fast Rust 2D and 3D math library for games and graphics.
 `mathbench` is a set of unit tests and criterion benchmarks comparing the
 performance of `glam` with the popular Rust math libraries `cgmath` and
 `nalgebra`.
 
+The following is a table of benchmarks produced by `mathbench` comparing `glam`
+peformance to `cgmath` and `nalgebra`.
+
+| benchmark                 |         glam   |       cgmath   |     nalgebra   |
+|:--------------------------|---------------:|---------------:|---------------:|
+| euler 2d                  |     9.202 us   |   __9.059 us__ |     26.53 us   |
+| euler 3d                  |   __14.37 us__ |     32.38 us   |     198.4 us   |
+| mat2 determinant          |    1.3619 ns   |    1.0668 ns   |  __1.0637 ns__ |
+| mat2 inverse (see notes)  |  __2.0673 ns__ |    2.7771 ns   |    3.9397 ns   |
+| mat2 mul mat2             |  __2.1416 ns__ |    3.0682 ns   |    3.6766 ns   |
+| mat2 transform vec2       |  __2.2084 ns__ |    2.4233 ns   |    7.0098 ns   |
+| mat2 transpose            |  __0.7204 ns__ |    1.3371 ns   |    1.8440 ns   |
+| mat3 determinant          |  __2.2374 ns__ |    2.6162 ns   |    2.6048 ns   |
+| mat3 inverse              |  __7.8398 ns__ |    8.0758 ns   |   11.4357 ns   |
+| mat3 mul mat3             |  __4.9372 ns__ |    9.5770 ns   |    8.1240 ns   |
+| mat3 transform vec3       |  __2.3139 ns__ |    4.1042 ns   |    8.2158 ns   |
+| mat3 transpose            |  __2.0043 ns__ |    3.5812 ns   |    5.9885 ns   |
+| mat4 determinant          |  __8.0186 ns__ |   11.3334 ns   |   54.3724 ns   |
+| mat4 inverse              | __21.2964 ns__ |   43.8595 ns   |   57.8703 ns   |
+| mat4 mul mat4             |  __6.8366 ns__ |    9.4308 ns   |   15.5215 ns   |
+| mat4 transform vec4       |  __2.5644 ns__ |    3.5984 ns   |    4.1611 ns   |
+| mat4 transpose            |  __2.7450 ns__ |    7.8940 ns   |   11.0163 ns   |
+| quat conjugate            |  __0.9036 ns__ |    1.8176 ns   |   11.2922 ns   |
+| quat mul quat             |  __2.9802 ns__ |    5.4663 ns   |   11.0629 ns   |
+| quat transform vec3       |  __4.2821 ns__ |    6.6963 ns   |   24.6107 ns   |
+| vec3 cross                |  __2.0753 ns__ |    2.8664 ns   |    6.9884 ns   |
+| vec3 dot                  |  __1.3448 ns__ |    1.7015 ns   |    1.6879 ns   |
+| vec3 length               |    2.0720 ns   |  __2.0494 ns__ |   82.7194 ns   |
+| vec3 normalize            |  __4.1169 ns__ |    4.1675 ns   |   84.2364 ns   |
+
+These benchmarks were performed on my [Intel i7-4710HQ
+CPU](https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html) under Linux.
+
 # Why write another math library?
 
 I had a couple of guiding principles for writing a new library, speed and
-simplicity:
+simplicity.
+
 
 ## Speed
 
