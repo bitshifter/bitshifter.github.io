@@ -5,13 +5,14 @@ excerpt_separator: <!--more-->
 tags: rust simd math performance
 ---
 
-`glam` is a simple and fast Rust 2D and 3D math library for games and graphics.
-`mathbench` is a set of unit tests and criterion benchmarks comparing the
-performance of `glam` with the popular Rust math libraries `cgmath` and
-`nalgebra`.
+[`glam`] is a simple and fast Rust 2D and 3D math library for games and graphics.
+
+[`mathbench`] is a set of unit tests and benchmarks comparing the
+performance of `glam` with the popular Rust math libraries [`cgmath`] and
+[`nalgebra`].
 
 The following is a table of benchmarks produced by `mathbench` comparing `glam`
-peformance to `cgmath` and `nalgebra`.
+peformance to `cgmath` and `nalgebra` on `f32` data.
 
 | benchmark                 |         glam   |       cgmath   |     nalgebra   |
 |:--------------------------|---------------:|---------------:|---------------:|
@@ -40,24 +41,49 @@ peformance to `cgmath` and `nalgebra`.
 | vec3 length               |    2.0720 ns   |  __2.0494 ns__ |   82.7194 ns   |
 | vec3 normalize            |  __4.1169 ns__ |    4.1675 ns   |   84.2364 ns   |
 
-These benchmarks were performed on my [Intel i7-4710HQ
-CPU](https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html) under Linux.
+These benchmarks were performed on my [Intel i7-4710HQ CPU] under Linux. Lower
+(better) numbers are highlighted, although close numbers may not be
+statistically significant, I am not a statistician! Even so, I hope it's clear
+that `glam` is performing better than `cgmath` and `nalgebra` in most of these
+benchmarks.
+
+See the full [mathbench report] for more detailed results.
+
+The reason `glam` is faster to due to it having different design goals and
+making different trade offs to `cgmath` and `nalgebra`.
 
 # Why write another math library?
 
-I had a couple of guiding principles for writing a new library, speed and
-simplicity.
+The goals of `glam` and the trade offs I have made are primarily being focused
+on good `f32` performance by using SIMD when available and a simple API. This is
+at the expense of genericity, there is no `Vector3<T>` type, just `Vec3` which
+is `f32` based. This decision, while limiting, means there is no need for
+generics or traits which keeps the API and internal implementation pretty
+simple. Note that it would be possible to support `f64` or generic types in the
+future but it's not a high priority for me, in my experience most games use
+`f32`.
 
+`glam` also avoids baking mathematical correctness into the type system, there
+are no `Point3` or `UnitQuaternion` types for example, it is up to the
+programmer if they want their `Vec3` to behave as a point or a vector or if
+their quaternion is normalised. This decision sacrifices enforced runtime
+correctness via the type system for performance and a smaller, simpler API.
 
-## Speed
+## SIMD
 
-One thing I noticed when optimising a path tracer was that I got some good
-performance wins from implementing a `Vector3` with `SSE2`. I wanted to take
-that further and build a full library that utilised SIMD for vector, matrix and
-quaternion types. I'd seen Rust math libraries that use SIMD for some functions
-but I hadn't see one that uses SIMD vectors for storage.
+I noticed when optimising a path tracer was that I got some good performance
+wins from implementing a `Vector3` with `SSE2` (see [SIMD path tracing]). I
+wanted to take that further and build a full library that utilised SIMD for
+vector, matrix and quaternion types. I'd seen Rust math libraries that use SIMD
+for some functions but I hadn't see one that uses SIMD vectors for storage.
 
-## Simplicity
+### TODO
+Describe SIMD here
+
+## API design
+
+### TODO
+Cut down below
 
 I wanted to come up with a very simple API which is very low friction for
 developers to use. Something that covers the common needs for someone working in
@@ -70,13 +96,10 @@ are wonderful language features, but I didn't see a great reason to use them in
 
 For one I wanted to use SSE2 for storage, which means a generic for the scalar
 type (e.g. `f32`) and a generic for the storage type (`__m128` if available),
-that already sounds complicated! In 15 years of working in games I can only
-think of one occasion where a generic vector type would have been useful which
-was porting code to some prototype hardware that didn't have an FPU, not exactly
-a common occurence.  Vectors of `i32` would have a reduced set of operations,
-e.g. normalizing an vector of integers is going to result in a zero vector
-except for the unit axes, which isn't super useful. One way of getting around
-that is using traits for operations that require real numbers, but that
+that already sounds complicated! Vectors of `i32` would have a reduced set of
+operations, e.g. normalizing an vector of integers is going to result in a zero
+vector except for the unit axes, which isn't super useful. One way of getting
+around that is using traits for operations that require real numbers, but that
 introduces complexity that your users need to learn for functionality that they
 may never use.
 
@@ -139,6 +162,13 @@ needs. I have it integrated into my [`travis-ci`] build and posting results to
 
 If you want to say your library is fast, you better be measuring perfomance.
 
+[`glam`]: https://docs.rs/crate/glam
+[`mathbench`]: https://github.com/bitshifter/mathbench-rs
+[`cgmath`]: https://docs.rs/crate/cgmath
+[`nalgebra`]: https://www.nalgebra.org
+[Intel i7-4710HQ CPU]: https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html
+[mathbench report]: https://bitshifter.github.io/mathbench/criterion/report/index.html
+[SIMD path tracing]: https://bitshifter.github.io/2018/06/04/simd-path-tracing/#converting-vec3-to-sse2
 [Rust API Guidelines]: https://rust-lang-nursery.github.io/api-guidelines/predictability.html#c-method
 [`tarpaulin`]: https://github.com/xd009642/tarpaulin
 [`travis-ci`]: https://travis-ci.org/bitshifter/glam-rs
