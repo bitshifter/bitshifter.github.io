@@ -42,10 +42,8 @@ peformance to `cgmath` and `nalgebra` on `f32` data.
 | vec3 normalize            |  __4.1169 ns__ |    4.1675 ns   |   84.2364 ns   |
 
 These benchmarks were performed on my [Intel i7-4710HQ CPU] under Linux. Lower
-(better) numbers are highlighted, although close numbers may not be
-statistically significant, I am not a statistician! Even so, I hope it's clear
-that `glam` is performing better than `cgmath` and `nalgebra` in most of these
-benchmarks.
+(better) numbers are highlighted. I hope it's clear that `glam` is performing
+better than `cgmath` and `nalgebra` in most of these benchmarks.
 
 See the full [mathbench report] for more detailed results.
 
@@ -54,18 +52,18 @@ making different trade offs to `cgmath` and `nalgebra`.
 
 # Why write another math library?
 
-The goals of `glam` and the trade offs I have made are primarily being focused
-on good `f32` performance by using SIMD when available and a simple API. This is
-at the expense of genericity, there is no `Vector3<T>` type, just `Vec3` which
-is `f32` based. This decision, while limiting, means there is no need for
+My goal writing `glam` and the trade offs I made are primarily being focused
+on good `f32` performance by using SIMD when available and a simpler API. This
+is at the expense of genericity, there is no `Vector3<T>` type, just `Vec3`
+which is `f32` based. This decision, while limiting, means there is no need for
 generics or traits which keeps the API and internal implementation pretty
 simple. Note that it would be possible to support `f64` or generic types in the
 future but it's not a high priority for me, in my experience most games use
-`f32`.
+`f32` almost exclusively.
 
 `glam` also avoids baking mathematical correctness into the type system, there
 are no `Point3` or `UnitQuaternion` types for example, it is up to the
-programmer if they want their `Vec3` to behave as a point or a vector or if
+programmer if they want their `Vector3` to behave as a point or a vector or if
 their quaternion is normalised. This decision sacrifices enforced runtime
 correctness via the type system for performance and a smaller, simpler API.
 
@@ -77,8 +75,72 @@ wanted to take that further and build a full library that utilised SIMD for
 vector, matrix and quaternion types. I'd seen Rust math libraries that use SIMD
 for some functions but I hadn't see one that uses SIMD vectors for storage.
 
-### TODO
-Describe SIMD here
+### SIMD primer
+
+SIMD stands for Single Instruction Multiple Data. The multiple data part varies
+depending on CPU. Recent Intel CPUs have SIMD instruction sets that can operate
+on 128-bit (SSE), 256-bit (AVX) and 512-bit data sizes. That is 4, 8 and 16
+`f32` values processed with a single instruction.
+
+Using a simple summation as an example, the difference between the scalar and
+SIMD operations is illustrated below.
+
+![Scalar vs
+SIMD](http://ftp.cvut.cz/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/CellProgrammingTutorial.files/image008.jpg)
+
+With conventional scalar operations, four add instructions must be executed one
+after another to obtain the sums. Meanwhile, SIMD uses only one add instruction
+to achieve the same result.  Requiring fewer instructions to process a given
+mass of data, SIMD operations yield higher efficiency than scalar operations.
+
+There are some down sides to using SIMD for a vector math library. One thing you
+may notice with the above example is there are 4 values, while a `Vec3` only
+contains 3 values. The 4th value is effectively ignored and is just wasted
+space.  Another down side is while SIMD is great for adding two vectors
+together, "horizontal operations" are awkward and not fast. An example of a
+horizontal operation would be to sum the values `A0`, `A1`, `A2` and `A3`, or
+more commonly in a vector math library, performing a dot product is a horizontal
+operation. If your CPU supported wider instruction sets such as AVX2, a `Vec3`
+can't take advantage of it, after all it only has 3 floats even if your
+instruction set can operate on 8.
+
+The most effective way to take advantage of SIMD is to structure your data is
+Structure of Arrays (SoA), and feed that through the widest SIMD vectors you
+have on your CPU.  What I mean by that is instead of:
+
+```rust
+struct Vec3AoS {
+  xyz: Vec<(f32, f32, f32)>,
+}
+```
+
+You store each component of the vector in it's own array:
+
+```rust
+struct Vec3SoA {
+  x: Vec<f32>,
+  y: Vec<f32>,
+  z: Vec<f32>,
+}
+```
+
+Then load 4 `x`, `y` and `z` values at a time and add them. `glam` does not help
+you with that.
+
+For more information on doing SIMD the "right way" I recommend reading through
+this GDC2015 presentation on [SIMD at Insomniac
+Games](https://deplinenoise.files.wordpress.com/2015/03/gdc2015_afredriksson_simd.pdf).
+
+You should always be able to out perform `glam` by rewriting your data
+structures to be SoA and using SIMD instructions directly, I still think it's
+valuable to have a math library that performs well if you haven't done that
+work.
+
+Even though 25% of `glam::Vec3` is wasted space, it still performs better than
+the equivalent scalar code since we are still getting 3 adds in one
+instructions. And even though horizontal operations such as dot products are
+awkward, they still have slightly better performance than the scalar equivalent
+as you can see in the `mathbench` results about for vec3 dot.
 
 ## API design
 
