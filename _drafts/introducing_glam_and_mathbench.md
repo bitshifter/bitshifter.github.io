@@ -50,16 +50,14 @@ See the full [mathbench report] for more detailed results.
 The reason `glam` is faster to due to it having different design goals and
 making different trade offs to `cgmath` and `nalgebra`.
 
-# Why write another math library?
+## Why write another math library?
 
 My goal writing `glam` and the trade offs I made are primarily being focused
 on good `f32` performance by using SIMD when available and a simpler API. This
 is at the expense of genericity, there is no `Vector3<T>` type, just `Vec3`
-which is `f32` based. This decision, while limiting, means there is no need for
-generics or traits which keeps the API and internal implementation pretty
-simple. Note that it would be possible to support `f64` or generic types in the
-future but it's not a high priority for me, in my experience most games use
-`f32` almost exclusively.
+which is `f32` based. It would be possible to support `f64` or generic types in
+the future but it's not a high priority right now, in my experience most games
+use `f32` almost exclusively.
 
 `glam` also avoids baking mathematical correctness into the type system, there
 are no `Point3` or `UnitQuaternion` types for example, it is up to the
@@ -85,13 +83,17 @@ on 128-bit (SSE), 256-bit (AVX) and 512-bit data sizes. That is 4, 8 and 16
 Using a simple summation as an example, the difference between the scalar and
 SIMD operations is illustrated below.
 
-![Scalar vs
-SIMD](http://ftp.cvut.cz/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/CellProgrammingTutorial.files/image008.jpg)
+![Scalar vs SIMD]
 
 With conventional scalar operations, four add instructions must be executed one
 after another to obtain the sums. Meanwhile, SIMD uses only one add instruction
 to achieve the same result.  Requiring fewer instructions to process a given
 mass of data, SIMD operations yield higher efficiency than scalar operations.
+
+SIMD values are typically stored in a special type. In the case of SSE2, the
+`__m128` type is used to store 4 floats. One signficant difference between this
+type and say `[f32; 4]` is `__m128` is 16 byte aligned. While you can load
+unaligned data into SSE2 registers, this is slower than loading aligned data.
 
 There are some down sides to using SIMD for a vector math library. One thing you
 may notice with the above example is there are 4 values, while a `Vec3` only
@@ -128,51 +130,74 @@ Then load 4 `x`, `y` and `z` values at a time and add them. `glam` does not help
 you with that.
 
 For more information on doing SIMD the "right way" I recommend reading through
-this GDC2015 presentation on [SIMD at Insomniac
-Games](https://deplinenoise.files.wordpress.com/2015/03/gdc2015_afredriksson_simd.pdf).
+this GDC2015 presentation on [SIMD at Insomniac Games].
 
 You should always be able to out perform `glam` by rewriting your data
 structures to be SoA and using SIMD instructions directly, I still think it's
 valuable to have a math library that performs well if you haven't done that
 work.
 
-Even though 25% of `glam::Vec3` is wasted space, it still performs better than
-the equivalent scalar code since we are still getting 3 adds in one
-instructions. And even though horizontal operations such as dot products are
-awkward, they still have slightly better performance than the scalar equivalent
-as you can see in the `mathbench` results about for vec3 dot.
+Although 25% of `glam::Vec3` is wasted space, it still performs better than the
+equivalent scalar code since we are still operating on 3 float with one
+instructions a lot of the time. And even though horizontal operations such as
+dot products are awkward, they still have slightly better performance than the
+scalar equivalent as you can see in the `mathbench` results about for vec3 dot.
 
 ## API design
 
-### TODO
-Cut down below
+### Built around SIMD
+
+Many `glam` types use `__m128` for data storage internally to get the best SSE2
+performance. This has a few implications for API design.
+
+The `__m128` is opaque. You do not have direct access to the underlying
+`f32` components. All component data must be read and written via accessors. For
+example this is how the get and set of the `y` component of a `glam::Vec3` are
+implemented:
+
+```rust
+impl Vec3 {
+    #[inline]
+    pub fn y(self) -> f32 {
+        unsafe { _mm_cvtss_f32(_mm_shuffle_ps(self.0, self.0, 0b01_01_01_01)) }
+    }
+
+    #[inline]
+    pub fn set_y(&mut self, y: f32) {
+        unsafe {
+            let mut t = _mm_move_ss(self.0, _mm_set_ss(y));
+            t = _mm_shuffle_ps(t, t, 0b11_10_00_00);
+            self.0 = _mm_move_ss(t, self.0);
+        }
+    }
+  }
+```
+
+### Avoiding complexity
 
 I wanted to come up with a very simple API which is very low friction for
 developers to use. Something that covers the common needs for someone working in
 games and graphics and doesn't require much effort learn. I also wanted
-something to was easy low friction to create.
+something to was easy for me to write.
 
 From the outset I wanted to avoid using traits and generics. Traits and generics
 are wonderful language features, but I didn't see a great reason to use them in
 `glam`.
 
-For one I wanted to use SSE2 for storage, which means a generic for the scalar
-type (e.g. `f32`) and a generic for the storage type (`__m128` if available),
-that already sounds complicated! Vectors of `i32` would have a reduced set of
-operations, e.g. normalizing an vector of integers is going to result in a zero
-vector except for the unit axes, which isn't super useful. One way of getting
-around that is using traits for operations that require real numbers, but that
-introduces complexity that your users need to learn for functionality that they
-may never use.
+Using SSE2 for storage would complicate generics, as I think 2 generic types
+would be required, a scalar type (e.g. `f32`) and a generic for the storage type
+(`__m128` if available), that already sounds complicated!
 
 That's not to say that `glam` will never contain vectors of integer or generic
 types, but for the sake of simplicity I wanted to avoid them for a while until
 the API feels stable and there's a compelling reason to use them.
 
+### Feeling Rusty
+
 I also wanted to make `glam` "Rusty". One thing I've noticed about the Rust
 standard library is everything is a method, for example `sin` is a method on
 `f32` and `f64`. It feels a bit weird coming from other languages. It turns out
-there are some reasons for this, from the [Rust API guidelines]:
+there are reasons for this, from the [Rust API guidelines]:
 
 > Methods have numerous advantages over functions:
 > * They do not need to be imported or qualified to be used: all you need is a
@@ -188,31 +213,10 @@ for this kind of thing in addition to the methods.
 
 I've tried to follow the Rust API Guidelines in general.
 
-## SSE2 and Scalar support
-
-One of the nice things about generics and traits is having a consistent
-interface not matter what the type is. In `glam` I wanted to have `SSE2`
-and scalar implementations. For the moment I have these defined in separate
-modules, one of which will be imported depending on what target features are
-available:
-
-```rust
-mod vec4;
-#[cfg(any(not(target_feature = "sse2"), feature = "scalar-math"))]
-mod vec4_f32;
-#[cfg(all(target_feature = "sse2", not(feature = "scalar-math")))]
-mod vec4_sse2;
-```
-
-This avoids having `#[cfg]` blocks littered through all of the implementation,
-but it does have it's down sides. All of the interface is duplicated between the
-different implementations, which means they could get out of sync. To try and
-mitigate that I've tried to reach 100% test coverage. This structure does
-confuse `rustdoc` a little too. A may move to a single implementation with all
-the `#[cfg]` noise long term though, it doesn't make a difference to the
-external API.
-
 ## Test Coverage
+
+I wanted to aim for 100% test coverage, especially because there are multiple
+implemenations of many types depending on whether SIMD is available or not.
 
 To determine if I actually did have 100% test coverage I've been using a cargo
 plugin called [`tarpaulin`]. It only supports **x86_64** processors running
@@ -224,6 +228,15 @@ needs. I have it integrated into my [`travis-ci`] build and posting results to
 
 If you want to say your library is fast, you better be measuring perfomance.
 
+### TODO
+
+Write about:
+* microbenchmarking glam with criterion
+* using criterion to compare glam with other libraries in mathbench
+* using cargo asm to inspect asm in mathbench
+* where to from here
+
+
 [`glam`]: https://docs.rs/crate/glam
 [`mathbench`]: https://github.com/bitshifter/mathbench-rs
 [`cgmath`]: https://docs.rs/crate/cgmath
@@ -231,6 +244,8 @@ If you want to say your library is fast, you better be measuring perfomance.
 [Intel i7-4710HQ CPU]: https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html
 [mathbench report]: https://bitshifter.github.io/mathbench/criterion/report/index.html
 [SIMD path tracing]: https://bitshifter.github.io/2018/06/04/simd-path-tracing/#converting-vec3-to-sse2
+[Scalar vs SIMD]: http://ftp.cvut.cz/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/CellProgrammingTutorial.files/image008.jpg
+[SIMD at Insomniac Games]: https://deplinenoise.files.wordpress.com/2015/03/gdc2015_afredriksson_simd.pdf
 [Rust API Guidelines]: https://rust-lang-nursery.github.io/api-guidelines/predictability.html#c-method
 [`tarpaulin`]: https://github.com/xd009642/tarpaulin
 [`travis-ci`]: https://travis-ci.org/bitshifter/glam-rs
