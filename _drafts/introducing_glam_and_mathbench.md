@@ -42,8 +42,8 @@ peformance to `cgmath` and `nalgebra` on `f32` data.
 | vec3 normalize            |  __4.1169 ns__ |    4.1675 ns   |   84.2364 ns   |
 
 These benchmarks were performed on my [Intel i7-4710HQ CPU] under Linux. Lower
-(better) numbers are highlighted. I hope it's clear that `glam` is performing
-better than `cgmath` and `nalgebra` in most of these benchmarks.
+(better) numbers are highlighted. I hope it's clear that `glam` is outperforming
+`cgmath` and `nalgebra` in most of these benchmarks.
 
 See the full [mathbench report] for more detailed results.
 
@@ -226,15 +226,115 @@ needs. I have it integrated into my [`travis-ci`] build and posting results to
 
 ## Performance
 
-If you want to say your library is fast, you better be measuring perfomance.
+If you want to say your library is fast, you better be measuring perfomance!
+
+### Micro-benchmarking with Criterion.rs
+
+I've primarily been monitoring the performance of `glam` using the [`criterion`]
+crate. `criterion` fills a similar niche to Rust's built-in [`bench`] but unlike
+`bench` it works on stable. It also has a bunch of other nice features.
+
+Microbenchmarking is a useful indication of performance, but it's not
+necessarily going to tell you the full story of what code will perform like
+under less artificial conditions (benchmarks tend to be quite limited in scope).
+All the same, they're definitely better than no metrics and I've found them to
+be a pretty reliable source of performance information when optimising some
+code.
+
+### Comparing with other libraries
+
+`glam` has a bunch of criterion benchmarks that are useful for optimising `glam`
+but they don't tell me how `glam` performs relative to other math libraries.
+
+I created [`mathbench`] for this purpose. `mathbench` is a collection of unit
+tests and benchmarks. The unit tests are to check that `glam` is producing the
+same output as other libraries (with some floating point tolerance) and the
+benchmarks compare performance. The table at the top of this post is produced
+from these benchmarks.
+
+`mathbench` could also be of use to other library authors to see how their
+library is performing and for performing optimisations.
+
+One of the nice features of `criterion` is you can set up one benchmark that
+runs multiple functions on the same data and produces a report comparing the
+results. Here's an example from `mathbench`:
+
+```rust
+fn bench_mat4_mul_mat4(c: &mut Criterion) {
+    use criterion::Benchmark;
+    use std::ops::Mul;
+    c.bench(
+        "mat4 mul mat4",
+        Benchmark::new("glam", |b| {
+            use glam::Mat4;
+            bench_binop!(b, op => mul_mat4, ty1 => Mat4, ty2 => Mat4)
+        })
+        .with_function("cgmath", |b| {
+            use cgmath::Matrix4;
+            bench_binop!(b, op => mul, ty1 => Matrix4<f32>, ty2 => Matrix4<f32>)
+        })
+        .with_function("nalgebra", |b| {
+            use nalgebra::Matrix4;
+            bench_binop!(b, op => mul, ty1 => Matrix4<f32>, ty2 => Matrix4<f32>)
+        }),
+    );
+}
+
+```
+
+If you have `gnuplot` installed `criterion` will produce [reports] with charts
+like the violin plot below:
+
+![violin plot]
+
+### Viewing assembly
+
+While `mathbench` is a library, most of it's utility is from the tests and
+benchmarks. One use I have had for the library though is creating public
+functions for inspecting assembly with [`cargo-asm`]. This is primarily because
+it was the easiest way to get `cargo-asm` to show me something.
+
+For example, in `mathbench` I've defined a simple wrapper function for
+`glam::Mat4 * glam::Vec4`:
+
+```rust
+pub fn glam_mat4_mul_vec4(lhs: &glam::Mat4, rhs: &glam::Vec4) -> glam::Vec4 {
+    *lhs * *rhs
+}
+```
+
+And then run `cargo asm mathbench::glam_mat4_mul_vec4` to get the following
+output:
+
+```
+ mov     rax, rdi
+ movaps  xmm0, xmmword, ptr, [rdx]
+ movaps  xmm1, xmm0
+ shufps  xmm1, xmm0, 0
+ mulps   xmm1, xmmword, ptr, [rsi]
+ movaps  xmm2, xmm0
+ shufps  xmm2, xmm0, 85
+ mulps   xmm2, xmmword, ptr, [rsi, +, 16]
+ addps   xmm2, xmm1
+ movaps  xmm1, xmm0
+ shufps  xmm1, xmm0, 170
+ mulps   xmm1, xmmword, ptr, [rsi, +, 32]
+ addps   xmm1, xmm2
+ shufps  xmm0, xmm0, 255
+ mulps   xmm0, xmmword, ptr, [rsi, +, 48]
+ addps   xmm0, xmm1
+ movaps  xmmword, ptr, [rdi], xmm0
+ ret
+```
+
+It's a pretty convenient way of viewing asm, with the catch that you can't see
+`#[inline]` blocks.
 
 ### TODO
 
 Write about:
-* microbenchmarking glam with criterion
-* using criterion to compare glam with other libraries in mathbench
-* using cargo asm to inspect asm in mathbench
 * where to from here
+* influences
 
 
 [`glam`]: https://docs.rs/crate/glam
@@ -250,3 +350,7 @@ Write about:
 [`tarpaulin`]: https://github.com/xd009642/tarpaulin
 [`travis-ci`]: https://travis-ci.org/bitshifter/glam-rs
 [`coveralls.io`]: https://coveralls.io/github/bitshifter/glam-rs
+[`criterion`]: https://bheisler.github.io/criterion.rs/book/index.html
+[`bench`]: https://doc.rust-lang.org/test/struct.Bencher.html
+[reports]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/index.html
+[violin plot]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/violin.svg
