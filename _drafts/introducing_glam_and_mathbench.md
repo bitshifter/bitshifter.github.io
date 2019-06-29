@@ -350,8 +350,8 @@ output:
  ret
 ```
 
-It's a pretty convenient way of viewing asm, with the catch that you can't see
-`#[inline]` blocks.
+It's a pretty convenient way of viewing assembly, with the catch that you can't
+see `#[inline]` blocks.
 
 ### Profiling benchmarks
 
@@ -379,6 +379,8 @@ adopt it and if so what features they are missing.
 
 The main outstanding thing for me right now is documenting what is there.
 
+There are of course more optimisations that could be done.
+
 I'm interested in using the [`packed_simd`] crate instead of using SSE2
 directly, as `packed_simd` supports multiple architectures out of the box.
 However I'm not sure what the status of this crate is right now.
@@ -389,7 +391,7 @@ However I'm not sure what the status of this crate is right now.
 the `scalar-math` feature. Some `glam` functions actually got it faster.
 
 | benchmark                 |         glam   |       cgmath   |     nalgebra   |
-|---------------------------|----------------|----------------|----------------|
+|:--------------------------|---------------:|---------------:|---------------:|
 | euler 2d                  |     9.074 us   |   __8.966 us__ |     26.22 us   |
 | euler 3d                  |   __28.86 us__ |      29.7 us   |     195.3 us   |
 | mat2 determinant          |  __1.0548 ns__ |    1.0603 ns   |    1.0600 ns   |
