@@ -12,7 +12,7 @@ performance of `glam` with the popular Rust math libraries [`cgmath`] and
 [`nalgebra`].
 
 The following is a table of benchmarks produced by `mathbench` comparing `glam`
-peformance to `cgmath` and `nalgebra` on `f32` data.
+performance to `cgmath` and `nalgebra` on `f32` data.
 
 | benchmark                 |         glam   |       cgmath   |     nalgebra   |
 |:--------------------------|---------------:|---------------:|---------------:|
@@ -41,14 +41,21 @@ peformance to `cgmath` and `nalgebra` on `f32` data.
 | vec3 length               |    2.0720 ns   |  __2.0494 ns__ |   82.7194 ns   |
 | vec3 normalize            |  __4.1169 ns__ |    4.1675 ns   |   84.2364 ns   |
 
-These benchmarks were performed on my [Intel i7-4710HQ CPU] under Linux. Lower
-(better) numbers are highlighted. I hope it's clear that `glam` is outperforming
-`cgmath` and `nalgebra` in most of these benchmarks.
+These benchmarks were performed on my [Intel i7-4710HQ] CPU on Linux. They were
+compiled with the stable 1.35 Rust compiler. Lower (better) numbers are
+highlighted. I hope it's clear that `glam` is outperforming `cgmath` and
+`nalgebra` in most of these benchmarks. Generally `glam` functionality is the
+same as the others, however `cgmath` and `nalgebra` matrix inverse functions
+return an `Option` type which is `None` if the matrix wasn't invertible, `glam`
+assumes the input was invertible and returns a `Mat4`.
 
 See the full [mathbench report] for more detailed results.
 
-The reason `glam` is faster to due to it having different design goals and
-making different trade offs to `cgmath` and `nalgebra`.
+The reason `glam` is faster is primarily due to it using SIMD internally for all
+types with the exception of `Vec2`.
+
+You can see a similar table at the bottom of this post with `glam`'s SIMD
+support disabled. TL;DR it's similar performance to `cgmath` which is expected.
 
 ## Why write another math library?
 
@@ -91,7 +98,7 @@ to achieve the same result.  Requiring fewer instructions to process a given
 mass of data, SIMD operations yield higher efficiency than scalar operations.
 
 SIMD values are typically stored in a special type. In the case of SSE2, the
-`__m128` type is used to store 4 floats. One signficant difference between this
+`__m128` type is used to store 4 floats. One significant difference between this
 type and say `[f32; 4]` is `__m128` is 16 byte aligned. While you can load
 unaligned data into SSE2 registers, this is slower than loading aligned data.
 
@@ -175,10 +182,10 @@ impl Vec3 {
 
 ### Avoiding complexity
 
-I wanted to come up with a very simple API which is very low friction for
-developers to use. Something that covers the common needs for someone working in
-games and graphics and doesn't require much effort learn. I also wanted
-something to was easy for me to write.
+I wanted to come up with a simple API which is very low friction for developers
+to use. Something that covers the common needs for someone working in games and
+graphics and doesn't require much effort learn. I also wanted something to was
+easy for me to write.
 
 From the outset I wanted to avoid using traits and generics. Traits and generics
 are wonderful language features, but I didn't see a great reason to use them in
@@ -202,7 +209,7 @@ there are reasons for this, from the [Rust API guidelines]:
 > Methods have numerous advantages over functions:
 > * They do not need to be imported or qualified to be used: all you need is a
 >   value of the appropriate type.
-> * Their invocation performs autoborrowing (including mutable borrows).
+> * Their invocation performs auto-borrowing (including mutable borrows).
 > * They make it easy to answer the question "what can I do with a value of type
 >   T" (especially when using rustdoc).
 > * They provide self notation, which is more concise and often more clearly
@@ -213,10 +220,26 @@ for this kind of thing in addition to the methods.
 
 I've tried to follow the Rust API Guidelines in general.
 
-## Test Coverage
+### Mathematical conventions
+
+`glam` interprets vectors as column matrices (also known as column vectors)
+meaning when transforming a vector with a matrix the matrix goes on the left,
+e.g. `v' = Mv`. DirectX uses row vectors, OpenGL uses column vectors. There are
+pros and cons to both.
+
+Matrices are stored in column major format. Each column vector is stored in
+contiguous memory.
+
+Rotations follow the left-hand rule.
+
+Some libraries support both column and row vectors my preference with `glam` is
+to pick one convention and stick with it (of course I didn't do that, I started
+with row vectors and switched to column vectors).
+
+## Test coverage
 
 I wanted to aim for 100% test coverage, especially because there are multiple
-implemenations of many types depending on whether SIMD is available or not.
+implementations of many types depending on whether SIMD is available or not.
 
 To determine if I actually did have 100% test coverage I've been using a cargo
 plugin called [`tarpaulin`]. It only supports **x86_64** processors running
@@ -226,7 +249,7 @@ needs. I have it integrated into my [`travis-ci`] build and posting results to
 
 ## Performance
 
-If you want to say your library is fast, you better be measuring perfomance!
+If you want to say your library is fast, you better be measuring performance!
 
 ### Micro-benchmarking with Criterion.rs
 
@@ -234,7 +257,7 @@ I've primarily been monitoring the performance of `glam` using the [`criterion`]
 crate. `criterion` fills a similar niche to Rust's built-in [`bench`] but unlike
 `bench` it works on stable. It also has a bunch of other nice features.
 
-Microbenchmarking is a useful indication of performance, but it's not
+Micro-benchmarking is a useful indication of performance, but it's not
 necessarily going to tell you the full story of what code will perform like
 under less artificial conditions (benchmarks tend to be quite limited in scope).
 All the same, they're definitely better than no metrics and I've found them to
@@ -330,18 +353,73 @@ output:
 It's a pretty convenient way of viewing asm, with the catch that you can't see
 `#[inline]` blocks.
 
-### TODO
+### Profiling benchmarks
 
-Write about:
-* where to from here
-* influences
+You can run individual benchmarks through a profiler to get a better
+understanding of their performance. When you run `cargo bench` it prints the
+path to each benchmark executable that it is running. You can pass the same
+parameters to this executable that you pass to `cargo bench`.
 
+For example, if I wanted to profile `glam`'s `Mat4` `inverse` I could run this
+command via my preferred profiler:
+
+```
+target/release/deps/mat4bench-e528128e2a9ccbc9 "mat4 inverse/glam"
+```
+
+There will be a bit of noise from the benchmarking code but it's usually not too
+hard to work out what is what. If your code is being inlined then it will
+probably appear inside `criterion::Bencher::iter`.
+
+## What next for glam
+
+I consider `glam` to be a minimum viable math library right now, so I'll slowly
+add more functionality over time. That will depend a bit on if other people
+adopt it and if so what features they are missing.
+
+The main outstanding thing for me right now is documenting what is there.
+
+I'm interested in using the [`packed_simd`] crate instead of using SSE2
+directly, as `packed_simd` supports multiple architectures out of the box.
+However I'm not sure what the status of this crate is right now.
+
+## glam without SSE2
+
+`glam`'s performance is around on par with `cgmath` if SSE2 is disabled using
+the `scalar-math` feature. Some `glam` functions actually got it faster.
+
+| benchmark                 |         glam   |       cgmath   |     nalgebra   |
+|---------------------------|----------------|----------------|----------------|
+| euler 2d                  |     9.074 us   |   __8.966 us__ |     26.22 us   |
+| euler 3d                  |   __28.86 us__ |      29.7 us   |     195.3 us   |
+| mat2 determinant          |  __1.0548 ns__ |    1.0603 ns   |    1.0600 ns   |
+| mat2 inverse (see notes) |  __2.3650 ns__ |    2.6464 ns   |    2.6712 ns   |
+| mat2 mul mat2             |    3.0660 ns   |  __3.0278 ns__ |    3.6211 ns   |
+| mat2 transform vec2       |  __2.4026 ns__ |    2.4059 ns   |    6.8847 ns   |
+| mat2 transpose            |    1.3356 ns   |  __1.3324 ns__ |    1.8256 ns   |
+| mat3 determinant          |    2.5755 ns   |    2.5934 ns   |  __2.5752 ns__ |
+| mat3 inverse              |   10.5764 ns   |  __7.9405 ns__ |    9.3305 ns   |
+| mat3 mul mat3             |    9.4757 ns   |    9.4536 ns   |  __7.9284 ns__ |
+| mat3 transform vec3       |    4.0669 ns   |  __4.0666 ns__ |    8.0513 ns   |
+| mat3 transpose            |    3.5409 ns   |  __3.5194 ns__ |    8.9463 ns   |
+| mat4 determinant          |  __7.6512 ns__ |   11.1750 ns   |   54.2360 ns   |
+| mat4 inverse              | __31.3069 ns__ |   43.3849 ns   |   55.4980 ns   |
+| mat4 mul mat4             |    9.5908 ns   |  __9.2905 ns__ |   15.8365 ns   |
+| mat4 transform vec4       |  __3.5640 ns__ |    3.5750 ns   |    4.1351 ns   |
+| mat4 transpose            |  __7.6544 ns__ |    9.7473 ns   |   10.6901 ns   |
+| quat conjugate            |    1.8292 ns   |  __1.7632 ns__ |    1.7671 ns   |
+| quat mul quat             |  __5.3086 ns__ |    5.3542 ns   |    5.4800 ns   |
+| quat transform vec3       |    7.1021 ns   |  __6.5746 ns__ |    7.0461 ns   |
+| vec3 cross                |    2.8486 ns   |    2.8410 ns   |  __2.8401 ns__ |
+| vec3 dot                  |  __1.5912 ns__ |    1.6773 ns   |    1.6324 ns   |
+| vec3 length               |  __2.0224 ns__ |    2.0248 ns   |   81.8765 ns   |
+| vec3 normalize            |    4.1265 ns   |  __4.1232 ns__ |   83.5038 ns   |
 
 [`glam`]: https://docs.rs/crate/glam
 [`mathbench`]: https://github.com/bitshifter/mathbench-rs
 [`cgmath`]: https://docs.rs/crate/cgmath
 [`nalgebra`]: https://www.nalgebra.org
-[Intel i7-4710HQ CPU]: https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html
+[Intel i7-4710HQ]: https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html
 [mathbench report]: https://bitshifter.github.io/mathbench/criterion/report/index.html
 [SIMD path tracing]: https://bitshifter.github.io/2018/06/04/simd-path-tracing/#converting-vec3-to-sse2
 [Scalar vs SIMD]: http://ftp.cvut.cz/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/CellProgrammingTutorial.files/image008.jpg
@@ -354,3 +432,4 @@ Write about:
 [`bench`]: https://doc.rust-lang.org/test/struct.Bencher.html
 [reports]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/index.html
 [violin plot]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/violin.svg
+[`packed_simd`]: https://rust-lang-nursery.github.io/packed_simd/packed_simd/
