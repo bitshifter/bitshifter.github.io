@@ -383,20 +383,37 @@ The main outstanding thing for me right now is documenting what is there.
 There are of course more optimisations that could be done.
 
 I'm interested in using the [`packed_simd`] crate instead of using SSE2
-directly, as `packed_simd` supports multiple architectures out of the box.
-However I'm not sure what the status of this crate is right now.
+directly as `packed_simd` supports multiple architectures out of the box.
+However `packed_simd` currently requires nightly and I'm not sure what the
+development status of this crate is right now.
+
+## Inspirations
+
+There were many inspirations for the interface and internals of `glam` from the
+Rust and C++ worlds. In no particular order:
+
+* [How to write a maths library in 2016] via
+  [Aras Pranckevičius's pathtracer blog series]
+* [Realtime Math] - header only C++11 with SSE and NEON SIMD intrinsic support
+* [DirectXMath] - header only SIMD C++ linear algebra library for use in games
+  and graphics apps
+* [DirectX Tool Kit SimpleMath] - simplified C++ wrapper around DirectXMath
+* [GLM] - header only C++ library based on the GLSL specification
+* [`packed_simd`] - mentioned above, I like the interface
+* [`cgmath`] - the Rust library I'm most familiar with
+* [`nalgebra`] - a very comprehensive and well documented Rust library
 
 ## glam without SSE2
 
 `glam`'s performance is around on par with `cgmath` if SSE2 is disabled using
-the `scalar-math` feature. Some `glam` functions actually got it faster.
+the `scalar-math` feature. Some `glam` functions got faster without SIMD.
 
 | benchmark                 |         glam   |       cgmath   |     nalgebra   |
 |:--------------------------|---------------:|---------------:|---------------:|
 | euler 2d                  |     9.074 us   |   __8.966 us__ |     26.22 us   |
 | euler 3d                  |   __28.86 us__ |      29.7 us   |     195.3 us   |
 | mat2 determinant          |  __1.0548 ns__ |    1.0603 ns   |    1.0600 ns   |
-| mat2 inverse (see notes) |  __2.3650 ns__ |    2.6464 ns   |    2.6712 ns   |
+| mat2 inverse (see notes)  |  __2.3650 ns__ |    2.6464 ns   |    2.6712 ns   |
 | mat2 mul mat2             |    3.0660 ns   |  __3.0278 ns__ |    3.6211 ns   |
 | mat2 transform vec2       |  __2.4026 ns__ |    2.4059 ns   |    6.8847 ns   |
 | mat2 transpose            |    1.3356 ns   |  __1.3324 ns__ |    1.8256 ns   |
@@ -436,3 +453,9 @@ the `scalar-math` feature. Some `glam` functions actually got it faster.
 [reports]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/index.html
 [violin plot]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/violin.svg
 [`packed_simd`]: https://rust-lang-nursery.github.io/packed_simd/packed_simd/
+[How to write a maths library in 2016]: http://www.codersnotes.com/notes/maths-lib-2016/
+[Aras Pranckevičius's pathtracer blog series]: https://aras-p.info/blog/2018/04/10/Daily-Pathtracer-Part-7-Initial-SIMD/
+[Realtime Math]: https://github.com/nfrechette/rtm
+[DirectXMath]: https://docs.microsoft.com/en-us/windows/desktop/dxmath/directxmath-portal
+[DirectX Tool Kit SimpleMath]: https://github.com/Microsoft/DirectXTK/wiki/SimpleMath
+[GLM]: https://glm.g-truc.net/
