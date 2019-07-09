@@ -6,11 +6,12 @@ excerpt_separator: <!--more-->
 tags: rust simd math performance
 ---
 
-[`glam`] is a simple and fast Rust 2D and 3D math library for games and graphics.
+[`glam`] is a simple and fast Rust linear algebra library for games and
+graphics.
 
 [`mathbench`] is a set of unit tests and benchmarks comparing the
-performance of `glam` with the popular Rust math libraries [`cgmath`] and
-[`nalgebra`].
+performance of `glam` with the popular Rust linear algebra libraries [`cgmath`]
+and [`nalgebra`].
 
 The following is a table of benchmarks produced by `mathbench` comparing `glam`
 performance to `cgmath` and `nalgebra` on `f32` data.
@@ -45,10 +46,15 @@ performance to `cgmath` and `nalgebra` on `f32` data.
 These benchmarks were performed on my [Intel i7-4710HQ] CPU on Linux. They were
 compiled with the stable 1.36 Rust compiler. Lower (better) numbers are
 highlighted. I hope it's clear that `glam` is outperforming `cgmath` and
-`nalgebra` in most of these benchmarks. Generally `glam` functionality is the
-same as the others, however `cgmath` and `nalgebra` matrix inverse functions
-return an `Option` type which is `None` if the matrix wasn't invertible, `glam`
-assumes the input was invertible and returns a `Mat4`.
+`nalgebra` in most of these benchmarks.
+
+Generally `glam` functionality is the same as the libraries for the functions
+tested here, however `cgmath` and `nalgebra` matrix inverse functions return an
+`Option` type which is `None` if the matrix wasn't invertible, `glam` assumes
+the input was invertible and returns a `Mat4`. There may be other differences
+I'm not aware of. `cgmath` also targets games and graphics, `nalgebra` is a
+general purpose linear algebra library which has a much broader target audience
+than just games and graphics programming.
 
 See the full [mathbench report] for more detailed results.
 
@@ -106,11 +112,15 @@ unaligned data into SSE2 registers, this is slower than loading aligned data.
 There are some down sides to using SIMD for a vector math library. One thing you
 may notice with the above example is there are 4 values, while a `Vec3` only
 contains 3 values. The 4th value is effectively ignored and is just wasted
-space.  Another down side is while SIMD is great for adding two vectors
-together, "horizontal operations" are awkward and not fast. An example of a
+space.
+
+Another down side is while SIMD is great for adding two vectors
+together, "horizontal operations" are awkward and not so fast. An example of a
 horizontal operation would be to sum the values `A0`, `A1`, `A2` and `A3`, or
 more commonly in a vector math library, performing a dot product is a horizontal
-operation. If your CPU supported wider instruction sets such as AVX2, a `Vec3`
+operation.
+
+If your CPU supported wider instruction sets such as AVX2, a `Vec3`
 can't take advantage of it, after all it only has 3 floats even if your
 instruction set can operate on 8.
 
@@ -149,7 +159,8 @@ Although 25% of `glam::Vec3` is wasted space, it still performs better than the
 equivalent scalar code since we are still operating on 3 float with one
 instructions a lot of the time. And even though horizontal operations such as
 dot products are awkward, they still have slightly better performance than the
-scalar equivalent as you can see in the `mathbench` results about for vec3 dot.
+scalar equivalent as you can see in the `mathbench` results above for `Vec3`
+`dot`.
 
 ## API design
 
@@ -180,6 +191,9 @@ impl Vec3 {
     }
   }
 ```
+
+These getter and setter methods are using SSE2 intrinsics to load and store
+scalar values to and from the y lane of the `__m128` vector.
 
 ### Avoiding complexity
 
@@ -244,9 +258,13 @@ implementations of many types depending on whether SIMD is available or not.
 
 To determine if I actually did have 100% test coverage I've been using a cargo
 plugin called [`tarpaulin`]. It only supports **x86_64** processors running
-Linux and does give some false positives, but it's been pretty good for my
+Linux and does give some false negatives, but it's been pretty good for my
 needs. I have it integrated into my [`travis-ci`] build and posting results to
 [`coveralls.io`].
+
+According to `coveralls.io` `glam` has 87% test covereage, I think the real
+figure is probably a bit higher due to `tarpaulin` reporting some lines being
+untested when they actually are.
 
 ## Performance
 
@@ -361,8 +379,8 @@ understanding of their performance. When you run `cargo bench` it prints the
 path to each benchmark executable that it is running. You can pass the same
 parameters to this executable that you pass to `cargo bench`.
 
-For example, if I wanted to profile `glam`'s `Mat4` `inverse` I could run this
-command via my preferred profiler:
+For example, if I wanted to profile the `glam` `Mat4` `inverse` method I could
+run this command via my preferred profiler:
 
 ```
 target/release/deps/mat4bench-e528128e2a9ccbc9 "mat4 inverse/glam"
@@ -402,6 +420,30 @@ Rust and C++ worlds. In no particular order:
 * [`packed_simd`] - mentioned above, I like the interface
 * [`cgmath`] - the Rust library I'm most familiar with
 * [`nalgebra`] - a very comprehensive and well documented Rust library
+
+## The Rust ecosystem is awesome
+
+Writing Rust is purely recreational for me. My day job for the last 14 years has
+been writing C++ game engine and gameplay code.
+
+It boggles my mind how much great tooling I have at my fingertips with Rust that
+either comes with the Rust installer or is easily accessible. Things like:
+
+* A common build system via `cargo build`
+* A common packaging system via [crates.io] and `cargo update`
+* Built in code formatting via `cargo fmt`
+* Built in linting via `cargo clippy`
+* Built in testing framework via `cargo test`
+* High quality third party micro-benchmarking - `criterion` and `cargo bench`
+* Code coverage - `tarpaulin` and `coveralls.io`
+* Continuous integration - `travis-ci`
+
+Setting up and maintaining this kind of infrastructure for a C++ project is a
+huge amount of work, especially for something I'm just doing in my evenings.
+
+Rust is pretty new and there are certainly a lot of gaps in the tooling compared
+to established languages like C++, but the out of the box experience is far far
+superior.
 
 ## glam without SSE2
 
@@ -452,6 +494,7 @@ the `scalar-math` feature. Some `glam` functions got faster without SIMD.
 [`bench`]: https://doc.rust-lang.org/test/struct.Bencher.html
 [reports]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/index.html
 [violin plot]: https://bitshifter.github.io/mathbench/criterion/mat4%20mul%20mat4/report/violin.svg
+[`cargo-asm`]: https://github.com/gnzlbg/cargo-asm
 [`packed_simd`]: https://rust-lang-nursery.github.io/packed_simd/packed_simd/
 [How to write a maths library in 2016]: http://www.codersnotes.com/notes/maths-lib-2016/
 [Aras Pranckevičius's pathtracer blog series]: https://aras-p.info/blog/2018/04/10/Daily-Pathtracer-Part-7-Initial-SIMD/
@@ -459,3 +502,4 @@ the `scalar-math` feature. Some `glam` functions got faster without SIMD.
 [DirectXMath]: https://docs.microsoft.com/en-us/windows/desktop/dxmath/directxmath-portal
 [DirectX Tool Kit SimpleMath]: https://github.com/Microsoft/DirectXTK/wiki/SimpleMath
 [GLM]: https://glm.g-truc.net/
+[crates.io]: https://crates.io
