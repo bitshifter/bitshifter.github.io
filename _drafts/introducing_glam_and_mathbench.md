@@ -408,32 +408,32 @@ Rust and C++ worlds. In no particular order:
 `glam`'s performance is around on par with `cgmath` if SSE2 is disabled using
 the `scalar-math` feature. Some `glam` functions got faster without SIMD.
 
-| benchmark                 |         glam   |       cgmath   |     nalgebra   |
-|:--------------------------|---------------:|---------------:|---------------:|
-| euler 2d                  |     9.074 us   |   __8.966 us__ |     26.22 us   |
-| euler 3d                  |   __28.86 us__ |      29.7 us   |     195.3 us   |
-| mat2 determinant          |  __1.0548 ns__ |    1.0603 ns   |    1.0600 ns   |
-| mat2 inverse (see notes)  |  __2.3650 ns__ |    2.6464 ns   |    2.6712 ns   |
-| mat2 mul mat2             |    3.0660 ns   |  __3.0278 ns__ |    3.6211 ns   |
-| mat2 transform vec2       |  __2.4026 ns__ |    2.4059 ns   |    6.8847 ns   |
-| mat2 transpose            |    1.3356 ns   |  __1.3324 ns__ |    1.8256 ns   |
-| mat3 determinant          |    2.5755 ns   |    2.5934 ns   |  __2.5752 ns__ |
-| mat3 inverse              |   10.5764 ns   |  __7.9405 ns__ |    9.3305 ns   |
-| mat3 mul mat3             |    9.4757 ns   |    9.4536 ns   |  __7.9284 ns__ |
-| mat3 transform vec3       |    4.0669 ns   |  __4.0666 ns__ |    8.0513 ns   |
-| mat3 transpose            |    3.5409 ns   |  __3.5194 ns__ |    8.9463 ns   |
-| mat4 determinant          |  __7.6512 ns__ |   11.1750 ns   |   54.2360 ns   |
-| mat4 inverse              | __31.3069 ns__ |   43.3849 ns   |   55.4980 ns   |
-| mat4 mul mat4             |    9.5908 ns   |  __9.2905 ns__ |   15.8365 ns   |
-| mat4 transform vec4       |  __3.5640 ns__ |    3.5750 ns   |    4.1351 ns   |
-| mat4 transpose            |  __7.6544 ns__ |    9.7473 ns   |   10.6901 ns   |
-| quat conjugate            |    1.8292 ns   |  __1.7632 ns__ |    1.7671 ns   |
-| quat mul quat             |  __5.3086 ns__ |    5.3542 ns   |    5.4800 ns   |
-| quat transform vec3       |    7.1021 ns   |  __6.5746 ns__ |    7.0461 ns   |
-| vec3 cross                |    2.8486 ns   |    2.8410 ns   |  __2.8401 ns__ |
-| vec3 dot                  |  __1.5912 ns__ |    1.6773 ns   |    1.6324 ns   |
-| vec3 length               |  __2.0224 ns__ |    2.0248 ns   |   81.8765 ns   |
-| vec3 normalize            |    4.1265 ns   |  __4.1232 ns__ |   83.5038 ns   |
+| benchmark           |         glam   |       cgmath   |     nalgebra   |
+|:--------------------|---------------:|---------------:|---------------:|
+| euler 2d            |     9.033 us   |   __8.985 us__ |     26.62 us   |
+| euler 3d            |   __28.89 us__ |     29.63 us   |     195.6 us   |
+| mat2 determinant    |    1.0632 ns   |  __1.0544 ns__ |    1.0545 ns   |
+| mat2 inverse        |  __2.2956 ns__ |    2.7002 ns   |    2.6893 ns   |
+| mat2 mul mat2       |    3.0813 ns   |  __3.0256 ns__ |    3.6432 ns   |
+| mat2 transform vec2 |    2.4044 ns   |  __2.4022 ns__ |    6.9133 ns   |
+| mat2 transpose      |  __1.3312 ns__ |    1.3319 ns   |    1.8201 ns   |
+| mat3 determinant    |    2.5810 ns   |  __2.5352 ns__ |    2.5799 ns   |
+| mat3 inverse        |   10.5985 ns   |  __8.0039 ns__ |    9.3055 ns   |
+| mat3 mul mat3       |    9.5327 ns   |    9.4730 ns   |  __7.9314 ns__ |
+| mat3 transform vec3 |    4.0703 ns   |  __4.0665 ns__ |    8.0555 ns   |
+| mat3 transpose      |    3.5448 ns   |  __3.5228 ns__ |    8.9625 ns   |
+| mat4 determinant    |  __7.7088 ns__ |   12.5664 ns   |   54.2749 ns   |
+| mat4 inverse        | __31.3339 ns__ |   43.7255 ns   |   55.6187 ns   |
+| mat4 mul mat4       |  __9.2925 ns__ |    9.3097 ns   |   15.6004 ns   |
+| mat4 transform vec4 |  __3.5887 ns__ |    3.6127 ns   |    4.1613 ns   |
+| mat4 transpose      |  __7.6722 ns__ |    8.6266 ns   |   10.7375 ns   |
+| quat conjugate      |  __1.7617 ns__ |    1.7622 ns   |    1.7684 ns   |
+| quat mul quat       |  __5.1730 ns__ |    5.4205 ns   |    5.5644 ns   |
+| quat transform vec3 |    7.1421 ns   |  __6.6010 ns__ |    7.0346 ns   |
+| vec3 cross          |  __2.8412 ns__ |    2.8485 ns   |    3.2746 ns   |
+| vec3 dot            |    1.6708 ns   |  __1.5822 ns__ |    1.6566 ns   |
+| vec3 length         |  __2.0307 ns__ |    2.0315 ns   |   84.6475 ns   |
+| vec3 normalize      |  __4.1255 ns__ |    4.1301 ns   |   85.3411 ns   |
 
 [`glam`]: https://docs.rs/crate/glam
 [`mathbench`]: https://github.com/bitshifter/mathbench-rs
