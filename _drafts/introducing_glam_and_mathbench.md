@@ -15,35 +15,35 @@ performance of `glam` with the popular Rust math libraries [`cgmath`] and
 The following is a table of benchmarks produced by `mathbench` comparing `glam`
 performance to `cgmath` and `nalgebra` on `f32` data.
 
-| benchmark                 |         glam   |       cgmath   |     nalgebra   |
-|:--------------------------|---------------:|---------------:|---------------:|
-| euler 2d                  |     9.202 us   |   __9.059 us__ |     26.53 us   |
-| euler 3d                  |   __14.37 us__ |     32.38 us   |     198.4 us   |
-| mat2 determinant          |    1.3619 ns   |    1.0668 ns   |  __1.0637 ns__ |
-| mat2 inverse (see notes)  |  __2.0673 ns__ |    2.7771 ns   |    3.9397 ns   |
-| mat2 mul mat2             |  __2.1416 ns__ |    3.0682 ns   |    3.6766 ns   |
-| mat2 transform vec2       |  __2.2084 ns__ |    2.4233 ns   |    7.0098 ns   |
-| mat2 transpose            |  __0.7204 ns__ |    1.3371 ns   |    1.8440 ns   |
-| mat3 determinant          |  __2.2374 ns__ |    2.6162 ns   |    2.6048 ns   |
-| mat3 inverse              |  __7.8398 ns__ |    8.0758 ns   |   11.4357 ns   |
-| mat3 mul mat3             |  __4.9372 ns__ |    9.5770 ns   |    8.1240 ns   |
-| mat3 transform vec3       |  __2.3139 ns__ |    4.1042 ns   |    8.2158 ns   |
-| mat3 transpose            |  __2.0043 ns__ |    3.5812 ns   |    5.9885 ns   |
-| mat4 determinant          |  __8.0186 ns__ |   11.3334 ns   |   54.3724 ns   |
-| mat4 inverse              | __21.2964 ns__ |   43.8595 ns   |   57.8703 ns   |
-| mat4 mul mat4             |  __6.8366 ns__ |    9.4308 ns   |   15.5215 ns   |
-| mat4 transform vec4       |  __2.5644 ns__ |    3.5984 ns   |    4.1611 ns   |
-| mat4 transpose            |  __2.7450 ns__ |    7.8940 ns   |   11.0163 ns   |
-| quat conjugate            |  __0.9036 ns__ |    1.8176 ns   |   11.2922 ns   |
-| quat mul quat             |  __2.9802 ns__ |    5.4663 ns   |   11.0629 ns   |
-| quat transform vec3       |  __4.2821 ns__ |    6.6963 ns   |   24.6107 ns   |
-| vec3 cross                |  __2.0753 ns__ |    2.8664 ns   |    6.9884 ns   |
-| vec3 dot                  |  __1.3448 ns__ |    1.7015 ns   |    1.6879 ns   |
-| vec3 length               |    2.0720 ns   |  __2.0494 ns__ |   82.7194 ns   |
-| vec3 normalize            |  __4.1169 ns__ |    4.1675 ns   |   84.2364 ns   |
+| benchmark           |         glam   |       cgmath   |     nalgebra   |
+|:--------------------|---------------:|---------------:|---------------:|
+| euler 2d            |     9.063 us   |   __8.977 us__ |     27.94 us   |
+| euler 3d            |   __15.78 us__ |     29.52 us   |     195.4 us   |
+| mat2 determinant    |    1.3140 ns   |  __1.0528 ns__ |    1.0825 ns   |
+| mat2 inverse        |  __2.0524 ns__ |    2.6565 ns   |    2.7056 ns   |
+| mat2 mul mat2       |  __2.1091 ns__ |    3.0495 ns   |    3.6305 ns   |
+| mat2 transform vec2 |  __2.1865 ns__ |    2.4035 ns   |    6.8877 ns   |
+| mat2 transpose      |  __0.7117 ns__ |    1.3231 ns   |    1.8297 ns   |
+| mat3 determinant    |  __2.2130 ns__ |    2.5348 ns   |    2.5766 ns   |
+| mat3 inverse        |  __7.7296 ns__ |    7.9519 ns   |    9.3100 ns   |
+| mat3 mul mat3       |  __4.9371 ns__ |    9.4619 ns   |    8.3076 ns   |
+| mat3 transform vec3 |  __2.2893 ns__ |    4.0822 ns   |    8.0838 ns   |
+| mat3 transpose      |  __2.0035 ns__ |    3.5175 ns   |    8.9548 ns   |
+| mat4 determinant    |  __7.9524 ns__ |   12.2581 ns   |   54.2954 ns   |
+| mat4 inverse        | __21.0455 ns__ |   43.6983 ns   |   55.8788 ns   |
+| mat4 mul mat4       |  __6.7517 ns__ |    9.2621 ns   |   16.2498 ns   |
+| mat4 transform vec4 |  __2.5298 ns__ |    3.5734 ns   |    4.1222 ns   |
+| mat4 transpose      |  __2.7026 ns__ |    8.0926 ns   |   11.5411 ns   |
+| quat conjugate      |  __0.8866 ns__ |    1.8263 ns   |    1.7650 ns   |
+| quat mul quat       |  __2.8647 ns__ |    5.6678 ns   |    5.4807 ns   |
+| quat transform vec3 |  __4.2107 ns__ |    6.5798 ns   |    7.0398 ns   |
+| vec3 cross          |  __2.0677 ns__ |    2.8890 ns   |    2.8725 ns   |
+| vec3 dot            |  __1.3789 ns__ |    1.6669 ns   |    1.6666 ns   |
+| vec3 length         |  __2.0412 ns__ |    2.0508 ns   |   88.1277 ns   |
+| vec3 normalize      |  __4.0433 ns__ |    4.1260 ns   |   87.2455 ns   |
 
 These benchmarks were performed on my [Intel i7-4710HQ] CPU on Linux. They were
-compiled with the stable 1.35 Rust compiler. Lower (better) numbers are
+compiled with the stable 1.36 Rust compiler. Lower (better) numbers are
 highlighted. I hope it's clear that `glam` is outperforming `cgmath` and
 `nalgebra` in most of these benchmarks. Generally `glam` functionality is the
 same as the others, however `cgmath` and `nalgebra` matrix inverse functions
