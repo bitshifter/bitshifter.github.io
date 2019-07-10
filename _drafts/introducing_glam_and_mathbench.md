@@ -56,22 +56,27 @@ I'm not aware of. `cgmath` also targets games and graphics, `nalgebra` is a
 general purpose linear algebra library which has a much broader target audience
 than just games and graphics programming.
 
-See the full [mathbench report] for more detailed results.
+There are some strange outliers in the `mathbench` results, mostly `vec3 length`
+and `vec3 normalize`. I haven't looked into why they're slow, if it's a problem
+with the bench or `nalgebra` but given `dot` is perfectly fast it seems odd, the
+only difference between `dot` and `length` is a square root.
 
 The reason `glam` is faster is primarily due to it using SIMD internally for all
 types with the exception of `Vec2`.
 
-You can see a similar table at the bottom of this post with `glam`'s SIMD
+You can see a similar table at the bottom of this post with `glam` SIMD
 support disabled. TL;DR it's similar performance to `cgmath` which is expected.
+
+See the full [mathbench report] for more detailed results.
 
 ## Why write another math library?
 
-My goal writing `glam` and the trade offs I made are primarily being focused
-on good `f32` performance by using SIMD when available and a simpler API. This
-is at the expense of genericity, there is no `Vector3<T>` type, just `Vec3`
-which is `f32` based. It would be possible to support `f64` or generic types in
-the future but it's not a high priority right now, in my experience most games
-use `f32` almost exclusively.
+My goal writing `glam` and the trade offs I made are primarily being focused on
+good `f32` performance by using SIMD when available and a simpler API. This is
+at the expense of genericity, there is no `Vector3<T>` type, just `Vec3` which
+is `f32` based. It would be possible to support `f64` or generic types in the
+future but it's not a high priority for me right now, in my experience most
+games use `f32` almost exclusively.
 
 `glam` also avoids baking mathematical correctness into the type system, there
 are no `Point3` or `UnitQuaternion` types for example, it is up to the
@@ -124,9 +129,9 @@ If your CPU supported wider instruction sets such as AVX2, a `Vec3`
 can't take advantage of it, after all it only has 3 floats even if your
 instruction set can operate on 8.
 
-The most effective way to take advantage of SIMD is to structure your data is
-Structure of Arrays (SoA), and feed that through the widest SIMD vectors you
-have on your CPU.  What I mean by that is instead of:
+The most effective way to take advantage of SIMD is to structure your data as
+Structure of Arrays (SoA) and feed that through the widest SIMD vectors you
+have on your CPU. What I mean by that is instead of an Array of Structs (AoS):
 
 ```rust
 struct Vec3AoS {
