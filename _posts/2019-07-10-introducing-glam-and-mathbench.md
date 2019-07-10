@@ -54,18 +54,19 @@ Generally `glam` functionality is the same as the libraries for the functions
 tested here. One exception is `cgmath` and `nalgebra` matrix inverse functions
 return an `Option` type which is `None` if the matrix wasn't invertible, `glam`
 assumes the input was invertible and returns a `Mat4`. There may be other
-differences I'm not aware of. `cgmath` also targets games and graphics,
-`nalgebra` is a general purpose linear algebra library which has a broader
-audience than games and graphics programmers.
+differences I'm not aware of.
+
+Like `glam`, `cgmath` also targets games and graphics. `nalgebra` is a general
+purpose linear algebra library which has a broader audience than games and
+graphics programmers.
 
 There are some strange outliers in the `mathbench` results, primarily `nalgebra`
 `vec3 length` and `vec3 normalize`. I haven't looked into why they're slow, if
 it's a problem with the bench or `nalgebra` but given `dot` is perfectly fast it
-seems odd, the only difference between `dot` and `length` should be a square
-root.
+seems odd, the only difference between `dot` and `length` should be a square root.
 
 The reason `glam` is faster is primarily due to it using SIMD internally for all
-types, with the exception of `Vec2`.
+types with the exception of `Vec2`.
 
 You can see a similar table at the bottom of this post with `glam` SIMD
 support disabled. TL;DR it's similar performance to `cgmath` which is expected.
@@ -75,17 +76,17 @@ See the full [mathbench report] for more detailed results.
 ## Why write another math library?
 
 My goal writing `glam` and the trade offs I made are primarily being focused on
-good `f32` performance by using SIMD when available and a simpler API. This is
-at the expense of genericity, there is no `Vector3<T>` type, just `Vec3` which
-is `f32` based. It would be possible to support `f64` or generic types in the
-future but it's not a high priority for me right now, in my experience most
-games use `f32` almost exclusively.
+good `f32` performance by utilising SIMD and a simple API. This is at the
+expense of genericity, there is no `Vector3<T>` type, just `Vec3` which is `f32`
+based. It would be possible to support `f64` or generic types in the future but
+it's not a high priority for me right now, in my experience most games only use
+`f32`.
 
-`glam` also avoids baking mathematical correctness into the type system, there
+`glam` also avoids baking mathematical correctness into the type system. There
 are no `Point3` or `UnitQuaternion` types for example, it is up to the
 programmer if they want their `Vector3` to behave as a point or a vector or if
 their quaternion is normalised. This decision sacrifices enforced runtime
-correctness via the type system for performance and a smaller, simpler API.
+correctness via the type system for performance and a simple API.
 
 ## SIMD
 
@@ -205,8 +206,8 @@ scalar values to and from the y lane of the `__m128` vector.
 
 ### Avoiding complexity
 
-I wanted to come up with a simple API which is very low friction for developers
-to use. Something that covers the common needs for someone working in games and
+I wanted to come up with an API which is very low friction for developers to
+use. Something that covers the common needs for someone working in games and
 graphics and doesn't require much effort learn. I also wanted something to was
 easy for me to write.
 
@@ -214,9 +215,9 @@ From the outset I wanted to avoid using traits and generics. Traits and generics
 are wonderful language features, but I didn't see a great reason to use them in
 `glam`.
 
-Using SSE2 for storage would complicate generics, as I think 2 generic types
-would be required, a scalar type (e.g. `f32`) and a generic for the storage type
-(`__m128` if available), that already sounds complicated!
+Using SIMD types for storage would complicate generics, as I think 2 generic
+types would be required, a scalar type (e.g. `f32`) and a generic for the
+storage type (e.g. `__m128` if available), that already sounds complicated!
 
 That's not to say that `glam` will never contain vectors of integer or generic
 types, but for the sake of simplicity I wanted to avoid them for a while until
@@ -265,12 +266,12 @@ I wanted to aim for 100% test coverage, especially because there are multiple
 implementations of many types depending on whether SIMD is available or not.
 
 To determine if I actually did have 100% test coverage I've been using a cargo
-plugin called [`tarpaulin`]. It only supports **x86_64** processors running
+plugin called [`tarpaulin`]. It only supports x86_64 processors running
 Linux and does give some false negatives, but it's been pretty good for my
 needs. I have it integrated into my [`travis-ci`] build and posting results to
 [`coveralls.io`].
 
-According to `coveralls.io` `glam` has 87% test covereage, I think the real
+According to `coveralls.io` `glam` has 87% test coverage, I think the real
 figure is probably a bit higher due to `tarpaulin` reporting some lines being
 untested when they actually are.
 
@@ -426,8 +427,8 @@ Rust and C++ worlds. In no particular order:
 * [DirectX Tool Kit SimpleMath] - simplified C++ wrapper around DirectXMath
 * [GLM] - header only C++ library based on the GLSL specification
 * [`packed_simd`] - mentioned above, I like the interface
-* [`cgmath`] - the Rust library I'm most familiar with
-* [`nalgebra`] - a very comprehensive and well documented Rust library
+* [`cgmath`] - a Rust linear algebra library for games and graphics
+* [`nalgebra`] - a general purpose Rust linear algebra library
 
 ## The Rust ecosystem is awesome
 
