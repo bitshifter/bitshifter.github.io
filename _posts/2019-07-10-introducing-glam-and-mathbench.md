@@ -491,7 +491,7 @@ the `scalar-math` feature. Some `glam` functions got faster without SIMD.
 [Intel i7-4710HQ]: https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html
 [mathbench report]: https://bitshifter.github.io/mathbench/criterion/report/index.html
 [SIMD path tracing]: https://bitshifter.github.io/2018/06/04/simd-path-tracing/#converting-vec3-to-sse2
-[Scalar vs SIMD]: http://ftp.cvut.cz/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/CellProgrammingTutorial.files/image008.jpg
+[Scalar vs SIMD]: https://mirrors.edge.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/CellProgrammingTutorial.files/image008.jpg
 [SIMD at Insomniac Games]: https://deplinenoise.files.wordpress.com/2015/03/gdc2015_afredriksson_simd.pdf
 [Rust API Guidelines]: https://rust-lang-nursery.github.io/api-guidelines/predictability.html#c-method
 [`tarpaulin`]: https://github.com/xd009642/tarpaulin
