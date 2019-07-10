@@ -13,6 +13,8 @@ graphics.
 performance of `glam` with the popular Rust linear algebra libraries [`cgmath`]
 and [`nalgebra`].
 
+<!--more-->
+
 The following is a table of benchmarks produced by `mathbench` comparing `glam`
 performance to `cgmath` and `nalgebra` on `f32` data.
 
