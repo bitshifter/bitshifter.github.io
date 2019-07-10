@@ -51,20 +51,21 @@ highlighted. I hope it's clear that `glam` is outperforming `cgmath` and
 `nalgebra` in most of these benchmarks.
 
 Generally `glam` functionality is the same as the libraries for the functions
-tested here, however `cgmath` and `nalgebra` matrix inverse functions return an
-`Option` type which is `None` if the matrix wasn't invertible, `glam` assumes
-the input was invertible and returns a `Mat4`. There may be other differences
-I'm not aware of. `cgmath` also targets games and graphics, `nalgebra` is a
-general purpose linear algebra library which has a much broader target audience
-than just games and graphics programming.
+tested here. One exception is `cgmath` and `nalgebra` matrix inverse functions
+return an `Option` type which is `None` if the matrix wasn't invertible, `glam`
+assumes the input was invertible and returns a `Mat4`. There may be other
+differences I'm not aware of. `cgmath` also targets games and graphics,
+`nalgebra` is a general purpose linear algebra library which has a broader
+audience than games and graphics programmers.
 
-There are some strange outliers in the `mathbench` results, mostly `vec3 length`
-and `vec3 normalize`. I haven't looked into why they're slow, if it's a problem
-with the bench or `nalgebra` but given `dot` is perfectly fast it seems odd, the
-only difference between `dot` and `length` is a square root.
+There are some strange outliers in the `mathbench` results, primarily `nalgebra`
+`vec3 length` and `vec3 normalize`. I haven't looked into why they're slow, if
+it's a problem with the bench or `nalgebra` but given `dot` is perfectly fast it
+seems odd, the only difference between `dot` and `length` should be a square
+root.
 
 The reason `glam` is faster is primarily due to it using SIMD internally for all
-types with the exception of `Vec2`.
+types, with the exception of `Vec2`.
 
 You can see a similar table at the bottom of this post with `glam` SIMD
 support disabled. TL;DR it's similar performance to `cgmath` which is expected.
