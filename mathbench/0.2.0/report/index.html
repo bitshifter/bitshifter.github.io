@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Index - Criterion.rs</title>
+    <style type="text/css">
+        body {
+            font: 14px Helvetica Neue;
+            text-rendering: optimizelegibility;
+        }
+
+        .body {
+            width: 960px;
+            margin: auto;
+        }
+
+        a:link {
+            color: #1F78B4;
+            text-decoration: none;
+        }
+
+        h2 {
+            font-size: 36px;
+            font-weight: 300;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 300;
+        }
+
+        #footer {
+            height: 40px;
+            background: #888;
+            color: white;
+            font-size: larger;
+            font-weight: 300;
+        }
+
+        #footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        #footer p {
+            text-align: center
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="body">
+        <h2>Criterion.rs Benchmark Index</h2>
+        See individual benchmark pages below for more details.
+        <ul>
+            <li><a href="../euler 2d/report/index.html">euler 2d</a></li>
+            
+            <ul>
+                <li><a href="../euler 2d/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../euler 2d/euclid/report/index.html">euclid</a></li>
+                <li><a href="../euler 2d/glam/report/index.html">glam</a></li>
+                <li><a href="../euler 2d/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../euler 2d/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../euler 2d/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../euler 3d/report/index.html">euler 3d</a></li>
+            
+            <ul>
+                <li><a href="../euler 3d/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../euler 3d/euclid/report/index.html">euclid</a></li>
+                <li><a href="../euler 3d/glam/report/index.html">glam</a></li>
+                <li><a href="../euler 3d/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../euler 3d/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../euler 3d/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat2 determinant/report/index.html">mat2 determinant</a></li>
+            
+            <ul>
+                <li><a href="../mat2 determinant/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat2 determinant/glam/report/index.html">glam</a></li>
+                <li><a href="../mat2 determinant/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat2 determinant/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat2 determinant/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat2 inverse/report/index.html">mat2 inverse</a></li>
+            
+            <ul>
+                <li><a href="../mat2 inverse/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat2 inverse/glam/report/index.html">glam</a></li>
+                <li><a href="../mat2 inverse/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat2 inverse/pathfinder/report/index.html">pathfinder</a></li>
+            </ul>
+            <li><a href="../mat2 mul mat2/report/index.html">mat2 mul mat2</a></li>
+            
+            <ul>
+                <li><a href="../mat2 mul mat2/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat2 mul mat2/glam/report/index.html">glam</a></li>
+                <li><a href="../mat2 mul mat2/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat2 mul mat2/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat2 mul mat2/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat2 return self/report/index.html">mat2 return self</a></li>
+            
+            <ul>
+                <li><a href="../mat2 return self/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat2 return self/glam/report/index.html">glam</a></li>
+                <li><a href="../mat2 return self/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat2 return self/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat2 transform vector2/report/index.html">mat2 transform vector2</a></li>
+            
+            <ul>
+                <li><a href="../mat2 transform vector2/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat2 transform vector2/glam/report/index.html">glam</a></li>
+                <li><a href="../mat2 transform vector2/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat2 transform vector2/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat2 transform vector2/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat2 transpose/report/index.html">mat2 transpose</a></li>
+            
+            <ul>
+                <li><a href="../mat2 transpose/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat2 transpose/glam/report/index.html">glam</a></li>
+                <li><a href="../mat2 transpose/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat2 transpose/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat3 determinant/report/index.html">mat3 determinant</a></li>
+            
+            <ul>
+                <li><a href="../mat3 determinant/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat3 determinant/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat3 determinant/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 determinant/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 determinant/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat3 inverse/report/index.html">mat3 inverse</a></li>
+            
+            <ul>
+                <li><a href="../mat3 inverse/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat3 inverse/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat3 inverse/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 inverse/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 inverse/pathfinder/report/index.html">pathfinder</a></li>
+            </ul>
+            <li><a href="../mat3 mul mat3/report/index.html">mat3 mul mat3</a></li>
+            
+            <ul>
+                <li><a href="../mat3 mul mat3/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat3 mul mat3/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat3 mul mat3/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 mul mat3/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 mul mat3/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat3 mul mat3/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat3 return self/report/index.html">mat3 return self</a></li>
+            
+            <ul>
+                <li><a href="../mat3 return self/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat3 return self/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 return self/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 return self/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat3 return self/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat3 transform point2/report/index.html">mat3 transform point2</a></li>
+            
+            <ul>
+                <li><a href="../mat3 transform point2/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat3 transform point2/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat3 transform point2/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 transform point2/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 transform point2/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat3 transform vector2/report/index.html">mat3 transform vector2</a></li>
+            
+            <ul>
+                <li><a href="../mat3 transform vector2/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat3 transform vector2/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 transform vector2/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 transform vector2/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat3 transform vector2/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat3 transform vector3/report/index.html">mat3 transform vector3</a></li>
+            
+            <ul>
+                <li><a href="../mat3 transform vector3/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat3 transform vector3/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 transform vector3/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 transform vector3/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat3 transpose/report/index.html">mat3 transpose</a></li>
+            
+            <ul>
+                <li><a href="../mat3 transpose/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat3 transpose/glam/report/index.html">glam</a></li>
+                <li><a href="../mat3 transpose/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat3 transpose/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 determinant/report/index.html">mat4 determinant</a></li>
+            
+            <ul>
+                <li><a href="../mat4 determinant/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 determinant/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat4 determinant/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 determinant/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 determinant/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 inverse/report/index.html">mat4 inverse</a></li>
+            
+            <ul>
+                <li><a href="../mat4 inverse/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 inverse/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat4 inverse/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 inverse/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 inverse/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat4 inverse/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 mul mat4/report/index.html">mat4 mul mat4</a></li>
+            
+            <ul>
+                <li><a href="../mat4 mul mat4/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 mul mat4/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat4 mul mat4/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 mul mat4/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 mul mat4/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat4 mul mat4/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 return self/report/index.html">mat4 return self</a></li>
+            
+            <ul>
+                <li><a href="../mat4 return self/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 return self/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 return self/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 return self/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 transform point3/report/index.html">mat4 transform point3</a></li>
+            
+            <ul>
+                <li><a href="../mat4 transform point3/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 transform point3/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat4 transform point3/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 transform point3/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 transform point3/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 transform vector3/report/index.html">mat4 transform vector3</a></li>
+            
+            <ul>
+                <li><a href="../mat4 transform vector3/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 transform vector3/euclid/report/index.html">euclid</a></li>
+                <li><a href="../mat4 transform vector3/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 transform vector3/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 transform vector3/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 transform vector4/report/index.html">mat4 transform vector4</a></li>
+            
+            <ul>
+                <li><a href="../mat4 transform vector4/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 transform vector4/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 transform vector4/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 transform vector4/pathfinder/report/index.html">pathfinder</a></li>
+                <li><a href="../mat4 transform vector4/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../mat4 transpose/report/index.html">mat4 transpose</a></li>
+            
+            <ul>
+                <li><a href="../mat4 transpose/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../mat4 transpose/glam/report/index.html">glam</a></li>
+                <li><a href="../mat4 transpose/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../mat4 transpose/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../quat conjugate/report/index.html">quat conjugate</a></li>
+            
+            <ul>
+                <li><a href="../quat conjugate/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../quat conjugate/euclid/report/index.html">euclid</a></li>
+                <li><a href="../quat conjugate/glam/report/index.html">glam</a></li>
+                <li><a href="../quat conjugate/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../quat conjugate/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../quat mul quat/report/index.html">quat mul quat</a></li>
+            
+            <ul>
+                <li><a href="../quat mul quat/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../quat mul quat/euclid/report/index.html">euclid</a></li>
+                <li><a href="../quat mul quat/glam/report/index.html">glam</a></li>
+                <li><a href="../quat mul quat/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../quat mul quat/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../quat return self/report/index.html">quat return self</a></li>
+            
+            <ul>
+                <li><a href="../quat return self/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../quat return self/glam/report/index.html">glam</a></li>
+                <li><a href="../quat return self/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../quat return self/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../quat transform vector3/report/index.html">quat transform vector3</a></li>
+            
+            <ul>
+                <li><a href="../quat transform vector3/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../quat transform vector3/euclid/report/index.html">euclid</a></li>
+                <li><a href="../quat transform vector3/glam/report/index.html">glam</a></li>
+                <li><a href="../quat transform vector3/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../quat transform vector3/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../vec3 cross/report/index.html">vec3 cross</a></li>
+            
+            <ul>
+                <li><a href="../vec3 cross/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../vec3 cross/euclid/report/index.html">euclid</a></li>
+                <li><a href="../vec3 cross/glam/report/index.html">glam</a></li>
+                <li><a href="../vec3 cross/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../vec3 cross/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../vec3 dot/report/index.html">vec3 dot</a></li>
+            
+            <ul>
+                <li><a href="../vec3 dot/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../vec3 dot/euclid/report/index.html">euclid</a></li>
+                <li><a href="../vec3 dot/glam/report/index.html">glam</a></li>
+                <li><a href="../vec3 dot/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../vec3 dot/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../vec3 length/report/index.html">vec3 length</a></li>
+            
+            <ul>
+                <li><a href="../vec3 length/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../vec3 length/euclid/report/index.html">euclid</a></li>
+                <li><a href="../vec3 length/glam/report/index.html">glam</a></li>
+                <li><a href="../vec3 length/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../vec3 length/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../vec3 normalize/report/index.html">vec3 normalize</a></li>
+            
+            <ul>
+                <li><a href="../vec3 normalize/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../vec3 normalize/euclid/report/index.html">euclid</a></li>
+                <li><a href="../vec3 normalize/glam/report/index.html">glam</a></li>
+                <li><a href="../vec3 normalize/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../vec3 normalize/vek/report/index.html">vek</a></li>
+            </ul>
+            <li><a href="../vec3 return self/report/index.html">vec3 return self</a></li>
+            
+            <ul>
+                <li><a href="../vec3 return self/cgmath/report/index.html">cgmath</a></li>
+                <li><a href="../vec3 return self/glam/report/index.html">glam</a></li>
+                <li><a href="../vec3 return self/nalgebra/report/index.html">nalgebra</a></li>
+                <li><a href="../vec3 return self/vek/report/index.html">vek</a></li>
+            </ul>
+        </ul>
+    </div>
+    <div id="footer">
+        <p>This report was generated by
+            <a href="https://github.com/bheisler/criterion.rs">Criterion.rs</a>, a statistics-driven benchmarking
+            library in Rust.</p>
+    </div>
+</body>
+</html>
