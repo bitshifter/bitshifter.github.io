@@ -70,8 +70,38 @@ As I mentioned before one big difference between all of these crates is their
 features. Most are oriented towards game development with the exception of
 `nalgebra` which has much broader design goals and supports many more features
 than `glam`. `glam` is about 8.5K lines of Rust, `nalgebra` is more like 40K.
-Feature wise `glam` is much closer to `pathfinder_geometry` or `cgmath` but
-without `generics`.
+Feature wise `glam` is much closer to `cgmath` but without `generics`.
+Aside from the use of generics one big different between `glam` and `cgmath` and
+indeed most of the other crates is what is included by default.
+
+# Default dependencies
+
+One decision I made with `glam` was to make all features opt-in rather than opt
+out. That is a large part of why `glam`'s build time is lower than the others,
+by default it doesn't pull any other crates in. `glam` does has have support for
+`serde`, `mint` and `rand`, but you have to enable those featues if you want to
+use them. `cgmath` for example has `mint` and `serde` as optional dependencies
+but `rand`, `approx` and `num-traits` are not. `num-traits` is probably pretty
+essential to `cgmath`, it's commonly used by generic math libraries,  but I'm
+not so sure about `rand`.
+
+`vek` stands out as taking a significant amount of time compared to the others.
+One thing to note though is the self time at 10.7 seconds is a lot less than
+16.5 seconds of `nalgebra`, a large portion of the time building `vek` is
+dependencies, mostly `serde` and `serde_derive`.
+
+# Building with no default dependencies
+
+In fairness I should be building all these crates with `default-features =
+false` you might argue. That is true, but unfortunately it's not that simple. A
+lot of libraries that support `no_std` do so by making `std` support a default
+feature which is then disabled with `default-features = false`. This complicates
+things.
+
+# In conclusion
+
+Something to consider when choosing a library though is are you paying for the
+features you aren't using?
 
 
 [cargo build timings]: https://internals.rust-lang.org/t/exploring-crate-graph-build-times-with-cargo-build-ztimings/10975
