@@ -132,21 +132,23 @@ people aren't going to go looking for that when disabling default features.
 `vek` also has some surprising issues around disabling default features and
 support for no_std. `vek` has the largest total build time of all the crates
 tested, but it's self time is only 25% of the total build time and building
-dependences are the other 75% or 30 seconds on my laptop. Looking at [vek
-build timings] the `serde` and `serde_derive` crates are a large chunk of
-that 30 seconds, According to crates.io the in the 0.10.1 release that I was
-using, `serde` is an optional dependency. OK, so I'll build `vek` with
+dependences are the other 75% or 30 seconds on my laptop. Looking at [vek build
+timings] the `serde` and `serde_derive` crates are a large chunk of that 30
+seconds, According to crates.io the in the 0.10.1 release that I was using,
+`serde` is an optional dependency. OK, so I'll build `vek` with
 `default-features = false`, but this is intended for use with no_std so if you
 just disable default features `vek` doesn't build at all. To build with no_std
 you need to manually add the `libm` feature, which I assume will link the
 necessary math routines. I imagine that this will have the same performance
 implications that it did for `nalgebra`. On the bright side this bought the
 total build time down to 7.54 seconds!. If you are still building for std though
-things get a bit trickier, you need to manually add the `num-traits/std`
+things get a bit trickier. You need to manually add the `num-traits/std`
 feature. Doing this I was able to build in 6.93 seconds.  Initially I tried
-disabling default features and enabling std again but this adds the `serde/std`
-feature, pulling in the `serde` and `serde_derive` crates which were supposed to
-be optional.
+disabling default features and enabling `std` again but this adds the
+`serde/std` feature, pulling in the `serde` and `serde_derive` crates which were
+supposed to be optional. I removed the `serde/std` from the `std` feature of
+`vek` and it compiled, so perhaps it isn't necessary. Removing it certainly
+makes the default build a lot faster.
 
 I'm glad it is possible but it's really not obvious how to build with default
 features disabled.
@@ -156,16 +158,6 @@ has arisen due to the convention of using `default-features = false` to build
 for no_std. If all you want to do is reduce unused feature dependencies
 `default-features = false` should be the right lever to push but in reality due
 to this being conflated with building for no_std it's often not that simple.
-While I found a work around for `vek` I am not sure how they could make things
-simpler for their users out of the box. Part of the issue is `vek` also tells
-dependencies like `serde` to build with `default-features = false` and those
-crates also treat this as building for no_std. This is why the std feature of
-`vek` adds `serde/std` but that appears to have the effect force enabling the
-optional `serde` feature when building for std. I don't know if there is a good
-way around that. As far as I know it's not possible to conditionally enable
-`serde/std` if both std and `serde` are enabled. I did try removing `serde/std`
-from the `std` feature of `vek` and it compiled, so perhaps it isn't necessary.
-Removing it certainly makes the default build a lot faster.
 
 One criticism I do have of many crates is this kind of behaviour is not well
 documented. Both `nalgebra` and `vek` do document how to build for no_std but
@@ -176,9 +168,9 @@ your own.
 
 With all of that out of the way, I think that making the optional features of
 `glam` not default features was a good choice. As I've discussed above turning
-off default features has not always been an easy thing to do. I
-think having them off by default and documenting how they can be enabled might
-be a better approach for the majority of users.
+off default features has not always been an easy thing to do. I think having
+them off by default and documenting what features are available and how they can
+be enabled might be a better approach for the majority of users.
 
 # Fair benchmarks
 
