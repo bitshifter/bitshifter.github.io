@@ -93,7 +93,7 @@ you want to use them.
 
 [`vek`] stands out as taking a significant amount of time compared to the others.
 One thing to note though is the self time at 10.7 seconds is a lot less than
-17.9 seconds of `nalgebra`, a large portion of the time building `vek` is
+17.9 seconds of `nalgebra`. A large portion of the time building `vek` is
 dependencies, mostly `serde` and `serde_derive`.
 
 # No default features surprise
@@ -153,7 +153,7 @@ features disabled.
 
 This isn't really a criticism of `nalgebra` or `vek`. I feel that this confusion
 has arisen due to the convention of using `default-features = false` to build
-for no_std. If all you want to do is reduce unnecessary dependencies
+for no_std. If all you want to do is reduce unused feature dependencies
 `default-features = false` should be the right lever to push but in reality due
 to this being conflated with building for no_std it's often not that simple.
 While I found a work around for `vek` I am not sure how they could make things
