@@ -165,6 +165,7 @@ optional `serde` feature when building for std. I don't know if there is a good
 way around that. As far as I know it's not possible to conditionally enable
 `serde/std` if both std and `serde` are enabled. I did try removing `serde/std`
 from the `std` feature of `vek` and it compiled, so perhaps it isn't necessary.
+Removing it certainly makes the default build a lot faster.
 
 One criticism I do have of many crates is this kind of behaviour is not well
 documented. Both `nalgebra` and `vek` do document how to build for no_std but
@@ -181,35 +182,31 @@ be a better approach for the majority of users.
 
 # Fair benchmarks
 
-While providing benchmarks for the default features is the most useful
-benchmark, it doesn't represent the minimal build time for many libraries.
+While providing benchmarks for the default features is the most useful benchmark
+it doesn't always represent the minimal build time for many crates.
 Unfortunately it seems I will need to tune the minimal set of features for each
 crate to achieve this. That's something I was trying to avoid doing but I think
-in fairness I will support that in a future version of `buildbench`.  Equally
+in fairness I will support it in a future version of `buildbench`.  Equally
 adding support for building all dependencies might also be informative.
 
 # What isn't being measured
 
-Maik Klein pointed out that one thing I am not measuring is the cost of generics
-in user code. When using generics a lot of the cost is shifted into the crate
-that is instantiating them. That is not something that `buildbench` is
+[Maik Klein] pointed out that one thing I am not measuring is the cost of
+generics in user code. When using generics a lot of the cost is shifted into the
+crate that is instantiating them. That is not something that `buildbench` is
 attempting to measure at the moment.
 
 # In conclusion
 
-As usual trying to compare libraries for some metric turned out to be not that
+As usual trying to compare libraries on some metric turned out to be not that
 simple.
 
 Turning off default features is harder than it should be. This setting is often
 an alias for `#![no_std]` support. I think that's unfortunate and perhaps there
 should be more explicit flags added to `cargo` to build for no_std.
 
-Another limitation of `cargo` right now is supporting more complex feature
-combinations. For example telling a dependency like `serde` to build with std
-support depending on how our crate is being built.
-
 Ultimately the point of this exercise was to provide another metric to consider
-when choosing a math library. Are you paying for the features you aren't using?
+when choosing a math library. Are you paying for features you aren't using?
 
 [`glam`]: https://crates.io/crates/glam
 [`mathbench`]: https://github.com/bitshifter/mathbench-rs
@@ -228,3 +225,4 @@ when choosing a math library. Are you paying for the features you aren't using?
 [vek build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-vek-release-defaults.html
 [no_std]: https://rust-embedded.github.io/book/intro/no-std.html
 [web assembly and embedded programming]: https://nalgebra.org/wasm_and_embedded_programming/
+[Maik Klein]: https://github.com/maikKlein
