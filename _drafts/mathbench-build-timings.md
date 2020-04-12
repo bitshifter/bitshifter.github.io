@@ -12,25 +12,26 @@ you have to wait long enough that you start to lose focus on the activity you
 are working on, or you start to get distracted or lose track of what you were
 doing which costs you more time.
 
-Thus one of my goals when writing `glam` was to ensure it was fast to compile.
+Thus one of my goals when writing [`glam`] was to ensure it was fast to compile.
 Rust compile times are known to be a bit slow compared to many other languages,
 and I didn't want to pour fuel on to that particular fire.
 
-As part of writing `glam` I also wrote `mathbench` so I could compare
+As part of writing `glam` I also wrote [`mathbench`] so I could compare
 performance with similar libraries. I also always wanted to perform build time
 comparisons as part of `mathbench` and I've finally got around to doing that
-with a new tool in `mathbench` called `buildbench`.
+with a new tool called `buildbench`.
+
+<!-- more -->
 
 # Introducing build bench
 
-`buildbench` tool uses the `cargo -Z timings` feature of the nightly build of
-`cargo`, thus you need a nightly build to run it. See [cargo -Z timings] for
-more details on this feature.
+`buildbench` tool uses the [`cargo -Z timings`] feature of the nightly build of
+`cargo`, thus you need a nightly build to run it.
 
 `buildbench` generates a `Cargo.toml` and empty `src/lib.rs` in a temporary
-directory for each library, recording some build time information which is
-included in the summary table below. The temporary directory is created every
-time the tool is run so this is a full build from a clean state.
+directory for each library, recording some build timin information from `cargo`
+which is included in the summary table below. The temporary directory is created
+every time the tool is run so this is a full build from a clean state.
 
 Each library is only built once so you may wish to run `buildbench` multiple
 times to ensure results are consistent.
@@ -45,7 +46,7 @@ number of units which is the number of dependencies (this will be 2 at minimum).
 
 When comparing build times keep in mind that each library has different feature
 sets and that naturally larger libraries will take longer to build. For many
-crates tested the dependencies take longer than the math crate. Also keep in
+crates tested the dependencies take longer than the main crate. Also keep in
 mind if you are already building one of the dependencies in your project you
 won't pay the build cost twice (unless it's a different version).
 
@@ -57,7 +58,6 @@ won't pay the build cost twice (unless it's a different version).
 | nalgebra            | 0.21.0  |      32.1 |     17.9 |    29 | [nalgebra build timings]   |
 | pathfinder_geometry | 0.4.0   |       2.9 |      0.3 |     8 | [pathfinder build timings] |
 | vek                 | 0.10.1  |      38.3 |     10.8 |    16 | [vek build timings]        |
-| crate               | total (s) | self (s) | units | report                     |
 
 These benchmarks were performed on an [Intel i7-4710HQ] CPU with 16GB RAM and a
 Toshiba MQ01ABD100 HDD (SATA 3Gbps 5400RPM) on Linux.
@@ -74,52 +74,56 @@ As I mentioned before one big difference between all of these crates is their
 features. Most are oriented towards game development with the exception of
 `nalgebra` which has much broader design goals and supports many more features
 than `glam`. `glam` is about 8.5K lines of Rust, `nalgebra` is more like 40K.
-Feature wise `glam` is much closer to `cgmath` but without `generics`.  Aside
-from the use of generics one big different between `glam` and `cgmath` and
-indeed most of the other crates is what is included by default. The most recent
-release of `cgmath` on crates.io has `approx`, `num-traits` and `rand` are non
-optional dependencies. I noticed on `master` that `rand` is now optional, but
-there hasn't been a release made in a while. Dependencies aside the self time
-for `cgmath` is 3.0 seconds, which is close to similar libraries like `euclid`
-and `pathfinder_geometry`.
 
-# Default dependencies
+Feature wise `glam` is much closer to `cgmath` but without `generics`.  Aside
+from the use of generics one big difference between `glam` and `cgmath` and
+indeed most of the other crates is what is included by default. The most recent
+release of `cgmath` on crates.io has non-optional dependencies on `approx`,
+`num-traits` and `rand`. I noticed on `master` that `rand` is now optional, but
+there hasn't been a release made in a while.
+
+Dependencies aside the self time for `cgmath` is 3.0 seconds, which is close to
+similar libraries like `euclid` and `pathfinder_geometry`.
+
+# Default features
 
 In addition to making most `glam` dependencies optional I also made all optional
-features opt-in rather than opt. That is `glam` optional dependencies are not
-enabled by default. That is part of why `glam`'s build time is lower than the others,
-by default it doesn't pull any other crates in. `glam` does has have support for
-`serde`, `mint` and `rand` but you have to enable those features if you want to
-use them.
+features opt-in rather than opt-out. That is `glam` optional dependencies are
+not enabled by default. That is part of why `glam`'s build time is lower than
+the others, by default its only dependency is `cfg-if`. `glam` does has have
+support for `serde`, `mint` and `rand` but you have to enable those features if
+you want to use them.
 
 `vek` stands out as taking a significant amount of time compared to the others.
 One thing to note though is the self time at 10.7 seconds is a lot less than
 16.5 seconds of `nalgebra`, a large portion of the time building `vek` is
 dependencies, mostly `serde` and `serde_derive`.
 
-# Building with no default dependencies
+# No default features surprises
 
-In fairness I should be building all these crates with `default-features =
-false` you might argue. That is true and `buildbench` does support this, but
-unfortunately with some crates one does not simply disable default features. A
-lot of libraries that support `no_std` do so by making `std` support a default
-feature which is then disabled with `default-features = false`. Because of this
-building with `default-features = false` can give surprising results.
+You could argue that for a fair comparison I should be building all these crates
+with `default-features = false`. That is true and `buildbench` does support
+this, but unfortunately with some crates one does not simply disable default
+features. Many libraries that support `no_std` do so by making `std` support a
+default feature which is then disabled using `default-features = false`.
+Because of this building with `default-features = false` can give surprising
+results.
 
-When I first wrote `mathbench` I did disable default features for all the math
+Early versions of `mathbench` did disable default features for all the math
 libraries to try improve my build times. A couple of issues arose from this
-decision. For one, `nalgebra` was getting really poor results for some
-benchmarks in a way that didn't make much sense. The dot product benchmark was
-similar to other libraries but vector length was really slow, the only
-difference between those is a square root. Fortunately some members of the Rust
-Community Discord prompted the author of `nalgebra` to investigate the issue and
-submitted a PR. The problem was that disabling defaults effectively put
-`nalgebra` in `no_std` mode. In this mode it changed the way math libraries were
-linked which meant calls to functions like `sqrt` or `sin` were no longer
-inlined, which has a big performance impact. I also had an issue raised to
-benchmark with default features enabled as that's what most people will use so
-between these two things I started building all libraries with default features
-enabled.
+decision.
+
+For one, `nalgebra` was getting really poor results for some benchmarks in a way
+that didn't make much sense. The dot product benchmark was similar to other
+libraries but vector length was really slow, the only difference between those
+is a square root. Fortunately some members of the Rust Community Discord
+prompted the author of `nalgebra` to investigate the issue and submitted a PR.
+The problem was that disabling defaults effectively put `nalgebra` in `no_std`
+mode. In this mode it changed the way math libraries were linked which meant
+calls to functions like `sqrt` or `sin` were no longer inlined, which has a big
+performance impact. I also had an issue raised to benchmark with default
+features enabled as that's what most people will use so between these two things
+I started building all libraries with default features enabled.
 
 The `nalgebra` `no_std` thing was quite surprising and if I wasn't writing
 benchmarks I don't think I would have noticed that there was something strange
@@ -149,21 +153,51 @@ which were supposed to be optional.
 I'm glad it is possible but it's really not obvious how to build with default
 features disabled.
 
-This isn't really a criticism of `nalgebra` or `vek`. I feel that this confusing
+This isn't really a criticism of `nalgebra` or `vek`. I feel that this confusion
 has arisen due to the convention of using `default-features = false` to build
 for `no_std`. If all you want to do is reduce your build times
 `default-features = false` in principle be the right lever to push but in
 reality due to this being conflated with building for `no_std` it's often not
 that simple. While I found a work around for `vek` I am not sure how they could
-make things simpler for their users.
+make things simpler for their users out of the box. Part of the issue is `vek`
+also tells it's depdendencies to build with `default-features = false` and those
+crates also treat this as building for `no_std`. This is why the `std` feature
+of `vek` adds `serde/std` but that appears to have the effect of no longer
+making `serde` optional when building for `std`. I don't know if there is a good
+way around that. As far as I know it's not possible to conditionally enable
+`serde/std` if both `std` and `serde` are enabled. I would have the same problem
+in `glam` if I were to try support `no_std`.
+
+One criticism I do have of many crates is this kind of behaviour is not well
+documented. Both `nalgebra` and `vek` do document how to build for `no_std` but
+if you just want to disable optional features in a `std` build you seem to be on
+your own.
+
+# No default features
+
+With all of that out of the way, I think that making the optional features of
+`glam` not default features was a good choice. As I've discussed above turning
+off default features has not always been an easy thing to do. I
+think having them off by default and documenting how they can be enabled might
+be a better approach for the majority of users.
+
+# Fair benchmarks
+
+While I think providing benchmarks for the default features is the most useful
+benchmark, it doesn't represent the minimal build time for many libraries.
+Unfortunately it seems I will need to tune the minimal set of features for each
+crate to achieve this. That's something I was trying to avoid doing but I think
+in fairness I think I'll add that feature to a future version of `buildbench`.
+Equally adding support for building all dependencies might also be informative.
 
 # In conclusion
 
 Something to consider when choosing a library though is are you paying for the
 features you aren't using?
 
-
-[cargo build timings]: https://internals.rust-lang.org/t/exploring-crate-graph-build-times-with-cargo-build-ztimings/10975
+[`glam`]: https://crates.io/crates/glam
+[`mathbench`]: https://github.com/bitshifter/mathbench-rs
+[`cargo -Z timings`]: https://internals.rust-lang.org/t/exploring-crate-graph-build-times-with-cargo-build-ztimings/10975
 [cgmath build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-cgmath-release-defaults.html
 [euclid build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-euclid-release-defaults.html
 [glam build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-glam-release-defaults.html
