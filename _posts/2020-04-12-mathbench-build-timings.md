@@ -21,7 +21,7 @@ performance with similar libraries. I also always wanted to include build time
 comparisons as part of `mathbench` and I've finally got around to doing that
 with a new tool called [`buildbench`].
 
-<!-- more -->
+<!--more-->
 
 # Introducing build bench
 

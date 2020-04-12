@@ -1,6 +1,5 @@
 ---
 layout: post
-comments: true
 title:  "Introducing glam and mathbench"
 excerpt_separator: <!--more-->
 tags: rust simd math performance
