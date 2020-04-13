@@ -68,12 +68,29 @@ It seems I achieved my goal of making `glam` fast to build! As `glam` grows and
 gets more features build times will of course increase, but a few seconds is the
 ballpark I'm hoping to stay in.
 
+# What isn't being measured
+
+`buildbench` is only measuring the time to do a full build.  Incremental build
+times would be very interesting since that's mostly what people will be doing
+during development. Especially from the point of view of iteration time.
+Unfortunately I think it would be quite time consuming to write a meaningful
+test of incremental build times across all crates in `mathbench`. To do that I
+think I'd need to write the equivalent amount of code for each crate, enough
+that changing it shows up in build times. It would be great to see the results
+of that, but it's a lot more effort. For now I'll have to live with comparing
+full build times.
+
+Related to that, Maik Klein pointed out that one thing I am not measuring is
+the cost of generics in user code. When using generics a lot of the cost is
+shifted into the crate that is instantiating them. That is not something that
+`buildbench` is attempting to measure at the moment.
+
 # Non-optional features
 
-As I mentioned before one big difference between all of these crates is their
-code size. Most are oriented towards game development with the exception of
-[`nalgebra`] which has much broader design goals and supports many more features
-than `glam`. `glam` is about 8.5K lines of Rust, `nalgebra` is more like 40K.
+One big difference between all of these crates is their code size. Most are
+oriented towards game development with the exception of [`nalgebra`] which has
+much broader design goals and supports many more features than `glam`. `glam` is
+about 8.5K lines of Rust, `nalgebra` is more like 40K.
 
 Feature wise `glam` is much closer to [`cgmath`] but without generics.  Aside
 from the use of generics one big difference between `glam` and `cgmath` and
@@ -181,13 +198,6 @@ crate to achieve this. That's something I was trying to avoid doing but I think
 in fairness I will support it in a future version of `buildbench`.  Equally
 adding support for building all dependencies might also be informative.
 
-# What isn't being measured
-
-[Maik Klein] pointed out that one thing I am not measuring is the cost of
-generics in user code. When using generics a lot of the cost is shifted into the
-crate that is instantiating them. That is not something that `buildbench` is
-attempting to measure at the moment.
-
 # In conclusion
 
 As usual trying to compare libraries on some metric turned out to be not that
@@ -195,7 +205,10 @@ simple.
 
 Turning off default features is harder than it should be. This setting is often
 an alias for `#![no_std]` support. I think that's unfortunate and perhaps there
-should be more explicit flags added to `cargo` to build for no_std.
+should be more explicit flags added to `cargo` to build for no_std. The Rust
+language is a very explicit language, there is not a lot of hidden behaviour.
+The pattern of using default features to control std versus no_std builds feels
+contrary to that.
 
 Ultimately the point of this exercise was to provide another metric to consider
 when choosing a math library. Are you paying for features you aren't using?
@@ -218,4 +231,3 @@ when choosing a math library. Are you paying for features you aren't using?
 [vek build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-vek-release-defaults.html
 [no_std]: https://rust-embedded.github.io/book/intro/no-std.html
 [web assembly and embedded programming]: https://nalgebra.org/wasm_and_embedded_programming/
-[Maik Klein]: https://github.com/maikKlein
