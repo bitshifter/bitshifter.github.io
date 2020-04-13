@@ -50,17 +50,21 @@ crates tested the dependencies take longer than the main crate. Also keep in
 mind if you are already using one of the dependencies in your project you won't
 pay the build cost twice (unless it's a different version).
 
-| crate               | version | total (s) | self (s) | units | full report link           |
-|:--------------------|:--------|----------:|---------:|------:|:---------------------------|
-| cgmath              | 0.17.0  |       9.5 |      3.0 |    17 | [cgmath build timings]     |
-| euclid              | 0.20.5  |       3.2 |      1.1 |     4 | [euclid build timings]     |
-| glam                | 0.8.6   |       0.8 |      0.5 |     3 | [glam build timings]       |
-| nalgebra            | 0.21.0  |      32.1 |     17.9 |    29 | [nalgebra build timings]   |
-| pathfinder_geometry | 0.4.0   |       2.9 |      0.3 |     8 | [pathfinder build timings] |
-| vek                 | 0.10.1  |      38.3 |     10.8 |    16 | [vek build timings]        |
+| crate               | version | total (s) | self (s) | units | full report link            |
+|:--------------------|:--------|----------:|---------:|------:|:----------------------------|
+| cgmath              | 0.17.0  |       6.5 |      3.0 |    17 | [cgmath build timings]      |
+| euclid              | 0.20.5  |       3.2 |      1.1 |     4 | [euclid build timings]      |
+| glam                | 0.8.6   |       0.8 |      0.5 |     3 | [glam build timings]        |
+| nalgebra            | 0.21.0  |      32.1 |     17.8 |    29 | [nalgebra build timings]    |
+| pathfinder_geometry | 0.5.0   |       5.6 |      0.3 |     8 | [pathfinder build timings]  |
+| ultraviolet         | 0.4.5   |       2.4 |      1.2 |     4 | [ultraviolet build timings] |
+| vek                 | 0.10.1  |      38.0 |     10.6 |    16 | [vek build timings]         |
 
 These benchmarks were performed on an [Intel i7-4710HQ] CPU with 16GB RAM and a
 Toshiba MQ01ABD100 HDD (SATA 3Gbps 5400RPM) on Linux.
+
+Note that [`ultraviolet`] has been included in the build timings but I want to
+resolve [issue #21] before including it in performance benchmarks.
 
 # Considering the results
 
@@ -213,11 +217,11 @@ contrary to that.
 Ultimately the point of this exercise was to provide another metric to consider
 when choosing a math library. Are you paying for features you aren't using?
 
-If you have feedback or comments see the [/r/rust] post or @ me on
-[twitter.com/bitshifternz].
+If you have feedback or comments see the [/r/rust] post or reply to the
+[twitter thread].
 
 [/r/rust]: https://www.reddit.com/r/rust/comments/g0a770/measuring_build_times_of_popular_game_math_crates/
-[twitter.com/bitshifternz]: https://twitter.com/bitshifternz
+[twitter thread]: https://twitter.com/bitshifternz/status/1249530020898336768
 [`glam`]: https://crates.io/crates/glam
 [`mathbench`]: https://github.com/bitshifter/mathbench-rs
 [`buildbench`]: https://github.com/bitshifter/mathbench-rs/tree/master/tools/buildbench
@@ -226,6 +230,7 @@ If you have feedback or comments see the [/r/rust] post or @ me on
 [`vek`]: https://crates.io/crates/vek
 [`euclid`]: https://crates.io/crates/euclid
 [`pathfinder_geometry]: https://crates.io/crates/pathfinder_geometry
+[`ultraviolet`]: https://crates.io/crates/ultraviolet
 [`-Z timings`]: https://internals.rust-lang.org/t/exploring-crate-graph-build-times-with-cargo-build-ztimings/10975
 [Intel i7-4710HQ]: https://ark.intel.com/content/www/us/en/ark/products/78930/intel-core-i7-4710hq-processor-6m-cache-up-to-3-50-ghz.html
 [cgmath build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-cgmath-release-defaults.html
@@ -233,6 +238,8 @@ If you have feedback or comments see the [/r/rust] post or @ me on
 [glam build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-glam-release-defaults.html
 [nalgebra build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-nalgebra-release-defaults.html
 [pathfinder build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-pathfinder_geometry-release-defaults.html
+[ultraviolet build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-ultraviolet-release-defaults.html
 [vek build timings]: https://bitshifter.github.io/buildbench/0.3.1/cargo-timing-vek-release-defaults.html
+[issue #21]: https://github.com/bitshifter/mathbench-rs/issues/21
 [no_std]: https://rust-embedded.github.io/book/intro/no-std.html
 [web assembly and embedded programming]: https://nalgebra.org/wasm_and_embedded_programming/

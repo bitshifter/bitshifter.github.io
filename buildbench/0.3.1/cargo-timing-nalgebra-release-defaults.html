@@ -126,10 +126,10 @@ h1 {
     <td>Max concurrency:</td><td>8 (jobs=8 ncpu=8)</td>
   </tr>
   <tr>
-    <td>Build start:</td><td>2020-04-12T00:17:36Z</td>
+    <td>Build start:</td><td>2020-04-13T20:56:47Z</td>
   </tr>
   <tr>
-    <td>Total time:</td><td>32.1s</td>
+    <td>Total time:</td><td>32.2s</td>
   </tr>
   <tr>
     <td>rustc:</td><td>rustc 1.43.0-nightly (442ae7f04 2020-02-06)<br>Host: x86_64-unknown-linux-gnu<br>Target: x86_64-unknown-linux-gnu</td>
@@ -178,7 +178,7 @@ h1 {
 <tr>
   <td>1.</td>
   <td>nalgebra v0.21.0</td>
-  <td>17.9s</td>
+  <td>17.8s</td>
   <td>0.2s (1%)</td>
   <td>default, matrixmultiply, rand_distr, std</td>
 </tr>
@@ -186,23 +186,23 @@ h1 {
 <tr>
   <td>2.</td>
   <td>syn v1.0.17</td>
-  <td>9.0s</td>
-  <td>5.7s (63%)</td>
+  <td>7.9s</td>
+  <td>5.0s (63%)</td>
   <td>clone-impls, default, derive, parsing, printing, proc-macro, quote</td>
 </tr>
 
 <tr>
   <td>3.</td>
   <td>proc-macro2 v1.0.10</td>
-  <td>5.5s</td>
-  <td>4.7s (86%)</td>
+  <td>5.0s</td>
+  <td>4.2s (85%)</td>
   <td>default, proc-macro</td>
 </tr>
 
 <tr>
   <td>4.</td>
   <td>proc-macro-hack v0.5.15</td>
-  <td>4.4s</td>
+  <td>3.8s</td>
   <td>0.0s (0%)</td>
   <td></td>
 </tr>
@@ -210,89 +210,89 @@ h1 {
 <tr>
   <td>5.</td>
   <td>matrixmultiply v0.2.3</td>
-  <td>3.8s</td>
-  <td>2.9s (77%)</td>
+  <td>3.5s</td>
+  <td>2.6s (74%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>6.</td>
   <td>libm v0.2.1</td>
-  <td>3.1s</td>
-  <td>2.0s (64%)</td>
+  <td>3.2s</td>
+  <td>2.1s (65%)</td>
   <td>default</td>
 </tr>
 
 <tr>
   <td>7.</td>
   <td>quote v1.0.3</td>
-  <td>2.8s</td>
-  <td>2.5s (87%)</td>
+  <td>2.5s</td>
+  <td>2.2s (86%)</td>
   <td>default, proc-macro</td>
 </tr>
 
 <tr>
   <td>8.</td>
   <td>autocfg v1.0.0</td>
-  <td>2.7s</td>
-  <td>2.5s (91%)</td>
+  <td>2.5s</td>
+  <td>2.3s (90%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>9.</td>
-  <td>rand v0.7.3</td>
-  <td>2.7s</td>
-  <td>1.3s (48%)</td>
-  <td>alloc, default, getrandom, getrandom_package, libc, std</td>
+  <td>num-rational v0.2.4</td>
+  <td>2.3s</td>
+  <td>1.8s (81%)</td>
+  <td></td>
 </tr>
 
 <tr>
   <td>10.</td>
-  <td>num-rational v0.2.4</td>
-  <td>2.6s</td>
-  <td>2.0s (78%)</td>
-  <td></td>
-</tr>
-
-<tr>
-  <td>11.</td>
   <td>num-traits v0.2.11</td>
-  <td>2.0s</td>
-  <td>0.6s (28%)</td>
+  <td>2.2s</td>
+  <td>0.5s (25%)</td>
   <td>libm</td>
 </tr>
 
 <tr>
+  <td>11.</td>
+  <td>rand v0.7.3</td>
+  <td>1.9s</td>
+  <td>0.6s (29%)</td>
+  <td>alloc, default, getrandom, getrandom_package, libc, std</td>
+</tr>
+
+<tr>
   <td>12.</td>
-  <td>typenum v1.11.2 custom-build</td>
-  <td>2.0s</td>
-  <td>0.0s (0%)</td>
-  <td></td>
+  <td>rand_chacha v0.2.2</td>
+  <td>1.8s</td>
+  <td>1.2s (68%)</td>
+  <td>std</td>
 </tr>
 
 <tr>
   <td>13.</td>
   <td>libc v0.2.68</td>
   <td>1.7s</td>
-  <td>0.3s (17%)</td>
+  <td>0.3s (18%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>14.</td>
-  <td>paste-impl v0.1.10</td>
-  <td>1.5s</td>
+  <td>typenum v1.11.2 custom-build</td>
+  <td>1.6s</td>
   <td>0.0s (0%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>15.</td>
-  <td>rand_chacha v0.2.2</td>
+  <td>paste-impl v0.1.10</td>
   <td>1.5s</td>
-  <td>1.0s (63%)</td>
-  <td>std</td>
+  <td>0.0s (0%)</td>
+  <td></td>
 </tr>
 
 <tr>
@@ -337,38 +337,30 @@ h1 {
 
 <tr>
   <td>21.</td>
-  <td>num-complex v0.2.4</td>
-  <td>1.1s</td>
-  <td>0.1s (12%)</td>
+  <td>num-integer v0.1.42</td>
+  <td>1.2s</td>
+  <td>0.6s (54%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>22.</td>
-  <td>num-integer v0.1.42</td>
-  <td>1.0s</td>
-  <td>0.6s (57%)</td>
+  <td>num-complex v0.2.4</td>
+  <td>1.1s</td>
+  <td>0.1s (11%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>23.</td>
   <td>rand_distr v0.2.2</td>
-  <td>0.9s</td>
-  <td>0.3s (32%)</td>
+  <td>0.6s</td>
+  <td>0.1s (11%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>24.</td>
-  <td>getrandom v0.1.14</td>
-  <td>0.6s</td>
-  <td>0.4s (63%)</td>
-  <td>std</td>
-</tr>
-
-<tr>
-  <td>25.</td>
   <td>getrandom v0.1.14 custom-build</td>
   <td>0.6s</td>
   <td>0.0s (0%)</td>
@@ -376,18 +368,26 @@ h1 {
 </tr>
 
 <tr>
-  <td>26.</td>
+  <td>25.</td>
   <td>generic-array v0.13.2</td>
   <td>0.6s</td>
-  <td>0.0s (7%)</td>
+  <td>0.0s (6%)</td>
   <td></td>
+</tr>
+
+<tr>
+  <td>26.</td>
+  <td>getrandom v0.1.14</td>
+  <td>0.6s</td>
+  <td>0.4s (62%)</td>
+  <td>std</td>
 </tr>
 
 <tr>
   <td>27.</td>
   <td>rand_core v0.5.1</td>
   <td>0.6s</td>
-  <td>0.3s (47%)</td>
+  <td>0.2s (42%)</td>
   <td>alloc, getrandom, std</td>
 </tr>
 
@@ -401,14 +401,6 @@ h1 {
 
 <tr>
   <td>29.</td>
-  <td>num-rational v0.2.4 custom-build</td>
-  <td>0.5s</td>
-  <td>0.0s (0%)</td>
-  <td></td>
-</tr>
-
-<tr>
-  <td>30.</td>
   <td>num-complex v0.2.4 custom-build</td>
   <td>0.5s</td>
   <td>0.0s (0%)</td>
@@ -416,19 +408,27 @@ h1 {
 </tr>
 
 <tr>
-  <td>31.</td>
-  <td>num-traits v0.2.11 custom-build</td>
+  <td>30.</td>
+  <td>num-rational v0.2.4 custom-build</td>
   <td>0.5s</td>
   <td>0.0s (0%)</td>
-  <td>libm</td>
+  <td></td>
 </tr>
 
 <tr>
-  <td>32.</td>
+  <td>31.</td>
   <td>num-integer v0.1.42 custom-build</td>
   <td>0.5s</td>
   <td>0.0s (0%)</td>
   <td></td>
+</tr>
+
+<tr>
+  <td>32.</td>
+  <td>num-traits v0.2.11 custom-build</td>
+  <td>0.5s</td>
+  <td>0.0s (0%)</td>
+  <td>libm</td>
 </tr>
 
 <tr>
@@ -443,7 +443,7 @@ h1 {
   <td>34.</td>
   <td>approx v0.3.2</td>
   <td>0.2s</td>
-  <td>0.0s (8%)</td>
+  <td>0.0s (7%)</td>
   <td></td>
 </tr>
 
@@ -451,13 +451,13 @@ h1 {
   <td>35.</td>
   <td>unicode-xid v0.2.0</td>
   <td>0.2s</td>
-  <td>0.1s (37%)</td>
+  <td>0.1s (38%)</td>
   <td>default</td>
 </tr>
 
 <tr>
   <td>36.</td>
-  <td>num-integer v0.1.42 custom-build (run)</td>
+  <td>num-complex v0.2.4 custom-build (run)</td>
   <td>0.1s</td>
   <td>0.0s (0%)</td>
   <td></td>
@@ -465,14 +465,6 @@ h1 {
 
 <tr>
   <td>37.</td>
-  <td>num-rational v0.2.4 custom-build (run)</td>
-  <td>0.1s</td>
-  <td>0.0s (0%)</td>
-  <td></td>
-</tr>
-
-<tr>
-  <td>38.</td>
   <td>num-traits v0.2.11 custom-build (run)</td>
   <td>0.1s</td>
   <td>0.0s (0%)</td>
@@ -480,8 +472,16 @@ h1 {
 </tr>
 
 <tr>
+  <td>38.</td>
+  <td>num-rational v0.2.4 custom-build (run)</td>
+  <td>0.1s</td>
+  <td>0.0s (0%)</td>
+  <td></td>
+</tr>
+
+<tr>
   <td>39.</td>
-  <td>num-complex v0.2.4 custom-build (run)</td>
+  <td>num-integer v0.1.42 custom-build (run)</td>
   <td>0.1s</td>
   <td>0.0s (0%)</td>
   <td></td>
@@ -491,7 +491,7 @@ h1 {
   <td>40.</td>
   <td>rawpointer v0.2.1</td>
   <td>0.1s</td>
-  <td>0.0s (22%)</td>
+  <td>0.0s (23%)</td>
   <td></td>
 </tr>
 
@@ -507,7 +507,7 @@ h1 {
   <td>42.</td>
   <td>paste v0.1.10</td>
   <td>0.1s</td>
-  <td>0.0s (12%)</td>
+  <td>0.0s (14%)</td>
   <td></td>
 </tr>
 
@@ -515,7 +515,7 @@ h1 {
   <td>43.</td>
   <td>mathbench-nalgebra-buildtime v0.1.0</td>
   <td>0.1s</td>
-  <td>0.0s (15%)</td>
+  <td>0.0s (14%)</td>
   <td></td>
 </tr>
 
@@ -523,16 +523,16 @@ h1 {
   <td>44.</td>
   <td>cfg-if v0.1.10</td>
   <td>0.1s</td>
-  <td>0.0s (24%)</td>
+  <td>0.0s (22%)</td>
   <td></td>
 </tr>
 
 <tr>
   <td>45.</td>
-  <td>libc v0.2.68 custom-build (run)</td>
+  <td>proc-macro2 v1.0.10 custom-build (run)</td>
   <td>0.0s</td>
   <td>0.0s (0%)</td>
-  <td></td>
+  <td>default, proc-macro</td>
 </tr>
 
 <tr>
@@ -545,26 +545,26 @@ h1 {
 
 <tr>
   <td>47.</td>
-  <td>proc-macro2 v1.0.10 custom-build (run)</td>
+  <td>libc v0.2.68 custom-build (run)</td>
   <td>0.0s</td>
   <td>0.0s (0%)</td>
-  <td>default, proc-macro</td>
+  <td></td>
 </tr>
 
 <tr>
   <td>48.</td>
-  <td>libm v0.2.1 custom-build (run)</td>
-  <td>0.0s</td>
-  <td>0.0s (0%)</td>
-  <td>default</td>
-</tr>
-
-<tr>
-  <td>49.</td>
   <td>getrandom v0.1.14 custom-build (run)</td>
   <td>0.0s</td>
   <td>0.0s (0%)</td>
   <td>std</td>
+</tr>
+
+<tr>
+  <td>49.</td>
+  <td>libm v0.2.1 custom-build (run)</td>
+  <td>0.0s</td>
+  <td>0.0s (1%)</td>
+  <td>default</td>
 </tr>
 </tbody>
 </table>
@@ -577,52 +577,38 @@ const UNIT_DATA = [
     "version": "1.0.0",
     "mode": "todo",
     "target": "",
-    "start": 0.3,
-    "duration": 2.73,
-    "rmeta_time": 0.24,
+    "start": 0.29,
+    "duration": 2.52,
+    "rmeta_time": 0.25,
     "unlocked_units": [
-      28,
+      25,
       26,
       27,
-      25
+      24
     ],
     "unlocked_rmeta_units": []
   },
   {
     "i": 1,
-    "name": "libc",
-    "version": "0.2.68",
-    "mode": "todo",
-    "target": " custom-build",
-    "start": 0.3,
-    "duration": 1.27,
-    "rmeta_time": 1.27,
-    "unlocked_units": [
-      17
-    ],
-    "unlocked_rmeta_units": []
-  },
-  {
-    "i": 2,
     "name": "libm",
     "version": "0.2.1",
     "mode": "todo",
     "target": " custom-build",
-    "start": 0.3,
-    "duration": 0.42,
-    "rmeta_time": 0.42,
+    "start": 0.29,
+    "duration": 0.39,
+    "rmeta_time": 0.39,
     "unlocked_units": [
       12
     ],
     "unlocked_rmeta_units": []
   },
   {
-    "i": 3,
+    "i": 2,
     "name": "proc-macro2",
     "version": "1.0.10",
     "mode": "todo",
     "target": " custom-build",
-    "start": 0.3,
+    "start": 0.29,
     "duration": 1.37,
     "rmeta_time": 1.37,
     "unlocked_units": [
@@ -631,55 +617,69 @@ const UNIT_DATA = [
     "unlocked_rmeta_units": []
   },
   {
+    "i": 3,
+    "name": "libc",
+    "version": "0.2.68",
+    "mode": "todo",
+    "target": " custom-build",
+    "start": 0.29,
+    "duration": 1.25,
+    "rmeta_time": 1.25,
+    "unlocked_units": [
+      17
+    ],
+    "unlocked_rmeta_units": []
+  },
+  {
     "i": 4,
+    "name": "unicode-xid",
+    "version": "0.2.0",
+    "mode": "todo",
+    "target": "",
+    "start": 0.29,
+    "duration": 0.17,
+    "rmeta_time": 0.1,
+    "unlocked_units": [],
+    "unlocked_rmeta_units": []
+  },
+  {
+    "i": 5,
     "name": "getrandom",
     "version": "0.1.14",
     "mode": "todo",
     "target": " custom-build",
-    "start": 0.3,
-    "duration": 0.63,
-    "rmeta_time": 0.63,
+    "start": 0.29,
+    "duration": 0.64,
+    "rmeta_time": 0.64,
     "unlocked_units": [
       13
     ],
     "unlocked_rmeta_units": []
   },
   {
-    "i": 5,
-    "name": "unicode-xid",
-    "version": "0.2.0",
-    "mode": "todo",
-    "target": "",
-    "start": 0.3,
-    "duration": 0.17,
-    "rmeta_time": 0.11,
-    "unlocked_units": [],
-    "unlocked_rmeta_units": []
-  },
-  {
     "i": 6,
-    "name": "syn",
-    "version": "1.0.17",
-    "mode": "todo",
-    "target": " custom-build",
-    "start": 0.3,
-    "duration": 1.23,
-    "rmeta_time": 1.23,
-    "unlocked_units": [
-      16
-    ],
-    "unlocked_rmeta_units": []
-  },
-  {
-    "i": 7,
     "name": "cfg-if",
     "version": "0.1.10",
     "mode": "todo",
     "target": "",
-    "start": 0.3,
+    "start": 0.29,
     "duration": 0.05,
     "rmeta_time": 0.04,
     "unlocked_units": [],
+    "unlocked_rmeta_units": []
+  },
+  {
+    "i": 7,
+    "name": "syn",
+    "version": "1.0.17",
+    "mode": "todo",
+    "target": " custom-build",
+    "start": 0.29,
+    "duration": 1.24,
+    "rmeta_time": 1.24,
+    "unlocked_units": [
+      16
+    ],
     "unlocked_rmeta_units": []
   },
   {
@@ -688,36 +688,36 @@ const UNIT_DATA = [
     "version": "0.2.6",
     "mode": "todo",
     "target": "",
-    "start": 0.35,
-    "duration": 1.46,
-    "rmeta_time": 1.43,
+    "start": 0.34,
+    "duration": 1.45,
+    "rmeta_time": 1.42,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
   {
     "i": 9,
-    "name": "typenum",
-    "version": "1.11.2",
-    "mode": "todo",
-    "target": " custom-build",
-    "start": 0.47,
-    "duration": 1.96,
-    "rmeta_time": 1.96,
-    "unlocked_units": [
-      21
-    ],
-    "unlocked_rmeta_units": []
-  },
-  {
-    "i": 10,
     "name": "proc-macro-hack",
     "version": "0.5.15",
     "mode": "todo",
     "target": "",
-    "start": 0.72,
-    "duration": 4.38,
-    "rmeta_time": 4.38,
+    "start": 0.45,
+    "duration": 3.82,
+    "rmeta_time": 3.82,
     "unlocked_units": [],
+    "unlocked_rmeta_units": []
+  },
+  {
+    "i": 10,
+    "name": "typenum",
+    "version": "1.11.2",
+    "mode": "todo",
+    "target": " custom-build",
+    "start": 0.68,
+    "duration": 1.62,
+    "rmeta_time": 1.62,
+    "unlocked_units": [
+      21
+    ],
     "unlocked_rmeta_units": []
   },
   {
@@ -740,7 +740,7 @@ const UNIT_DATA = [
     "version": "0.2.1",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 1.0,
+    "start": 1.01,
     "duration": 0.0,
     "rmeta_time": 0.0,
     "unlocked_units": [
@@ -767,7 +767,7 @@ const UNIT_DATA = [
     "mode": "todo",
     "target": "",
     "start": 1.01,
-    "duration": 3.83,
+    "duration": 3.46,
     "rmeta_time": 0.89,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
@@ -779,8 +779,8 @@ const UNIT_DATA = [
     "mode": "todo",
     "target": "",
     "start": 1.53,
-    "duration": 3.11,
-    "rmeta_time": 1.12,
+    "duration": 3.25,
+    "rmeta_time": 1.15,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
@@ -790,9 +790,9 @@ const UNIT_DATA = [
     "version": "1.0.17",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 1.57,
-    "duration": 0.03,
-    "rmeta_time": 0.03,
+    "start": 1.54,
+    "duration": 0.02,
+    "rmeta_time": 0.02,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
@@ -802,9 +802,9 @@ const UNIT_DATA = [
     "version": "0.2.68",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 1.6,
-    "duration": 0.03,
-    "rmeta_time": 0.03,
+    "start": 1.56,
+    "duration": 0.02,
+    "rmeta_time": 0.02,
     "unlocked_units": [
       18
     ],
@@ -816,12 +816,12 @@ const UNIT_DATA = [
     "version": "0.2.68",
     "mode": "todo",
     "target": "",
-    "start": 1.62,
+    "start": 1.59,
     "duration": 1.73,
-    "rmeta_time": 1.44,
+    "rmeta_time": 1.42,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
-      29
+      28
     ]
   },
   {
@@ -830,9 +830,9 @@ const UNIT_DATA = [
     "version": "1.0.10",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 1.67,
-    "duration": 0.03,
-    "rmeta_time": 0.03,
+    "start": 1.66,
+    "duration": 0.02,
+    "rmeta_time": 0.02,
     "unlocked_units": [
       20
     ],
@@ -845,11 +845,11 @@ const UNIT_DATA = [
     "mode": "todo",
     "target": "",
     "start": 1.69,
-    "duration": 5.5,
-    "rmeta_time": 0.76,
+    "duration": 4.98,
+    "rmeta_time": 0.77,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
-      22
+      23
     ]
   },
   {
@@ -858,35 +858,21 @@ const UNIT_DATA = [
     "version": "1.11.2",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 2.43,
+    "start": 2.3,
     "duration": 0.07,
     "rmeta_time": 0.07,
     "unlocked_units": [
-      23
+      22
     ],
     "unlocked_rmeta_units": []
   },
   {
     "i": 22,
-    "name": "quote",
-    "version": "1.0.3",
-    "mode": "todo",
-    "target": "",
-    "start": 2.47,
-    "duration": 2.81,
-    "rmeta_time": 0.36,
-    "unlocked_units": [],
-    "unlocked_rmeta_units": [
-      24
-    ]
-  },
-  {
-    "i": 23,
     "name": "typenum",
     "version": "1.11.2",
     "mode": "todo",
     "target": "",
-    "start": 2.51,
+    "start": 2.37,
     "duration": 1.36,
     "rmeta_time": 1.25,
     "unlocked_units": [],
@@ -895,30 +881,44 @@ const UNIT_DATA = [
     ]
   },
   {
-    "i": 24,
-    "name": "syn",
-    "version": "1.0.17",
+    "i": 23,
+    "name": "quote",
+    "version": "1.0.3",
     "mode": "todo",
     "target": "",
-    "start": 3.04,
-    "duration": 9.04,
-    "rmeta_time": 3.33,
+    "start": 2.81,
+    "duration": 2.52,
+    "rmeta_time": 0.35,
+    "unlocked_units": [],
+    "unlocked_rmeta_units": [
+      29
+    ]
+  },
+  {
+    "i": 24,
+    "name": "num-traits",
+    "version": "0.2.11",
+    "mode": "todo",
+    "target": " custom-build",
+    "start": 3.32,
+    "duration": 0.48,
+    "rmeta_time": 0.48,
     "unlocked_units": [
-      44
+      31
     ],
     "unlocked_rmeta_units": []
   },
   {
     "i": 25,
-    "name": "num-traits",
-    "version": "0.2.11",
+    "name": "num-integer",
+    "version": "0.1.42",
     "mode": "todo",
     "target": " custom-build",
-    "start": 3.35,
+    "start": 3.73,
     "duration": 0.49,
     "rmeta_time": 0.49,
     "unlocked_units": [
-      31
+      32
     ],
     "unlocked_rmeta_units": []
   },
@@ -928,21 +928,7 @@ const UNIT_DATA = [
     "version": "0.2.4",
     "mode": "todo",
     "target": " custom-build",
-    "start": 3.84,
-    "duration": 0.5,
-    "rmeta_time": 0.5,
-    "unlocked_units": [
-      32
-    ],
-    "unlocked_rmeta_units": []
-  },
-  {
-    "i": 27,
-    "name": "num-integer",
-    "version": "0.1.42",
-    "mode": "todo",
-    "target": " custom-build",
-    "start": 3.86,
+    "start": 3.8,
     "duration": 0.49,
     "rmeta_time": 0.49,
     "unlocked_units": [
@@ -951,32 +937,46 @@ const UNIT_DATA = [
     "unlocked_rmeta_units": []
   },
   {
-    "i": 28,
+    "i": 27,
     "name": "num-rational",
     "version": "0.2.4",
     "mode": "todo",
     "target": " custom-build",
-    "start": 4.34,
-    "duration": 0.51,
-    "rmeta_time": 0.51,
+    "start": 3.9,
+    "duration": 0.49,
+    "rmeta_time": 0.49,
     "unlocked_units": [
-      35
+      34
     ],
     "unlocked_rmeta_units": []
   },
   {
-    "i": 29,
+    "i": 28,
     "name": "getrandom",
     "version": "0.1.14",
     "mode": "todo",
     "target": "",
-    "start": 4.35,
-    "duration": 0.63,
-    "rmeta_time": 0.23,
+    "start": 4.22,
+    "duration": 0.59,
+    "rmeta_time": 0.22,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
-      34
+      35
     ]
+  },
+  {
+    "i": 29,
+    "name": "syn",
+    "version": "1.0.17",
+    "mode": "todo",
+    "target": "",
+    "start": 4.27,
+    "duration": 7.94,
+    "rmeta_time": 2.97,
+    "unlocked_units": [
+      44
+    ],
+    "unlocked_rmeta_units": []
   },
   {
     "i": 30,
@@ -984,9 +984,9 @@ const UNIT_DATA = [
     "version": "0.13.2",
     "mode": "todo",
     "target": "",
-    "start": 4.64,
-    "duration": 0.62,
-    "rmeta_time": 0.58,
+    "start": 4.29,
+    "duration": 0.63,
+    "rmeta_time": 0.59,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
@@ -996,7 +996,7 @@ const UNIT_DATA = [
     "version": "0.2.11",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 4.84,
+    "start": 4.39,
     "duration": 0.12,
     "rmeta_time": 0.12,
     "unlocked_units": [
@@ -1006,11 +1006,11 @@ const UNIT_DATA = [
   },
   {
     "i": 32,
-    "name": "num-complex",
-    "version": "0.2.4",
+    "name": "num-integer",
+    "version": "0.1.42",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 4.85,
+    "start": 4.47,
     "duration": 0.12,
     "rmeta_time": 0.12,
     "unlocked_units": [],
@@ -1018,41 +1018,41 @@ const UNIT_DATA = [
   },
   {
     "i": 33,
-    "name": "num-integer",
-    "version": "0.1.42",
+    "name": "num-complex",
+    "version": "0.2.4",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 4.96,
-    "duration": 0.13,
-    "rmeta_time": 0.13,
+    "start": 4.51,
+    "duration": 0.12,
+    "rmeta_time": 0.12,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
   {
     "i": 34,
-    "name": "rand_core",
-    "version": "0.5.1",
-    "mode": "todo",
-    "target": "",
-    "start": 4.97,
-    "duration": 0.58,
-    "rmeta_time": 0.31,
-    "unlocked_units": [],
-    "unlocked_rmeta_units": [
-      37
-    ]
-  },
-  {
-    "i": 35,
     "name": "num-rational",
     "version": "0.2.4",
     "mode": "run-custom-build",
     "target": " custom-build (run)",
-    "start": 4.99,
+    "start": 4.59,
     "duration": 0.12,
     "rmeta_time": 0.12,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
+  },
+  {
+    "i": 35,
+    "name": "rand_core",
+    "version": "0.5.1",
+    "mode": "todo",
+    "target": "",
+    "start": 4.63,
+    "duration": 0.56,
+    "rmeta_time": 0.33,
+    "unlocked_units": [],
+    "unlocked_rmeta_units": [
+      37
+    ]
   },
   {
     "i": 36,
@@ -1060,14 +1060,14 @@ const UNIT_DATA = [
     "version": "0.2.11",
     "mode": "todo",
     "target": "",
-    "start": 5.09,
-    "duration": 2.01,
-    "rmeta_time": 1.44,
+    "start": 4.71,
+    "duration": 2.2,
+    "rmeta_time": 1.66,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
-      40,
+      39,
       41,
-      39
+      40
     ]
   },
   {
@@ -1076,8 +1076,8 @@ const UNIT_DATA = [
     "version": "0.2.2",
     "mode": "todo",
     "target": "",
-    "start": 5.29,
-    "duration": 1.53,
+    "start": 5.15,
+    "duration": 1.81,
     "rmeta_time": 0.57,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
@@ -1090,9 +1090,9 @@ const UNIT_DATA = [
     "version": "0.7.3",
     "mode": "todo",
     "target": "",
-    "start": 5.86,
-    "duration": 2.72,
-    "rmeta_time": 1.41,
+    "start": 5.73,
+    "duration": 1.92,
+    "rmeta_time": 1.36,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
       43
@@ -1104,9 +1104,9 @@ const UNIT_DATA = [
     "version": "0.1.42",
     "mode": "todo",
     "target": "",
-    "start": 6.53,
-    "duration": 1.03,
-    "rmeta_time": 0.44,
+    "start": 6.37,
+    "duration": 1.18,
+    "rmeta_time": 0.54,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
       42
@@ -1118,9 +1118,9 @@ const UNIT_DATA = [
     "version": "0.3.2",
     "mode": "todo",
     "target": "",
-    "start": 6.53,
-    "duration": 0.21,
-    "rmeta_time": 0.19,
+    "start": 6.37,
+    "duration": 0.2,
+    "rmeta_time": 0.18,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
@@ -1130,9 +1130,9 @@ const UNIT_DATA = [
     "version": "0.2.4",
     "mode": "todo",
     "target": "",
-    "start": 6.53,
-    "duration": 1.05,
-    "rmeta_time": 0.93,
+    "start": 6.37,
+    "duration": 1.09,
+    "rmeta_time": 0.97,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
@@ -1142,9 +1142,9 @@ const UNIT_DATA = [
     "version": "0.2.4",
     "mode": "todo",
     "target": "",
-    "start": 6.97,
-    "duration": 2.63,
-    "rmeta_time": 0.58,
+    "start": 6.9,
+    "duration": 2.27,
+    "rmeta_time": 0.44,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
@@ -1154,9 +1154,9 @@ const UNIT_DATA = [
     "version": "0.2.2",
     "mode": "todo",
     "target": "",
-    "start": 7.27,
-    "duration": 0.86,
-    "rmeta_time": 0.58,
+    "start": 7.09,
+    "duration": 0.64,
+    "rmeta_time": 0.57,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
   },
@@ -1166,7 +1166,7 @@ const UNIT_DATA = [
     "version": "0.1.10",
     "mode": "todo",
     "target": "",
-    "start": 12.07,
+    "start": 12.21,
     "duration": 1.54,
     "rmeta_time": 1.54,
     "unlocked_units": [
@@ -1180,7 +1180,7 @@ const UNIT_DATA = [
     "version": "0.1.10",
     "mode": "todo",
     "target": "",
-    "start": 13.61,
+    "start": 13.75,
     "duration": 0.07,
     "rmeta_time": 0.06,
     "unlocked_units": [],
@@ -1194,7 +1194,7 @@ const UNIT_DATA = [
     "version": "0.1.2",
     "mode": "todo",
     "target": "",
-    "start": 13.67,
+    "start": 13.81,
     "duration": 0.54,
     "rmeta_time": 0.53,
     "unlocked_units": [],
@@ -1208,9 +1208,9 @@ const UNIT_DATA = [
     "version": "0.21.0",
     "mode": "todo",
     "target": "",
-    "start": 14.2,
-    "duration": 17.87,
-    "rmeta_time": 17.7,
+    "start": 14.34,
+    "duration": 17.82,
+    "rmeta_time": 17.65,
     "unlocked_units": [],
     "unlocked_rmeta_units": [
       48
@@ -1222,8 +1222,8 @@ const UNIT_DATA = [
     "version": "0.1.0",
     "mode": "todo",
     "target": "",
-    "start": 31.9,
-    "duration": 0.05,
+    "start": 31.99,
+    "duration": 0.06,
     "rmeta_time": 0.05,
     "unlocked_units": [],
     "unlocked_rmeta_units": []
@@ -1231,1435 +1231,1428 @@ const UNIT_DATA = [
 ];
 const CONCURRENCY_DATA = [
   {
-    "t": 0.299468928,
+    "t": 0.28795776,
     "active": 8,
     "waiting": 4,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.338287024,
+    "t": 0.329230015,
     "active": 8,
     "waiting": 4,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.350506204,
+    "t": 0.340965163,
     "active": 8,
     "waiting": 3,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.350598274,
+    "t": 0.341050842,
     "active": 8,
     "waiting": 3,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.406606941,
+    "t": 0.389879859,
     "active": 8,
     "waiting": 3,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.470207041,
+    "t": 0.453758927,
     "active": 8,
     "waiting": 2,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.471712436,
+    "t": 0.453840712,
     "active": 8,
     "waiting": 2,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.542820754,
+    "t": 0.53358929,
     "active": 8,
     "waiting": 2,
     "inactive": 37,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.718853699,
+    "t": 0.679963434,
     "active": 8,
     "waiting": 2,
     "inactive": 36,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.718960827,
+    "t": 0.680146962,
     "active": 8,
     "waiting": 2,
     "inactive": 36,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.925306206,
+    "t": 0.926831471,
     "active": 8,
     "waiting": 2,
     "inactive": 35,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.925495437,
+    "t": 0.927035719,
     "active": 8,
     "waiting": 2,
     "inactive": 35,
     "rustc_parallelism": 0
   },
   {
-    "t": 0.985443208,
+    "t": 0.987185045,
     "active": 8,
     "waiting": 3,
     "inactive": 34,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.00229614,
+    "t": 1.00561999,
     "active": 8,
     "waiting": 2,
     "inactive": 34,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.00239328,
+    "t": 1.005679647,
     "active": 8,
     "waiting": 2,
     "inactive": 34,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.005245017,
+    "t": 1.007978438,
     "active": 8,
     "waiting": 2,
     "inactive": 33,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.005325346,
+    "t": 1.008089748,
     "active": 8,
     "waiting": 2,
     "inactive": 33,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.008115583,
+    "t": 1.010424669,
     "active": 8,
     "waiting": 1,
     "inactive": 33,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.008201961,
+    "t": 1.010546334,
     "active": 8,
     "waiting": 1,
     "inactive": 33,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.5083037510000001,
+    "t": 1.5106351820000001,
     "active": 8,
     "waiting": 1,
     "inactive": 33,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.5341278,
+    "t": 1.528547423,
     "active": 8,
     "waiting": 1,
     "inactive": 32,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.534224536,
+    "t": 1.5286392640000002,
     "active": 8,
     "waiting": 1,
     "inactive": 32,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.5705845250000001,
+    "t": 1.5400848169999999,
     "active": 8,
     "waiting": 1,
     "inactive": 31,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.5706744110000002,
+    "t": 1.540169708,
     "active": 8,
     "waiting": 1,
     "inactive": 31,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.596929293,
+    "t": 1.564236932,
     "active": 8,
     "waiting": 0,
     "inactive": 31,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.597032575,
+    "t": 1.56432671,
     "active": 8,
     "waiting": 0,
     "inactive": 31,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.624357787,
+    "t": 1.58832378,
     "active": 8,
     "waiting": 0,
     "inactive": 30,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.624586646,
+    "t": 1.58844283,
     "active": 8,
     "waiting": 0,
     "inactive": 30,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.666881923,
+    "t": 1.662526566,
     "active": 8,
     "waiting": 0,
     "inactive": 29,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.6670126459999999,
+    "t": 1.662700827,
     "active": 8,
     "waiting": 0,
     "inactive": 29,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.692714045,
+    "t": 1.6868479920000001,
     "active": 8,
     "waiting": 0,
     "inactive": 28,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.6928439659999999,
+    "t": 1.6870081049999999,
     "active": 8,
     "waiting": 0,
     "inactive": 28,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.779614936,
+    "t": 1.762989956,
     "active": 8,
     "waiting": 0,
     "inactive": 28,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.808172807,
+    "t": 1.791390061,
     "active": 7,
     "waiting": 0,
     "inactive": 28,
     "rustc_parallelism": 0
   },
   {
-    "t": 1.9022478409999999,
+    "t": 1.896788183,
     "active": 7,
     "waiting": 0,
     "inactive": 28,
     "rustc_parallelism": 0
   },
   {
-    "t": 2.402446556,
-    "active": 7,
-    "waiting": 0,
-    "inactive": 28,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 2.433695386,
+    "t": 2.296525074,
     "active": 7,
     "waiting": 0,
     "inactive": 27,
     "rustc_parallelism": 0
   },
   {
-    "t": 2.433782672,
+    "t": 2.296711989,
     "active": 7,
     "waiting": 0,
     "inactive": 27,
     "rustc_parallelism": 0
   },
   {
-    "t": 2.451569787,
+    "t": 2.369452891,
+    "active": 7,
+    "waiting": 0,
+    "inactive": 26,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 2.369554564,
+    "active": 7,
+    "waiting": 0,
+    "inactive": 26,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 2.454654152,
     "active": 7,
     "waiting": 1,
-    "inactive": 26,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 2.474810554,
-    "active": 8,
-    "waiting": 0,
-    "inactive": 26,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 2.474924007,
-    "active": 8,
-    "waiting": 0,
-    "inactive": 26,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 2.508733812,
-    "active": 8,
-    "waiting": 0,
     "inactive": 25,
     "rustc_parallelism": 0
   },
   {
-    "t": 2.508957192,
-    "active": 8,
-    "waiting": 0,
-    "inactive": 25,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 2.656176705,
-    "active": 8,
-    "waiting": 0,
-    "inactive": 25,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 2.836863405,
-    "active": 8,
+    "t": 2.679912524,
+    "active": 7,
     "waiting": 1,
-    "inactive": 24,
+    "inactive": 25,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.029202737,
-    "active": 8,
+    "t": 2.805334555,
+    "active": 7,
     "waiting": 4,
+    "inactive": 21,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 2.805515993,
+    "active": 7,
+    "waiting": 4,
+    "inactive": 21,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 3.012223151,
+    "active": 7,
+    "waiting": 5,
     "inactive": 20,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.03610149,
-    "active": 8,
-    "waiting": 4,
-    "inactive": 20,
+    "t": 3.157957728,
+    "active": 7,
+    "waiting": 6,
+    "inactive": 19,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.059895119,
-    "active": 8,
+    "t": 3.322350607,
+    "active": 7,
     "waiting": 5,
     "inactive": 19,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.353099545,
-    "active": 8,
-    "waiting": 4,
+    "t": 3.322555485,
+    "active": 7,
+    "waiting": 5,
     "inactive": 19,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.353297757,
-    "active": 8,
-    "waiting": 4,
-    "inactive": 19,
+    "t": 3.623867077,
+    "active": 7,
+    "waiting": 6,
+    "inactive": 18,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.756920911,
-    "active": 8,
+    "t": 3.733040118,
+    "active": 7,
     "waiting": 5,
     "inactive": 18,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.843867319,
-    "active": 8,
+    "t": 3.733226202,
+    "active": 7,
+    "waiting": 5,
+    "inactive": 18,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 3.801154311,
+    "active": 7,
     "waiting": 5,
     "inactive": 17,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.8439697,
-    "active": 8,
+    "t": 3.801244243,
+    "active": 7,
     "waiting": 5,
     "inactive": 17,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.864317603,
+    "t": 3.8993410280000003,
     "active": 8,
     "waiting": 4,
     "inactive": 17,
     "rustc_parallelism": 0
   },
   {
-    "t": 3.864540811,
+    "t": 3.899555126,
     "active": 8,
     "waiting": 4,
     "inactive": 17,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.343775037,
+    "t": 4.219352099,
     "active": 8,
     "waiting": 4,
     "inactive": 16,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.3439757,
+    "t": 4.219561421,
     "active": 8,
     "waiting": 4,
     "inactive": 16,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.353161245,
+    "t": 4.269847412,
     "active": 8,
-    "waiting": 4,
+    "waiting": 3,
+    "inactive": 16,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 4.269981307,
+    "active": 8,
+    "waiting": 3,
+    "inactive": 16,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 4.291607469,
+    "active": 8,
+    "waiting": 3,
     "inactive": 15,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.353259389,
+    "t": 4.291695162,
     "active": 8,
-    "waiting": 4,
+    "waiting": 3,
     "inactive": 15,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.585083709,
-    "active": 8,
-    "waiting": 5,
-    "inactive": 14,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 4.641433052,
-    "active": 8,
-    "waiting": 4,
-    "inactive": 14,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 4.641568123,
-    "active": 8,
-    "waiting": 4,
-    "inactive": 14,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 4.8354352689999995,
+    "t": 4.385874015,
     "active": 8,
     "waiting": 3,
     "inactive": 14,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.835668839,
+    "t": 4.386118276,
     "active": 8,
     "waiting": 3,
     "inactive": 14,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.849651981,
+    "t": 4.443267285,
+    "active": 8,
+    "waiting": 4,
+    "inactive": 13,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 4.470010646,
     "active": 8,
     "waiting": 3,
     "inactive": 13,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.849786039,
+    "t": 4.470105224,
     "active": 8,
     "waiting": 3,
     "inactive": 13,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.960012719,
+    "t": 4.509614143,
     "active": 8,
     "waiting": 3,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.960227117,
+    "t": 4.509832116,
     "active": 8,
     "waiting": 3,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.973158216,
+    "t": 4.587271428,
     "active": 8,
     "waiting": 2,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.973260496,
+    "t": 4.587365239,
     "active": 8,
     "waiting": 2,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.986335004,
+    "t": 4.634393624,
     "active": 8,
     "waiting": 1,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 4.986430242,
+    "t": 4.634649211,
     "active": 8,
     "waiting": 1,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.087284878,
+    "t": 4.704921186,
     "active": 8,
     "waiting": 0,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.087439316,
+    "t": 4.705042443,
     "active": 8,
     "waiting": 0,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.096408194,
+    "t": 4.776364835,
     "active": 7,
     "waiting": 0,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.111421171,
+    "t": 4.809120748,
     "active": 6,
     "waiting": 0,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.217996921,
+    "t": 4.880750595,
     "active": 6,
     "waiting": 0,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.2586839659999995,
+    "t": 4.920870925,
     "active": 5,
     "waiting": 0,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.258779023,
+    "t": 4.92292016,
     "active": 5,
     "waiting": 0,
     "inactive": 12,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.282116886,
+    "t": 4.961240775,
     "active": 5,
     "waiting": 1,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.288285845,
+    "t": 5.154248997,
+    "active": 6,
+    "waiting": 0,
+    "inactive": 11,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 5.154400365,
+    "active": 6,
+    "waiting": 0,
+    "inactive": 11,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 5.180142708,
+    "active": 6,
+    "waiting": 0,
+    "inactive": 11,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 5.198045275,
     "active": 5,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.288381027,
-    "active": 5,
-    "waiting": 0,
-    "inactive": 11,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 5.554274347,
+    "t": 5.326549391,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.797656979,
+    "t": 5.326695804,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.797846484,
+    "t": 5.673291255,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.7978839650000005,
+    "t": 5.673448167,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.797911499,
+    "t": 5.67348247,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.79793751,
+    "t": 5.6735146069999995,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.797951745,
+    "t": 5.6735305700000005,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.797978175,
+    "t": 5.673559094,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.79800404,
+    "t": 5.673587269,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798030472,
+    "t": 5.673615515,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798044731,
+    "t": 5.673642529,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798069963,
+    "t": 5.67367013,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798094439,
+    "t": 5.673698508,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798119082,
+    "t": 5.673727745,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798132559,
+    "t": 5.673756482,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.79815695,
+    "t": 5.673782621,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.79818167,
+    "t": 5.673808758,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798195224,
+    "t": 5.673836285,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.7982195149999995,
+    "t": 5.673864193,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798244053,
+    "t": 5.673891489,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798269614,
+    "t": 5.673918407,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798295697,
+    "t": 5.673946523,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798309473,
+    "t": 5.6739748389999995,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798335069,
+    "t": 5.674001462,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798360618,
+    "t": 5.674027804,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798374947,
+    "t": 5.674054769,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798399432,
+    "t": 5.674085704,
     "active": 4,
     "waiting": 0,
     "inactive": 11,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.798430324,
-    "active": 4,
-    "waiting": 0,
-    "inactive": 11,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 5.798459656,
-    "active": 4,
-    "waiting": 0,
-    "inactive": 11,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 5.857186126,
+    "t": 5.729164386,
     "active": 4,
     "waiting": 1,
     "inactive": 10,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.857314468,
+    "t": 5.729282841,
     "active": 5,
     "waiting": 0,
     "inactive": 10,
     "rustc_parallelism": 0
   },
   {
-    "t": 5.8573940140000005,
+    "t": 5.7293661369999995,
     "active": 5,
     "waiting": 0,
     "inactive": 10,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.357492768,
+    "t": 6.229470371,
     "active": 5,
     "waiting": 0,
     "inactive": 10,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.369484498,
-    "active": 5,
-    "waiting": 0,
-    "inactive": 10,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 6.524846387,
+    "t": 6.365283356,
     "active": 5,
     "waiting": 3,
     "inactive": 7,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.528253004,
-    "active": 6,
-    "waiting": 2,
-    "inactive": 7,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 6.530972298,
-    "active": 7,
-    "waiting": 1,
-    "inactive": 7,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 6.531013982,
-    "active": 7,
-    "waiting": 1,
-    "inactive": 7,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 6.531087598,
-    "active": 7,
-    "waiting": 1,
-    "inactive": 7,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 6.532058812,
+    "t": 6.365656683,
     "active": 8,
     "waiting": 0,
     "inactive": 7,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.533062803,
+    "t": 6.365711536,
     "active": 8,
     "waiting": 0,
     "inactive": 7,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.720553769,
+    "t": 6.365733692,
     "active": 8,
     "waiting": 0,
     "inactive": 7,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.7365842019999995,
+    "t": 6.365774592,
+    "active": 8,
+    "waiting": 0,
+    "inactive": 7,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 6.550475821,
+    "active": 8,
+    "waiting": 0,
+    "inactive": 7,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 6.564860753,
     "active": 7,
     "waiting": 0,
     "inactive": 7,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.816021491,
+    "t": 6.664343388,
     "active": 6,
     "waiting": 0,
     "inactive": 7,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.970742646,
+    "t": 6.903813212,
     "active": 6,
     "waiting": 1,
     "inactive": 6,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.970922586,
+    "t": 6.903992422,
     "active": 7,
     "waiting": 0,
     "inactive": 6,
     "rustc_parallelism": 0
   },
   {
-    "t": 6.971001669,
+    "t": 6.904076628,
     "active": 7,
     "waiting": 0,
     "inactive": 6,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.095375209,
+    "t": 6.905465046,
     "active": 6,
     "waiting": 0,
     "inactive": 6,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.189212309,
+    "t": 6.964067101,
     "active": 5,
     "waiting": 0,
     "inactive": 6,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.271848799,
+    "t": 7.093048244,
     "active": 5,
     "waiting": 1,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.272152496,
+    "t": 7.093311473,
     "active": 6,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.272256693,
+    "t": 7.093394642,
     "active": 6,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.462988376,
+    "t": 7.241099156,
     "active": 6,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.554366762,
+    "t": 7.332366675,
     "active": 6,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.564547479,
+    "t": 7.343821541,
+    "active": 6,
+    "waiting": 0,
+    "inactive": 5,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 7.455059814,
     "active": 5,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.587646826,
+    "t": 7.547985231,
     "active": 4,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 7.853978684,
-    "active": 4,
-    "waiting": 0,
-    "inactive": 5,
-    "rustc_parallelism": 0
-  },
-  {
-    "t": 8.130884859,
+    "t": 7.645450605,
     "active": 3,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 8.572864246,
+    "t": 7.666143334,
+    "active": 3,
+    "waiting": 0,
+    "inactive": 5,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 7.735921948,
     "active": 2,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 9.07305757,
+    "t": 8.236013239,
     "active": 2,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 9.573251249,
+    "t": 8.736219206,
     "active": 2,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 9.602635835,
+    "t": 9.170793458,
     "active": 1,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 10.102731606,
+    "t": 9.670968123,
     "active": 1,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 10.602952979,
+    "t": 10.17115925,
     "active": 1,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 11.103161547,
+    "t": 10.671348913,
     "active": 1,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 11.60336656,
+    "t": 11.171538699,
     "active": 1,
     "waiting": 0,
     "inactive": 5,
     "rustc_parallelism": 0
   },
   {
-    "t": 12.071210159,
+    "t": 11.671731074,
+    "active": 1,
+    "waiting": 0,
+    "inactive": 5,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 12.17192891,
+    "active": 1,
+    "waiting": 0,
+    "inactive": 5,
+    "rustc_parallelism": 0
+  },
+  {
+    "t": 12.210561928,
     "active": 1,
     "waiting": 0,
     "inactive": 4,
     "rustc_parallelism": 0
   },
   {
-    "t": 12.071292271,
+    "t": 12.210644975,
     "active": 1,
     "waiting": 0,
     "inactive": 4,
     "rustc_parallelism": 0
   },
   {
-    "t": 12.571393287,
+    "t": 12.710733613,
     "active": 1,
     "waiting": 0,
     "inactive": 4,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.071578171,
+    "t": 13.210979496,
     "active": 1,
     "waiting": 0,
     "inactive": 4,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.571762307,
+    "t": 13.711151039,
     "active": 1,
     "waiting": 0,
     "inactive": 4,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.611427563,
+    "t": 13.750135602,
     "active": 1,
     "waiting": 0,
     "inactive": 3,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.611503452000001,
+    "t": 13.750220822,
     "active": 1,
     "waiting": 0,
     "inactive": 3,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.670721752,
+    "t": 13.80672564,
     "active": 1,
     "waiting": 1,
     "inactive": 2,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.670926027,
+    "t": 13.806907841,
     "active": 2,
     "waiting": 0,
     "inactive": 2,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.671010967,
+    "t": 13.807007533,
     "active": 2,
     "waiting": 0,
     "inactive": 2,
     "rustc_parallelism": 0
   },
   {
-    "t": 13.679036461,
+    "t": 13.815597088,
     "active": 1,
     "waiting": 0,
     "inactive": 2,
     "rustc_parallelism": 0
   },
   {
-    "t": 14.179226125,
+    "t": 14.315805909,
     "active": 1,
     "waiting": 0,
     "inactive": 2,
     "rustc_parallelism": 0
   },
   {
-    "t": 14.19918023,
+    "t": 14.33668767,
     "active": 1,
     "waiting": 1,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 14.199332781,
+    "t": 14.336846635,
     "active": 2,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 14.199419479,
+    "t": 14.336946662,
     "active": 2,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 14.210863508,
+    "t": 14.348505094,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 14.710946784,
+    "t": 14.848601424,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 15.211136546,
+    "t": 15.348769253,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 15.711318777,
+    "t": 15.848941084,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 16.211484001,
+    "t": 16.349093442,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 16.711664019,
+    "t": 16.849252319,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 17.211831582,
+    "t": 17.34942322,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 17.71204579,
+    "t": 17.849592063,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 18.212218297,
+    "t": 18.3497521,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 18.712393081,
+    "t": 18.849911611,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 19.212571972,
+    "t": 19.350071267,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 19.7127511,
+    "t": 19.850227072,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 20.212940391,
+    "t": 20.350391332,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 20.713121666,
+    "t": 20.850585778,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 21.213302599,
+    "t": 21.350750604,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 21.713482976,
+    "t": 21.850915792,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 22.21366001,
+    "t": 22.351074129,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 22.713837869,
+    "t": 22.851227405,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 23.214015644,
+    "t": 23.351390431,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 23.714204551,
+    "t": 23.851544878,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 24.214380427,
+    "t": 24.351703676,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 24.714560937999998,
+    "t": 24.851862739,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 25.214740371,
+    "t": 25.352022665,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 25.714917873,
+    "t": 25.852181684,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 26.215093597,
+    "t": 26.352342556,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 26.715270154,
+    "t": 26.852501268,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 27.215449066,
+    "t": 27.352656158,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 27.715626836,
+    "t": 27.852813544,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 28.215795898,
+    "t": 28.352975507,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 28.715972671,
+    "t": 28.853138382,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 29.216150099,
+    "t": 29.353297792,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 29.716332602,
+    "t": 29.853455701,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 30.216511296,
+    "t": 30.353596664,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 30.716690221,
+    "t": 30.853757983,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 31.216867131,
+    "t": 31.353924044,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 31.717046147,
+    "t": 31.854087387,
     "active": 1,
     "waiting": 0,
     "inactive": 1,
     "rustc_parallelism": 0
   },
   {
-    "t": 31.900757509,
+    "t": 31.984840215,
     "active": 1,
     "waiting": 1,
     "inactive": 0,
     "rustc_parallelism": 0
   },
   {
-    "t": 31.90100033,
+    "t": 31.985030489,
     "active": 2,
     "waiting": 0,
     "inactive": 0,
     "rustc_parallelism": 0
   },
   {
-    "t": 31.901071401,
+    "t": 31.985121074,
     "active": 2,
     "waiting": 0,
     "inactive": 0,
     "rustc_parallelism": 0
   },
   {
-    "t": 31.94685438,
+    "t": 32.033235119,
     "active": 2,
     "waiting": 0,
     "inactive": 0,
     "rustc_parallelism": 0
   },
   {
-    "t": 31.954715032,
+    "t": 32.04080587,
     "active": 1,
     "waiting": 0,
     "inactive": 0,
     "rustc_parallelism": 0
   },
   {
-    "t": 32.073786431,
+    "t": 32.156441095,
     "active": 0,
     "waiting": 0,
     "inactive": 0,
@@ -2668,336 +2661,352 @@ const CONCURRENCY_DATA = [
 ];
 const CPU_USAGE = [
   [
-    0.406614906,
-    92.13483146067416
+    0.389888211,
+    90.69767441860465
   ],
   [
-    0.54282315,
-    99.06542056074767
-  ],
-  [
-    0.718855305,
-    99.29078014184397
-  ],
-  [
-    0.925306707,
-    100.0
-  ],
-  [
-    1.508306473,
-    99.78632478632478
-  ],
-  [
-    1.624358343,
-    100.0
-  ],
-  [
-    1.7796458560000001,
-    99.1869918699187
-  ],
-  [
-    1.902248371,
-    100.0
-  ],
-  [
-    2.402446876,
-    99.75
-  ],
-  [
-    2.508734162,
-    100.0
-  ],
-  [
-    2.656179422,
-    100.0
-  ],
-  [
-    2.8368638219999998,
-    100.0
-  ],
-  [
-    3.029203232,
-    100.0
-  ],
-  [
-    3.353099951,
-    99.61389961389962
-  ],
-  [
-    3.756921361,
-    100.0
-  ],
-  [
-    3.864319036,
-    100.0
-  ],
-  [
-    4.343775539,
-    99.73614775725594
-  ],
-  [
-    4.585084054,
-    100.0
-  ],
-  [
-    4.83543691,
-    99.49748743718592
-  ],
-  [
-    4.960014231,
-    100.0
-  ],
-  [
-    5.087286291,
-    100.0
-  ],
-  [
-    5.217997406,
-    100.0
-  ],
-  [
-    5.554275768,
-    100.0
-  ],
-  [
-    5.797657649,
-    100.0
-  ],
-  [
-    6.357495491,
-    68.45637583892618
-  ],
-  [
-    6.524846953,
-    71.42857142857143
-  ],
-  [
-    6.720556739,
-    99.35897435897436
-  ],
-  [
-    6.970743243,
-    82.82828282828282
-  ],
-  [
-    7.095376644,
-    88.0
-  ],
-  [
-    7.271849182,
-    82.85714285714286
-  ],
-  [
-    7.462991252,
-    100.0
-  ],
-  [
-    7.564547934,
-    100.0
-  ],
-  [
-    7.853979159,
+    0.533592064,
     99.1304347826087
   ],
   [
-    8.130885229,
+    0.679965074,
     100.0
   ],
   [
-    8.572864592,
-    99.43661971830986
+    0.926832058,
+    99.0
   ],
   [
-    9.07305807,
-    99.49874686716792
+    1.510638174,
+    99.78494623655914
   ],
   [
-    9.573251615,
-    74.87562189054727
+    1.662527081,
+    99.1869918699187
   ],
   [
-    10.102732299,
+    1.76301882,
     100.0
   ],
   [
-    10.602953614,
+    1.8967886470000002,
     100.0
   ],
   [
-    11.103162125,
+    2.296525525,
+    99.68652037617555
+  ],
+  [
+    2.454655484,
     100.0
   ],
   [
-    11.603367058,
-    89.02743142144638
+    2.679913031,
+    99.44134078212291
   ],
   [
-    12.071210513,
-    40.106951871657756
+    2.805335194,
+    99.0
   ],
   [
-    12.571395546,
-    48.1203007518797
+    3.012224557,
+    100.0
   ],
   [
-    13.071578679,
-    56.5
+    3.157958298,
+    100.0
   ],
   [
-    13.571762765,
-    12.5
+    3.322351072,
+    100.0
   ],
   [
-    13.679037678,
-    12.643678160919535
+    3.623867527,
+    100.0
   ],
   [
-    14.179226924,
-    12.781954887218049
+    3.733040614,
+    98.83720930232558
   ],
   [
-    14.710947243,
-    12.941176470588232
+    3.899341588,
+    99.25373134328358
   ],
   [
-    15.211137122,
-    12.718204488778056
+    4.219352578,
+    100.0
   ],
   [
-    15.711319264,
-    12.531328320802004
+    4.385874511,
+    100.0
   ],
   [
-    16.211484524,
-    12.5
+    4.50961592,
+    98.98989898989899
   ],
   [
-    16.711664723,
-    12.531328320802004
+    4.634394944,
+    100.0
   ],
   [
-    17.211832065,
-    12.718204488778056
+    4.776366389,
+    99.1304347826087
   ],
   [
-    17.712046289,
+    4.88075108,
+    100.0
+  ],
+  [
+    5.154249747,
+    100.0
+  ],
+  [
+    5.326549836,
+    99.29078014184397
+  ],
+  [
+    5.673291873,
+    100.0
+  ],
+  [
+    6.229473251,
+    69.6629213483146
+  ],
+  [
+    6.365283882,
+    62.96296296296296
+  ],
+  [
+    6.550478311,
+    98.67549668874172
+  ],
+  [
+    6.664343714,
+    94.38202247191012
+  ],
+  [
+    6.903813941,
+    82.29166666666666
+  ],
+  [
+    7.093048675,
+    67.33333333333334
+  ],
+  [
+    7.241102001,
+    87.28813559322035
+  ],
+  [
+    7.343821995,
+    100.0
+  ],
+  [
+    7.455060291,
+    97.77777777777777
+  ],
+  [
+    7.645451199,
+    94.63087248322148
+  ],
+  [
+    8.236013628,
+    62.5
+  ],
+  [
+    8.73621958,
+    99.75062344139651
+  ],
+  [
+    9.170793915,
+    99.42528735632185
+  ],
+  [
+    9.670968731,
+    74.5
+  ],
+  [
+    10.171159662,
+    100.0
+  ],
+  [
+    10.671349371,
+    100.0
+  ],
+  [
+    11.171539121,
+    100.0
+  ],
+  [
+    11.67173148,
+    94.76309226932668
+  ],
+  [
+    12.171929403,
+    47.98994974874372
+  ],
+  [
+    12.71073677,
+    46.27906976744186
+  ],
+  [
+    13.210979974,
+    57.64411027568922
+  ],
+  [
+    13.711151507,
     12.75
   ],
   [
-    18.212218671,
-    12.5
+    13.815598598,
+    12.048192771084345
   ],
   [
-    18.712393609,
-    12.5
-  ],
-  [
-    19.212572461,
-    12.5
-  ],
-  [
-    19.712751525,
-    12.5
-  ],
-  [
-    20.212940761,
-    12.5
-  ],
-  [
-    20.713122147,
-    13.0
-  ],
-  [
-    21.213306026,
-    12.5
-  ],
-  [
-    21.713483712,
-    12.531328320802004
-  ],
-  [
-    22.213660563,
-    12.5
-  ],
-  [
-    22.713838252,
-    12.5
-  ],
-  [
-    23.214016249,
-    12.5
-  ],
-  [
-    23.714205026,
-    12.75
-  ],
-  [
-    24.214381044,
-    12.93532338308458
-  ],
-  [
-    24.714561465,
-    12.531328320802004
-  ],
-  [
-    25.214740766,
-    12.5
-  ],
-  [
-    25.714918347,
-    12.93532338308458
-  ],
-  [
-    26.215093996,
-    12.75
-  ],
-  [
-    26.71527077,
-    13.53383458646617
-  ],
-  [
-    27.215449537,
-    14.0
-  ],
-  [
-    27.715627333,
-    12.5
-  ],
-  [
-    28.215796404,
+    14.3158066,
     12.718204488778056
   ],
   [
-    28.715973112,
+    14.848602008,
+    12.910798122065728
+  ],
+  [
+    15.348769994,
+    12.531328320802004
+  ],
+  [
+    15.848941581,
+    13.21695760598503
+  ],
+  [
+    16.349093701,
+    14.713216957605994
+  ],
+  [
+    16.849252786,
+    13.21695760598503
+  ],
+  [
+    17.349423695,
+    12.531328320802004
+  ],
+  [
+    17.849592602,
+    12.718204488778056
+  ],
+  [
+    18.349752368,
+    12.5
+  ],
+  [
+    18.849912097,
+    12.531328320802004
+  ],
+  [
+    19.350071745,
+    12.718204488778056
+  ],
+  [
+    19.850227516,
+    12.531328320802004
+  ],
+  [
+    20.350391774,
+    12.5
+  ],
+  [
+    20.850586288,
     12.967581047381543
   ],
   [
-    29.21615062,
-    12.5
-  ],
-  [
-    29.716333119,
-    12.280701754385973
-  ],
-  [
-    30.216511889,
-    12.718204488778056
-  ],
-  [
-    30.716690665,
+    21.350751164,
     12.531328320802004
   ],
   [
-    31.216867621,
+    21.850916289,
+    13.965087281795505
+  ],
+  [
+    22.351074649,
+    12.75
+  ],
+  [
+    22.851227892,
+    12.781954887218049
+  ],
+  [
+    23.351390898,
+    12.531328320802004
+  ],
+  [
+    23.851545146,
+    12.5
+  ],
+  [
+    24.351704172,
+    12.5
+  ],
+  [
+    24.851863239,
     12.718204488778056
   ],
   [
-    31.717046556,
+    25.352023176,
+    12.967581047381543
+  ],
+  [
+    25.852182159,
+    12.718204488778056
+  ],
+  [
+    26.35234302,
+    12.531328320802004
+  ],
+  [
+    26.852501745,
+    12.5
+  ],
+  [
+    27.352656636,
+    12.531328320802004
+  ],
+  [
+    27.852814008,
     12.280701754385973
   ],
   [
-    31.900757952,
-    19.72789115646259
+    28.352976045,
+    12.718204488778056
+  ],
+  [
+    28.853138875,
+    12.781954887218049
+  ],
+  [
+    29.353298261,
+    12.718204488778056
+  ],
+  [
+    29.853456472,
+    12.75
+  ],
+  [
+    30.353597364,
+    12.75
+  ],
+  [
+    30.853758521,
+    12.531328320802004
+  ],
+  [
+    31.353924338,
+    13.466334164588531
+  ],
+  [
+    31.85408821,
+    12.531328320802004
+  ],
+  [
+    31.984840727,
+    12.38095238095238
   ]
 ];
 // Position of the vertical axis.
