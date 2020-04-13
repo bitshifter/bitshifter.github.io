@@ -213,6 +213,11 @@ contrary to that.
 Ultimately the point of this exercise was to provide another metric to consider
 when choosing a math library. Are you paying for features you aren't using?
 
+If you have feedback or comments see the [/r/rust] post or @ me on
+[twitter.com/bitshifternz].
+
+[/r/rust]: https://www.reddit.com/r/rust/comments/g0a770/measuring_build_times_of_popular_game_math_crates/
+[twitter.com/bitshifternz]: https://twitter.com/bitshifternz
 [`glam`]: https://crates.io/crates/glam
 [`mathbench`]: https://github.com/bitshifter/mathbench-rs
 [`buildbench`]: https://github.com/bitshifter/mathbench-rs/tree/master/tools/buildbench
