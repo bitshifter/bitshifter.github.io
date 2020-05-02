@@ -79,13 +79,15 @@ So perhaps instead of setting our own define lets just make these `cfg` checks i
 
 ```rust
 #[inline]
-fn vector_get_x(intput: vector4f) -> f32 {
-  #[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
-  unsafe { _mm_cvtss_f32(input.0) }
-  #[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
-  unsafe { f32x4_extract_lane(input.0, 0) }
-  #[cfg(any(feature = "no-intrinsics, not(any(target_feature = "sse2", target_feature = "wasm32"))))]
-  { input.0 }
+impl Vec4 {
+  fn x(self) -> f32 {
+    #[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
+    unsafe { _mm_cvtss_f32(self.0) }
+    #[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
+    unsafe { f32x4_extract_lane(self.0, 0) }
+    #[cfg(any(feature = "no-intrinsics, not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+    { self.0 }
+  }
 }
 ```
 
@@ -97,13 +99,18 @@ If you are familiar with Rust you might be thinking we could use the `cfg!` macr
 consider that:
 
 ```rust
-  if cfg!(all(not(feature = "no-intrinsics"), target_feature = "sse2")) {
-    unsafe { _mm_cvtss_f32(input.0) }
-  } else if cfg!(all(not(feature = "no-intrinsics"), target_feature = "wasm32")) {
-    unsafe { f32x4_extract_lane(input.0, 0) }
-  } else {
-    input.0
+#[inline]
+impl Vec4 {
+  fn x(self) -> f32 {
+    if cfg!(all(not(feature = "no-intrinsics"), target_feature = "sse2")) {
+      unsafe { _mm_cvtss_f32(input.0) }
+    } else if cfg!(all(not(feature = "no-intrinsics"), target_feature = "wasm32")) {
+      unsafe { f32x4_extract_lane(input.0, 0) }
+    } else {
+      input.0
+    }
   }
+}
 ```
 
 This looks much better in principle but it doesn't compile. The problem here is the compiler still
@@ -114,23 +121,95 @@ That is the definition of the problem, let's look at the different approaches I'
 
 # Conditional compilation by module
 
-At the moment different implementations are split into different modules, e.g.  for `Vec4`:
-* vec4_f32.rs - scalar f32 `struct Vec4` declaration and implementation
-* vec4_sse2.rs - SSE2 SIMD `struct Vec4` declaration and implementation vec4.rs
-* - common methods use by both implementations
+This approach splits the different implementations for each architecture into it's own module and
+then exports the appropriate module at compile time. This is the first approach I took in glam.
+Continuing with the above example, separating into modules looks like so:
+
+```rust
+// vec4_sse2.rs
+pub struct Vec4(__m128);
+impl Vec4 {
+  pub fn x(self) -> f32 {
+    unsafe { _mm_cvtss_f32(input.0) }
+  }
+}
+```
+
+```rust
+// file: vec4_wasm32.rs
+pub struct Vec4(f32x4);
+impl Vec4 {
+  pub fn x(self) -> f32 {
+    unsafe { f32x4_extract_lane(input.0) }
+  }
+}
+```
+
+```rust
+// file: vec4_f32.rs
+pub struct Vec4(f32, f32, f32, f32);
+impl Vec4 {
+  pub fn x(self) -> f32 {
+    input.0
+  }
+}
+```
+
+```rust
+// file: lib.rs
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
+mod vec4_sse2;
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
+mod vec4_wasm32;
+#[cfg(any(feature = "no-intrinsics, not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+mod vec4_f32;
+
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
+pub use vec4_sse2::*;
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
+pub use vec4_wasm32::*;
+#[cfg(any(feature = "no-intrinsics, not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+pub use vec4_f32::*;
+
+impl Vec4 {
+  // common implementations
+}
+```
+
+This simple code sample probably looks verbose compared to earlier samples, however when the module
+contains 50 or so functions a complete absense of any `cfg` checks inside the module is quite
+pleasant.
 
 The advantages of doing things this way are:
-* Keeps different implementations separate, so there's no need for `#[cfg(...)]`
-* blocks everywhere, just where the modules are imported The code is simple - if
-* you are debugging SSE2 it's straight Rust code and just the SSE2
-* implementation
+* Keeps different implementations separate, so there's no need for `#[cfg(...)]` blocks in every
+  method.
+* The implementation for each architecture is normal code and easy to read.
 
-However, there are a number of downsides to this approach:
-* The interface needs to be duplicated for each implementation - this is
-* mitigated somewhat by ensuring the interface has 100% test coverage.
-* Documentation also needs to be duplicated for each implementation - this is a
-* bit more annoying Adding additional architectures will start to make the
-* library difficult to maintain due to the above issues
+However I found a number of downsides to this approach:
+* The interface needs to be duplicated for each implementation - this is mitigated somewhat by
+  ensuring the interface has near 100% test coverage.
+* Documentation also needs to be duplicated for each implementation - this is a bit more annoying
+  Adding additional architectures will start to make the library difficult to maintain due to the
+  above issues
+
+Having to duplicate the interface was annoying and even with a lot of tests sometimes I still made
+mistakes. Having to duplicate the docs to keep `rust doc` happy was really the reason I moved away
+from this method though.
+
+Perhaps another way of doing this would be to have a single public interface with docs and have that
+pull in the architecture specific module with the actual implmentation. That would make it harder to
+not have matching interfaces and there's one place for docs, but it would be a lot more boiler plate
+and I'd need to make all the implementation methods `#[inline(always)]` to avoid overhead,
+especially in non-optimised builds.
+
+# `cfg-if`
+
+Everything is wrapped in a macro.
+
+I found rust `fmt` wouldn't format things inside the macro.
+Debugging an unoptimized build with `gdb` seemed to work OK.
+
+# OLD
 
 In C/C++ the pre-processor makes it pretty easy to support multiple implementations in a function at
 compile time, for example from the Realtime Math library:
@@ -188,9 +267,3 @@ The last block will continue to get more complicated as more target features are
 added. This complexity will be in every function that contains a SIMD
 implementation.
 
-# `cfg-if`
-
-Everything is wrapped in a macro.
-
-I found rust `fmt` wouldn't format things inside the macro.
-Debugging an unoptimized build with `gdb` seemed to work OK.
