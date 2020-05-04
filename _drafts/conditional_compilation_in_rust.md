@@ -114,8 +114,8 @@ impl Vec4 {
 ```
 
 This looks much better in principle but it doesn't compile. The problem here is the compiler still
-tries to parse every block and if you are on a platform that supports SSE2 then the wasm32 module
-won't exist, and vice verse.
+tries to parse every block and if you are on a platform that supports `sse2` then the `wasm32`
+module won't exist, and vice verse.
 
 That is the definition of the problem, let's look at the different approaches I've tried with glam.
 
@@ -177,8 +177,8 @@ impl Vec4 {
 ```
 
 This simple code sample probably looks verbose compared to earlier samples, however when the module
-contains 50 or so functions a complete absense of any `cfg` checks inside the module is quite
-pleasant.
+contains 50 or so functions a complete absence of any `cfg` checks inside each architecture's module
+is quite pleasant.
 
 The advantages of doing things this way are:
 * Keeps different implementations separate, so there's no need for `#[cfg(...)]` blocks in every
@@ -197,73 +197,57 @@ mistakes. Having to duplicate the docs to keep `rust doc` happy was really the r
 from this method though.
 
 Perhaps another way of doing this would be to have a single public interface with docs and have that
-pull in the architecture specific module with the actual implmentation. That would make it harder to
-not have matching interfaces and there's one place for docs, but it would be a lot more boiler plate
-and I'd need to make all the implementation methods `#[inline(always)]` to avoid overhead,
+pull in the architecture specific module with the actual implementation. That would make it harder
+to not have matching interfaces and there's one place for docs, but it would be a lot more boiler
+plate and I'd need to make all the implementation methods `#[inline(always)]` to avoid overhead,
 especially in non-optimised builds.
+
+I could have also created trait for each type and make each architecture implement it, which would
+mean documenting the trait and not each implementation and would mean there were no missing
+implementations. The trait would have to be public to do this though and at that point it seemed
+like I'm leaking internal implementation details to users.
 
 # `cfg-if`
 
-Everything is wrapped in a macro.
-
-I found rust `fmt` wouldn't format things inside the macro.
-Debugging an unoptimized build with `gdb` seemed to work OK.
-
-# OLD
-
-In C/C++ the pre-processor makes it pretty easy to support multiple implementations in a function at
-compile time, for example from the Realtime Math library:
-
-```cpp
-inline float RTM_SIMD_CALL vector_get_x(vector4f_arg0 input) RTM_NO_EXCEPT
-{
-#if defined(RTM_SSE2_INTRINSICS)
-  return _mm_cvtss_f32(input);
-#elif defined(RTM_NEON_INTRINSICS)
-  return vgetq_lane_f32(input, 0);
-#else
-  return input.x;
-#endif
-}
-```
-
-There are a few reasons why this is difficult to do in Rust. For one,
-`RTM_SSE2_INTRINSICS` is itself a define which is based on definitions from the
-build system:
-
-```cpp
-#if !defined(RTM_NO_INTRINSICS)
-  #if defined(__SSE2__) || defined(_M_IX86) || defined(_M_X64)
-    #define RTM_SSE2_INTRINSICS
-  #endif
-#endif
-```
-
-As far as I know, Rust can't create new `cfg` features in Rust code like you can
-in C++. This could be done using a `build.rs` which might be an OK option but
-`build.rs` itself is a little controversial even if using if for this purpose
-wouldn't be. Because it's not easy to create new feature flags programmatically,
-the `cfg` blocks become complicated. The above block of code from Realtime Math translated
-to Rust would be:
+The `cfg-if` crate is probably the de facto solution to this problem in the Rust ecosystem. The
+crate provides the `cfg_if` macro which supports similar functionality to the `if/else if/else`
+branches of the C preprocessor. Here's our familiar sample code using `cfg_if`.
 
 ```rust
-fn vector_get_x(input: Vector4f) -> f32 {
-  #[cfg(all(target_feature = "sse2", not(feature = "rtm-no-intrinsics")))]
-  {
-    unsafe { _mm_cvtss_f32(input) }
-  }
-  #[cfg(all(target_feature = "arm-neon", not(feature = "rtm-no-intrinsics")))]
-  {
-    unsafe { vgetq_lane_f32(input, 0) }
-  }
-  #[cfg(any(not(any(target_feature = "sse2", target_feature = "arm-neon")), feature = "rtm-no-intrinsics"))]
-  {
-    input.x
+impl Vec4 {
+  pub fn x(self) -> f32 {
+    cfg_if! {
+      if #[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))] {
+        unsafe { _mm_cvtss_f32(self.0) }
+      } else if #[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))] {
+        unsafe { f32x4_extract_lane(input.0) }
+      } else {
+        self.0
+      }
+    }
   }
 }
 ```
 
-The last block will continue to get more complicated as more target features are
-added. This complexity will be in every function that contains a SIMD
-implementation.
+This is a pretty good option for mimicking the functionality provided by the C Preprocessor and
+nicely solves the convoluted `else` block problem you run into using Rust's `cfg` attribute on it's
+own, but I ran into a few problems.
+
+Aesthetically, I didn't like having to wrap almost all of the glam code in a macro. This is a bit of
+a personal preference but I did run into a couple of tooling issues also.
+
+[Rustfmt] did not format code blocks inside `cfg_if` macros. I like being able to write code fast
+and messy and then running `cargo fmt` to tidy it up when I'm done, so this was a bit of a
+hindrance to my workflow. The other tooling problem was that [tarpaulin], the code coverage tool I
+am using did not like `cfg_if` at all it seemed and my test coverage mysteriously dropped from 87%
+to 73% which was a bit annoying.
+
+The tooling issues are nothing to do with `cfg_if` and are most probably bugs that may well get
+fixed one day, but until that happens it felt like I'd gone backwards a bit.
+
+# `build.rs`
+
+The `cfg_if` macro solves the convoluted `else` block problem that you encounter when using the
+`cfg` attribute on it's own, but the other problem I wanted to solve was my `if` blocks were also a
+bit complicated and they were duplicated in every method.
 
