@@ -249,5 +249,31 @@ fixed one day, but until that happens it felt like I'd gone backwards a bit.
 
 The `cfg_if` macro solves the convoluted `else` block problem that you encounter when using the
 `cfg` attribute on it's own, but the other problem I wanted to solve was my `if` blocks were also a
-bit complicated and they were duplicated in every method.
+bit complicated and they were duplicated in every method. What I really wanted was the C
+Preprocessor's ability to create new defines. While you can't do this in your crate, you can do it
+from [`build.rs`]. 
 
+The idea here is simplify the `feature` and `target_feature` options into a single config. The other
+idea is to create a `cfg` for what would be the `else` condition. The advantage of doing this in the
+`build.rs` is I only need to maintain this complicated condition in one place, and I can use normal
+rust code to define it.
+
+```rust
+// build.rs
+fn main() {
+  let force_no_intrinsics = env::var("CARGO_FEATURE_NO_INTRINSICS").is_ok();
+
+  let target_feature_sse2 = env::var("CARGO_CFG_TARGET_FEATURE")
+    .map_or(false, |cfg| cfg.split(',').find(|&f| f == "sse2").is_some());
+
+  if target_feature_sse2 && !force_no_intrinsics {
+    println!("cargo:rustc-cfg=vec4sse2");
+  } else if target_feature_wasm32 && !force_no_intrinsics {
+    println!("cargo:rustc-cfg=vec4wasm32");
+  } else {
+    println!("cargo:rustc-cfg=vec4f32");
+  }
+}
+```
+
+[`build.rs]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
