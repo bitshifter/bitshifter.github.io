@@ -10,6 +10,8 @@ different implementations for multiple architectures. That is to use the
 preprocessor to select the appropriate implementation at compile time. This
 pattern is frequently used in C++ math libraries.
 
+<!--more-->
+
 For example, the C++ [Realtime Math] library sets up it's own defines based on
 definitions passed in from the build system:
 
