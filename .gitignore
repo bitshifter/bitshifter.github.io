@@ -43,6 +43,7 @@ validation-report.json
 
 # Folders to ignore
 node_modules
+vendor
 
 # Bundle
 Gemfile.lock
