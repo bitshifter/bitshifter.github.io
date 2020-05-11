@@ -82,7 +82,7 @@ attribute?
 
 In some ways Rust is simpler in that we only need to check `target_feature =
 sse2` instead of multiple vendor specific compiler flags in C or C++, however
-unline `#define` we are unable to introduce a new `feature` in Rust code. These
+unlike `#define` we are unable to introduce a new `feature` in Rust code. These
 can only come from the build system. I will come back to this point later one.
 
 Perhaps instead of setting our own define lets just make these `cfg` checks
@@ -129,7 +129,7 @@ impl Vec4 {
 This looks much better in principle but it doesn't compile. The problem here is
 the compiler still tries to parse every conditional block regardless and if you
 are on a platform that supports `sse2` then the `wasm32` module won't exist, and
-vice verse.
+vice versa.
 
 That is the definition of the problem I'm trying to solve, let's look at the
 different approaches I've tried with glam.
