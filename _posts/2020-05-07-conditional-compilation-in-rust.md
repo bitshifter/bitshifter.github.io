@@ -351,3 +351,9 @@ This is the end of my journey in conditional compilation in Rust, for now. I'm
 not totally sure I'll stick with the solution I've got. If I were to support
 many architectures in glam it may get too unwieldy to continue doing things this
 way, but that is a future problem.
+
+If you have an comments or feedback you can reply to my posts on [/r/rust] or
+[twitter].
+
+[/r/rust]: https://www.reddit.com/r/rust/comments/ghkunu/yak_shaving_conditional_compilation_in_rust/
+[twitter]: https://twitter.com/bitshifternz/status/1259787546927566849
