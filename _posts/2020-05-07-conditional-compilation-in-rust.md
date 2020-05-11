@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Conditional compilation in Rust
+title: Yak shaving conditional compilation in Rust
 excerpt_separator: <!--more-->
 tags: performance profiling
 ---
@@ -54,38 +54,36 @@ There is nothing quite the same as the C preprocessor in Rust. That is generally
 considered a good thing, however when it comes to the above idiom there is
 nothing I've found in Rust that feels quite as convenient.
 
-I've tried three different approaches to this problem in [glam] which I'll
-discuss the pros on cons of here. Perhaps first though, let's talk about the
-primary features that Rust provides to solve this problem.
+I've tried three different approaches to solving this problem in [glam] which
+I'll discuss the pros on cons of here. Perhaps first though, let's talk about
+the primary features that Rust provides to solve this problem.
 
 [glam]: https://github.com/bitshifter/glam-rs
 
 ## `cfg` attributes
 
-Source code can be conditionally compiled using the attributes `cfg` and
-`cfg_attr` and the built-in `cfg!` macro. These conditions are based on the
-target architecture of the compiled crate, arbitrary values passed to the
-compiler, and so on. Usually for SIMD we're interested in `target_arch`,
-`target_feature` and our own crate's `feature`s.
+Rust code can be conditionally compiled using the attributes `cfg` and
+`cfg_attr` and the built-in `cfg!` macro. These can be used to check conditions
+like the target architecture of the compiled crate, enabled features passed to
+the compiler by cargo, and so on. Usually for SIMD we're interested in
+`target_arch`, `target_feature` and our own crate's `feature` flags.
 
 See the [conditional compilation] section of the Rust book for more details.
 
 [conditional compilation]: https://doc.rust-lang.org/1.9.0/book/conditional-compilation.html
 
-Can we achieve the same thing as the C/C++ example above using `cfg`?
+Can we achieve the same thing as the C/C++ example above using the `cfg`
+attribute?
 
 ```rust
 #[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
 // now what?
 ```
 
-Rust is simpler in that we only need to check `target_feature = sse` but at
-that point we're stuck, we can't set a `feature` in Rust code, these can only
-come from the build system. I will come back to this point later one.
-
-There are some other differences also. There is not `else` with the attribute
-check which is why we check that `not(feature = "no-intrinsics")` is checked
-here.
+In some ways Rust is simpler in that we only need to check `target_feature =
+sse2` instead of multiple vendor specific compiler flags in C or C++, however
+unline `#define` we are unable to introduce a new `feature` in Rust code. These
+can only come from the build system. I will come back to this point later one.
 
 Perhaps instead of setting our own define lets just make these `cfg` checks
 in our function.
@@ -98,17 +96,17 @@ impl Vec4 {
     unsafe { _mm_cvtss_f32(self.0) }
     #[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
     unsafe { f32x4_extract_lane(self.0, 0) }
-    #[cfg(any(feature = "no-intrinsics, not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+    #[cfg(any(feature = "no-intrinsics", not(any(target_feature = "sse2", target_feature = "wasm32"))))]
     { self.0 }
   }
 }
 ```
 
-The lack of an `else` equivalent is making this a lot more verbose than the C
-preprocessor version.  It might be okay for one or two methods, but not for
-hundreds. Also there would be a combinatorial explosion every time a new
-`target_feature` is supported - the fallback `cfg` check is going to get even
-more complex.
+The lack of an `else` equivalent means this final fallback `cfg` check is lot
+more verbose than the C preprocessor version.  It might be okay for one or two
+methods, but not for hundreds. Also there would be a combinatorial explosion
+every time a new `target_feature` is supported - the fallback `cfg` check is
+going to get even more complex.
 
 If you are familiar with Rust you might be thinking we could use the `cfg!`
 macro here, let's consider that:
@@ -194,7 +192,7 @@ impl Vec4 {
 }
 ```
 
-This simple code sample probably looks verbose compared to earlier samples,
+This simple code sample probably looks verbose compared to the earlier example,
 however when the module contains 50 or so functions a complete absence of any
 `cfg` checks inside each architecture's module implementation is quite pleasant.
 
@@ -204,10 +202,11 @@ The advantages of doing things this way are:
   `#[cfg(...)]` blocks in every method.
 * The implementation for each architecture is normal code and easy to read.
 
-However I found a number of downsides to this approach:
+Unfortunately I found a number of downsides to this approach:
 
 * The interface needs to be duplicated for each implementation - this is
-  mitigated somewhat by ensuring the interface has near 100% test coverage.
+  mitigated in glam somewhat by ensuring the interface has near 100% test
+  coverage.
 * Documentation also needs to be duplicated for each implementation - this is a
   bit more annoying Adding additional architectures will start to make the
   library difficult to maintain due to the above issues
@@ -280,6 +279,8 @@ every method. What I really wanted was the C preprocessor ability to create
 new defines. While you can't do this in your crate, you can do it from
 [`build.rs`].
 
+[`build.rs`]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
+
 The idea here is simplify the `feature` and `target_feature` options into a
 single `cfg` check. The other idea is to create a `cfg` for what would be the
 `else` condition. The advantage of doing this in the `build.rs` is I only need
@@ -303,8 +304,6 @@ fn main() {
   }
 }
 ```
-
-[`build.rs]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
 
 Then in my Rust code I can check for this with the `cfg` attribute.
 
