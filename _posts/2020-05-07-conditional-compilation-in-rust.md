@@ -12,7 +12,7 @@ pattern is frequently used in C++ math libraries.
 
 <!--more-->
 
-For example, the C++ [Realtime Math] library sets up it's own defines based on
+For example, the C++ [Realtime Math] library sets up its own defines based on
 definitions passed in from the build system:
 
 [Realtime Math]: https://github.com/nfrechette/rtm
@@ -85,7 +85,7 @@ sse2` instead of multiple vendor specific compiler flags in C or C++, however
 unlike `#define` we are unable to introduce a new `feature` in Rust code. These
 can only come from the build system. I will come back to this point later one.
 
-Perhaps instead of setting our own define lets just make these `cfg` checks
+Perhaps instead of setting our own define let's just make these `cfg` checks
 in our function.
 
 ```rust
