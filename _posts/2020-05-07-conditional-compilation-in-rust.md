@@ -116,11 +116,11 @@ macro here, let's consider that:
 impl Vec4 {
   fn x(self) -> f32 {
     if cfg!(all(not(feature = "no-intrinsics"), target_feature = "sse2")) {
-      unsafe { _mm_cvtss_f32(input.0) }
+      unsafe { _mm_cvtss_f32(self.0) }
     } else if cfg!(all(not(feature = "no-intrinsics"), target_feature = "wasm32")) {
-      unsafe { f32x4_extract_lane(input.0, 0) }
+      unsafe { f32x4_extract_lane(self.0, 0) }
     } else {
-      input.0
+      self.0
     }
   }
 }
@@ -145,8 +145,10 @@ separating into modules looks like so:
 // vec4_sse2.rs
 pub struct Vec4(__m128);
 impl Vec4 {
+  /// Returns element `x`.
+  #[inline]
   pub fn x(self) -> f32 {
-    unsafe { _mm_cvtss_f32(input.0) }
+    unsafe { _mm_cvtss_f32(self.0) }
   }
 }
 ```
@@ -155,8 +157,10 @@ impl Vec4 {
 // file: vec4_wasm32.rs
 pub struct Vec4(f32x4);
 impl Vec4 {
+  /// Returns element `x`.
+  #[inline]
   pub fn x(self) -> f32 {
-    unsafe { f32x4_extract_lane(input.0) }
+    unsafe { f32x4_extract_lane(self.0) }
   }
 }
 ```
@@ -165,8 +169,10 @@ impl Vec4 {
 // file: vec4_f32.rs
 pub struct Vec4(f32, f32, f32, f32);
 impl Vec4 {
+  /// Returns element `x`.
+  #[inline]
   pub fn x(self) -> f32 {
-    input.0
+    self.0
   }
 }
 ```
@@ -177,14 +183,14 @@ impl Vec4 {
 mod vec4_sse2;
 #[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
 mod vec4_wasm32;
-#[cfg(any(feature = "no-intrinsics, not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+#[cfg(any(feature = "no-intrinsics", not(any(target_feature = "sse2", target_feature = "wasm32"))))]
 mod vec4_f32;
 
 #[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
 pub use vec4_sse2::*;
 #[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
 pub use vec4_wasm32::*;
-#[cfg(any(feature = "no-intrinsics, not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+#[cfg(any(feature = "no-intrinsics", not(any(target_feature = "sse2", target_feature = "wasm32"))))]
 pub use vec4_f32::*;
 
 impl Vec4 {
@@ -219,6 +225,9 @@ You can see an example of this approach in [glam 0.8.5].
 
 [glam 0.8.5]: https://github.com/bitshifter/glam-rs/blob/0.8.5/src/f32/vec4_f32.rs
 
+Some improvements to this approach were suggested on reddit, see the addendum
+at the end of this post for more details.
+
 ## cfg-if
 
 The [cfg-if] crate is probably the de facto solution to this problem in the Rust
@@ -230,12 +239,14 @@ our familiar sample code using `cfg_if`.
 
 ```rust
 impl Vec4 {
+  /// Returns element `x`.
+  #[inline]
   pub fn x(self) -> f32 {
     cfg_if! {
       if #[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))] {
         unsafe { _mm_cvtss_f32(self.0) }
       } else if #[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))] {
-        unsafe { f32x4_extract_lane(input.0) }
+        unsafe { f32x4_extract_lane(self.0) }
       } else {
         self.0
       }
@@ -319,7 +330,7 @@ impl Vec4 {
 
     #[cfg(vec4wasm32)]
     unsafe {
-      f32x4_extract_lane(input.0)
+      f32x4_extract_lane(self.0)
     }
 
     #[cfg(vec4f32)]
@@ -351,6 +362,83 @@ This is the end of my journey in conditional compilation in Rust, for now. I'm
 not totally sure I'll stick with the solution I've got. If I were to support
 many architectures in glam it may get too unwieldy to continue doing things this
 way, but that is a future problem.
+
+## By modules addendum
+
+[CAD1197 suggested some improvements] to my by module approach which would
+address both the duplicated documentation and inconsistent public interface
+issues I was seeing in my original implementation. The idea is a public
+interface calls an internal method which is implemented in conditionally
+compiled modules.
+
+[CAD1197 suggested some improvements]: https://www.reddit.com/r/rust/comments/ghkunu/yak_shaving_conditional_compilation_in_rust/fqac3cm/
+
+```rust
+// file: vec4.rs
+// public interface with docs
+
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
+mod vec4_sse2;
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
+mod vec4_wasm32;
+#[cfg(any(feature = "no-intrinsics", not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+mod vec4_f32;
+
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "sse2"))]
+pub struct Vec4(__m128);
+
+#[cfg(all(not(feature = "no-intrinsics"), target_feature = "wasm32"))]
+pub struct Vec4(f32x4);
+
+#[cfg(any(feature = "no-intrinsics", not(any(target_feature = "sse2", target_feature = "wasm32"))))]
+pub struct Vec4(f32, f32, f32, f32);
+
+impl Vec4 {
+  /// Returns element `x`.
+  #[inline]
+  pub fn x(self) -> f32 {
+    self._x()
+  }
+}
+```
+
+```rust
+// vec4_sse2.rs
+use super::Vec4;
+impl Vec4 {
+  #[inline(always)]
+  pub(super) fn _x(self) -> f32 {
+    unsafe { _mm_cvtss_f32(self.0) }
+  }
+}
+```
+
+```rust
+// file: vec4_wasm32.rs
+use super::Vec4;
+impl Vec4 {
+  #[inline(always)]
+  pub(super) fn _x(self) -> f32 {
+    unsafe { f32x4_extract_lane(self.0) }
+  }
+}
+```
+
+```rust
+// file: vec4_f32.rs
+use super::Vec4;
+impl Vec4 {
+  #[inline(always)]
+  pub(super) fn _x(self) -> f32 {
+    self.0
+  }
+}
+```
+
+I think if I were to support a lot of different architectures in glam I would
+switch to this approach. There is a lot more boilerplate than my current
+solution, however once the API is stable the boilerplate won't need to change
+often.
 
 If you have an comments or feedback you can reply to my posts on [/r/rust] or
 [twitter].
