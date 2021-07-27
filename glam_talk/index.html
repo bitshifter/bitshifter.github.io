@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>glam talk</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# glam
+
+---
+
+# Agenda
+
+1. About me
+1. What is glam
+  * crates.io
+  * projects using glam
+2. Rust for games
+  * replace C++
+  * data race freedom
+  * elegance
+3. Why another math crate?
+  * confused by existing crates
+  * fast math (see path tracer)
+  * simple
+    * no generics
+    * no traits
+    * live with a little duplication
+    * documented (rust doc)
+    * tested
+    * benchmarked (mathbench)
+4. Going public
+5. Conditional compilation - 0.8.5 to 0.8.6 to 0.8.7
+6. The bevy effect
+   * more users, more features
+7. Rust GPU appears
+8. Support more types
+   * Increased complexity
+   * Lost readability
+
+7. Coming back to features versus complexity which drove initial design - limiting scope and features keeps things simple. What is the right balance?
+
+8. Where to from here?
+  * other architectures
+  * try and fix readability
+
+
+
+---
+
+# Introduction
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
