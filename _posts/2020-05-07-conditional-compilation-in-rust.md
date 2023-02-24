@@ -440,8 +440,6 @@ switch to this approach. There is a lot more boilerplate than my current
 solution, however once the API is stable the boilerplate won't need to change
 often.
 
-If you have an comments or feedback you can reply to my posts on [/r/rust] or
-[twitter].
+If you have an comments or feedback you can reply to my posts on [/r/rust].
 
 [/r/rust]: https://www.reddit.com/r/rust/comments/ghkunu/yak_shaving_conditional_compilation_in_rust/
-[twitter]: https://twitter.com/bitshifternz/status/1259787546927566849
