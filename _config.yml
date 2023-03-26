@@ -21,7 +21,6 @@ description: > # this means to ignore newlines until "baseurl:"
   Maybe this will be a blog about programming in C, C++ and Rust.
   Or maybe it will be a desolate wasteland of infrequent posts and spam bot
   comments.
-twitter_username: bitshifternz
 github_username:  bitshifter
 
 # Markdown
@@ -39,8 +38,7 @@ sass:
 # About/contact
 author:
   name:              Cameron Hart
-  url:               https://twitter.com/bitshifternz
-#  email:             cameron.hart@gmail.com
+  url:               https://mastodon.gamedev.place/@bitshifter
 
 # Plugins
 plugins:
